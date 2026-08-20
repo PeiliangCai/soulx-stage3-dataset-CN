@@ -10,6 +10,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import sys
 import time
 from typing import Any, Iterable, Sequence
@@ -43,6 +44,14 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sha256_lines(lines: Sequence[str]) -> str:
+    digest = hashlib.sha256()
+    for line in lines:
+        digest.update(line.encode("utf-8"))
+        digest.update(b"\n")
+    return digest.hexdigest()
+
+
 def discover_samples(root: Path, language: str) -> list[EasyTurnSample]:
     root = root.resolve(strict=True)
     if language not in {"en", "zh"}:
@@ -67,6 +76,30 @@ def discover_samples(root: Path, language: str) -> list[EasyTurnSample]:
     if counts != expected[language]:
         raise ValueError(f"unexpected Easy Turn inventory for {language}: {counts}")
     return samples
+
+
+def select_sample_subset(
+    samples: Sequence[EasyTurnSample],
+    limit: int | None = None,
+    limit_per_label: int | None = None,
+) -> list[EasyTurnSample]:
+    if limit is not None and limit_per_label is not None:
+        raise ValueError("--limit and --limit-per-label are mutually exclusive")
+    if limit is not None:
+        if limit <= 0:
+            raise ValueError("--limit must be positive")
+        return list(samples[:limit])
+    if limit_per_label is not None:
+        if limit_per_label <= 0:
+            raise ValueError("--limit-per-label must be positive")
+        return [
+            sample
+            for label in ("complete", "incomplete")
+            for sample in [item for item in samples if item.label == label][
+                :limit_per_label
+            ]
+        ]
+    return list(samples)
 
 
 def load_audio_16k_mono(path: Path) -> tuple[np.ndarray, dict[str, Any]]:
@@ -174,8 +207,69 @@ def summarize(records: Sequence[dict[str, Any]]) -> dict[str, Any]:
     return summary
 
 
+def progress_path_for(output: Path) -> Path:
+    return output.with_name(f".{output.name}.progress.jsonl")
+
+
+def load_or_create_progress(
+    path: Path, run_metadata: dict[str, Any], resume: bool
+) -> tuple[str, list[dict[str, Any]]]:
+    if path.exists():
+        if not resume:
+            raise FileExistsError(
+                f"unfinished progress exists; pass --resume after verifying it: {path}"
+            )
+        with path.open("r", encoding="utf-8") as handle:
+            lines = [line for line in handle if line.strip()]
+        if not lines:
+            raise ValueError(f"empty progress journal: {path}")
+        header = json.loads(lines[0])
+        if header.get("kind") != "header" or header.get("schema_version") != 1:
+            raise ValueError(f"invalid progress header: {path}")
+        if header.get("run") != run_metadata:
+            raise ValueError("progress journal does not match the requested benchmark")
+        records = []
+        seen = set()
+        for line_number, line in enumerate(lines[1:], start=2):
+            item = json.loads(line)
+            if item.get("kind") != "record" or not isinstance(item.get("record"), dict):
+                raise ValueError(f"invalid progress record at line {line_number}: {path}")
+            record = item["record"]
+            sample_id = record.get("sample_id")
+            if not sample_id or sample_id in seen:
+                raise ValueError(f"duplicate or missing sample_id at line {line_number}: {path}")
+            seen.add(sample_id)
+            records.append(record)
+        return str(header["started_at"]), records
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    header = {
+        "kind": "header",
+        "schema_version": 1,
+        "started_at": started_at,
+        "run": run_metadata,
+    }
+    with path.open("x", encoding="utf-8") as handle:
+        handle.write(json.dumps(header, ensure_ascii=False, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return started_at, []
+
+
+def append_progress_record(path: Path, record: dict[str, Any]) -> None:
+    item = {"kind": "record", "record": record}
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(item, ensure_ascii=False, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
 def load_official_turn_model(
-    official_root: Path, config_path: Path, paraformer_model_dir: Path | None = None
+    official_root: Path,
+    config_path: Path,
+    paraformer_model_dir: Path | None = None,
+    sensevoice_model_dir: Path | None = None,
 ) -> Any:
     official_root = official_root.resolve(strict=True)
     config_path = config_path.resolve(strict=True)
@@ -210,6 +304,72 @@ def load_official_turn_model(
                         return ""
 
             asr_module.ParaformerASR = LocalParaformerASR
+        if sensevoice_model_dir is not None:
+            sensevoice_model_dir = sensevoice_model_dir.resolve(strict=True)
+            asr_module = importlib.import_module("model.asr")
+
+            class LocalSensevoiceASR:
+                def __init__(self, language="auto"):
+                    from funasr import AutoModel
+                    from funasr.utils.postprocess_utils import (
+                        rich_transcription_postprocess,
+                    )
+
+                    self.sensevoice_model = AutoModel(
+                        model=str(sensevoice_model_dir),
+                        trust_remote_code=False,
+                        device="cuda",
+                        disable_pbar=True,
+                        disable_update=True,
+                    )
+                    self.language = language
+                    remove_set = {
+                        "😊",
+                        "😔",
+                        "😡",
+                        "😰",
+                        "🤢",
+                        "😮",
+                        "🎼",
+                        "👏",
+                        "😀",
+                        "😭",
+                        "🤧",
+                        "😷",
+                    }
+                    self.pattern = "[" + "".join(remove_set) + "]"
+                    self.rich_transcription_postprocess = (
+                        rich_transcription_postprocess
+                    )
+
+                def clean_sensevoice_text(self, value: str) -> str:
+                    if not re.search(r"[\u4e00-\u9fff]|[a-zA-Z]", value):
+                        return ""
+                    return re.sub(self.pattern, "", value)
+
+                def recognize(self, audio_chunk, sample_rate=16_000, language=None):
+                    if audio_chunk.ndim > 1:
+                        audio_chunk = audio_chunk.mean(axis=1)
+                    if sample_rate != 16_000:
+                        audio_chunk = soxr.resample(audio_chunk, sample_rate, 16_000)
+                    if language is None:
+                        language = self.language
+                    try:
+                        result = self.rich_transcription_postprocess(
+                            self.sensevoice_model.generate(
+                                input=audio_chunk,
+                                cache={},
+                                language=language,
+                                use_itn=True,
+                                batch_size=16,
+                            )[0]["text"]
+                        ).strip()
+                        return self.clean_sensevoice_text(result)
+                    except Exception as exc:
+                        print(f"ASR recognition failed: {exc}")
+                        return ""
+
+            asr_module.SensevoiceASR = LocalSensevoiceASR
         service_model = importlib.import_module("service.model")
         turn_model = service_model.TurnModel(str(config_path))
     finally:
@@ -226,9 +386,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--official-root", type=Path, required=True)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--paraformer-model-dir", type=Path)
+    parser.add_argument("--sensevoice-model-dir", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--tail-silence-ms", type=int, default=1600)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--limit-per-label", type=int)
+    parser.add_argument("--resume", action="store_true")
     return parser
 
 
@@ -238,32 +401,62 @@ def main(argv: Sequence[str] | None = None) -> int:
     if output.exists():
         raise FileExistsError(f"refusing to overwrite output: {output}")
     samples = discover_samples(args.dataset_root, args.language)
-    if args.limit is not None:
-        if args.limit <= 0:
-            raise ValueError("--limit must be positive")
-        samples = samples[: args.limit]
-    turn_model = load_official_turn_model(
-        args.official_root, args.config, args.paraformer_model_dir
+    samples = select_sample_subset(samples, args.limit, args.limit_per_label)
+    resolved_dataset_root = args.dataset_root.resolve(strict=True)
+    resolved_official_root = args.official_root.resolve(strict=True)
+    resolved_config = args.config.resolve(strict=True)
+    resolved_paraformer = (
+        args.paraformer_model_dir.resolve(strict=True)
+        if args.paraformer_model_dir is not None
+        else None
     )
-    records = []
-    for sample in samples:
+    resolved_sensevoice = (
+        args.sensevoice_model_dir.resolve(strict=True)
+        if args.sensevoice_model_dir is not None
+        else None
+    )
+    run_metadata = {
+        "language": args.language,
+        "dataset_root": str(resolved_dataset_root),
+        "official_root": str(resolved_official_root),
+        "config_path": str(resolved_config),
+        "config_sha256": sha256_file(resolved_config),
+        "benchmark_runner_sha256": sha256_file(Path(__file__)),
+        "paraformer_model_dir": str(resolved_paraformer) if resolved_paraformer else None,
+        "sensevoice_model_dir": str(resolved_sensevoice) if resolved_sensevoice else None,
+        "tail_silence_ms": args.tail_silence_ms,
+        "sample_count": len(samples),
+        "sample_inventory_sha256": sha256_lines([sample.sample_id for sample in samples]),
+    }
+    progress_path = progress_path_for(output)
+    started_at, records = load_or_create_progress(progress_path, run_metadata, args.resume)
+    selected_ids = {sample.sample_id for sample in samples}
+    completed_ids = {record["sample_id"] for record in records}
+    if not completed_ids <= selected_ids:
+        raise ValueError("progress journal contains samples outside the requested inventory")
+    remaining = [sample for sample in samples if sample.sample_id not in completed_ids]
+    resumed_record_count = len(records)
+    turn_model = None
+    if remaining:
+        turn_model = load_official_turn_model(
+            resolved_official_root,
+            resolved_config,
+            resolved_paraformer,
+            resolved_sensevoice,
+        )
+    for sample in remaining:
+        assert turn_model is not None
         record = evaluate_sample(turn_model, sample, args.tail_silence_ms)
         records.append(record)
+        append_progress_record(progress_path, record)
         print(json.dumps({k: record[k] for k in ("sample_id", "label", "prediction", "correct")}, ensure_ascii=False))
     payload = {
         "schema_version": 1,
-        "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "language": args.language,
-        "dataset_root": str(args.dataset_root.resolve(strict=True)),
-        "official_root": str(args.official_root.resolve(strict=True)),
-        "config_path": str(args.config.resolve(strict=True)),
-        "paraformer_model_dir": (
-            str(args.paraformer_model_dir.resolve(strict=True))
-            if args.paraformer_model_dir is not None
-            else None
-        ),
-        "tail_silence_ms": args.tail_silence_ms,
+        "started_at": started_at,
+        "completed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        **run_metadata,
         "modelscope_cache": os.getenv("MODELSCOPE_CACHE"),
+        "resumed_record_count": resumed_record_count,
         "summary": summarize(records),
         "records": records,
     }
@@ -275,6 +468,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         handle.flush()
         os.fsync(handle.fileno())
     temporary.replace(output)
+    progress_path.unlink()
     print(json.dumps(payload["summary"], ensure_ascii=False, sort_keys=True, indent=2))
     return 0
 

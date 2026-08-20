@@ -7,9 +7,12 @@ import soundfile as sf
 
 from duplexconv_stage3.easy_turn_benchmark import (
     EasyTurnSample,
+    append_progress_record,
     attach_raw_state_capture,
     evaluate_sample,
     load_audio_16k_mono,
+    load_or_create_progress,
+    select_sample_subset,
     stream_chunks,
     summarize,
 )
@@ -34,6 +37,39 @@ class FakeTurnModel:
 
 
 class EasyTurnBenchmarkTests(unittest.TestCase):
+    def test_progress_journal_can_resume(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "progress.jsonl"
+            metadata = {"language": "zh", "sample_count": 2}
+            started_at, records = load_or_create_progress(path, metadata, False)
+            self.assertEqual(records, [])
+            append_progress_record(path, {"sample_id": "zh:one"})
+            resumed_at, records = load_or_create_progress(path, metadata, True)
+        self.assertEqual(resumed_at, started_at)
+        self.assertEqual(records, [{"sample_id": "zh:one"}])
+
+    def test_progress_journal_rejects_changed_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "progress.jsonl"
+            load_or_create_progress(path, {"language": "zh"}, False)
+            with self.assertRaisesRegex(ValueError, "does not match"):
+                load_or_create_progress(path, {"language": "en"}, True)
+
+    def test_limit_per_label_selects_both_classes(self):
+        samples = [
+            EasyTurnSample(f"complete-{index}", "zh", "complete", Path("unused"))
+            for index in range(3)
+        ] + [
+            EasyTurnSample(f"incomplete-{index}", "zh", "incomplete", Path("unused"))
+            for index in range(3)
+        ]
+        selected = select_sample_subset(samples, limit_per_label=1)
+        self.assertEqual([sample.label for sample in selected], ["complete", "incomplete"])
+
+    def test_limit_modes_are_mutually_exclusive(self):
+        with self.assertRaisesRegex(ValueError, "mutually exclusive"):
+            select_sample_subset([], limit=1, limit_per_label=1)
+
     def test_stream_chunks_pads_audio_and_adds_tail(self):
         audio = np.zeros(2_561, dtype=np.float32)
         chunks = list(stream_chunks(audio, 320))
@@ -74,4 +110,3 @@ class EasyTurnBenchmarkTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
