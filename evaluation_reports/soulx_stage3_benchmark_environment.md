@@ -50,7 +50,7 @@
   -r /root/SoulX-stage3-dataset/requirements/soulx_stage3_benchmark_minimal.txt
 ```
 
-国内 Python/模型源下载前清除遗留代理；只有访问 GitHub、Hugging Face 等国外资源时才启用 AutoDL 代理。不得将 OpenRouter API key 写入依赖清单、日志或 benchmark 结果。
+网络路由按目标端点、本地缓存、实时连通性、稳定性和吞吐综合选择。国内源通常先试直连，GitHub、Hugging Face、OpenRouter 等境外端点通常先试 AutoDL 或已批准代理；任一路线超时或明显更慢时允许切换。下载前做轻量探测，执行记录保留最终路由、失败原因、重试次数和文件哈希。不得将 OpenRouter API key 写入依赖清单、日志或 benchmark 结果。
 
 ## 4. 系统依赖和硬件
 

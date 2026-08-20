@@ -208,7 +208,7 @@ a0b9063843df69619b087b95b74597b2176910b8
 
 两份代码用途必须分开：`training-code` 及其 runtime 用于 Stage 3 训练，`main` worktree 用于复现官方流式推理。不得为了让评测通过而直接修改任一 upstream；必要兼容层放本项目 `src/` 或独立 runtime，并记录 diff。
 
-网络命令必须清除现有 HTTP/HTTPS 遗留代理，再按需要使用 AutoDL `/etc/network_turbo`。clone 后记录 commit、tree hash 和 `git status --short`；upstream 必须保持 clean。
+网络路由按实际端点、缓存命中、连通性、稳定性和吞吐综合选择，不按模型国别设置绝对规则。通常国内源先试直连、GitHub/Hugging Face/OpenRouter 等境外端点先试 AutoDL 或已批准代理；若默认路线超时或明显更慢，可切换后重试。大文件下载前优先确认本地缓存并做轻量连通测试，记录最终路由、失败原因、重试次数和文件哈希。clone 后记录 commit、tree hash 和 `git status --short`；upstream 必须保持 clean。
 
 ## 7. 旧资产删除计划
 
@@ -423,7 +423,7 @@ OPENROUTER_API_KEY=
 - `.env` 加入 `.gitignore`；
 - key 不进入命令行、日志、异常、缓存、Git 或报告；
 - `.env.example` 只含空占位符；
-- 不使用遗留本地 HTTP/HTTPS 代理访问 OpenRouter。
+- OpenRouter 的网络端点是 `openrouter.ai`，路由选择依据该端点的实际连通性和速度，而不是所调用模型的国别；客户端必须显式记录使用环境代理还是强制直连。
 
 使用结构化输出：
 
@@ -818,6 +818,8 @@ estimate_confidence = low
 6. 端到端 Full-Duplex-Bench 使用论文相同系统组件和官方评测脚本；随机组件至少重复 3 次并报告均值、标准差和 seed；
 7. 基线未通过时不得启动正式续训练，不能通过调 test-set 阈值制造一致结果。
 
+协议选择必须先有外部或实现依据，再运行汇总指标。允许的依据仅包括论文、官方代码/配置、官方数据说明和作者确认；禁止根据“哪种规则更接近 89.33%/79.33%”反向选择门限、尾部静音或状态读出。诊断实验全部保留且明确标为 diagnostic。若官方样本级协议仍不可获得，或按唯一预注册协议运行后仍未达到门禁，则 Gate 9 保持关闭并向项目负责人报告阻塞，不以最接近论文的诊断结果代替基线。
+
 ## 18. 实际执行 TODO 与门禁
 
 ### Gate 0：计划确认
@@ -922,12 +924,18 @@ estimate_confidence = low
 - [x] 实现逐样本可审计、可中断续跑的 Easy Turn runner和指标汇总；结果记录环境、代码、配置、模型与样本身份。
 - [ ] 在 checkpoint 对比汇总中补充 paired bootstrap 和 McNemar 统计检验。
 - [x] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 输出和精简 Conda 环境运行链；真实 smoke 分别完成 ZH 2 条和 EN 2 条。论文表 3 的样本级读出协议仍待复现。
+- [x] 完成 ZH 600 条在线服务语义诊断，确认 Complete 269/300、Incomplete 191/300；该结果不计作官方基线。
+- [x] 定向重跑 18 条 `no_decision`：关闭部署 RMS 门限后 14 条为 Incomplete、4 条为 Complete，证明门限只能解释部分差异。
+- [ ] 在查看下一轮汇总结果前冻结 Easy Turn 协议证据表：单声道/重采样、是否使用部署 RMS 门限、尾部静音、终态读取时点和多终态处理均须有官方依据。
+- [ ] 扩展审计轨迹，记录每块 RMS、raw state、service state、ASR 文本和 Complete/Incomplete logits；不得修改官方模型权重或按标签分支处理。
+- [ ] 向作者确认或取得 Easy Turn 样本级评测脚本；至少确认 `far_field_threshold`、尾部静音长度、终态读取规则和预切分音频的结束点处理。
 - [ ] 全量运行官方 checkpoint 的 Easy Turn baseline。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
 
 ### Gate 9：基线一致性
 
 - [ ] Easy Turn 四个类别达到论文对应正确样本数，或差异不超过预定义 ±1 条且原因已完全解释。
+- [ ] 使用在结果前冻结、且有官方依据的唯一协议；没有阈值搜索、规则择优、标签条件分支或样本排除。
 - [ ] Full-Duplex-Bench 主要指标达到预定义复现容差，随机运行统计和环境差异完整。
 - [ ] 固定 baseline predictions、配置、日志、软件/硬件版本和 checksum。
 

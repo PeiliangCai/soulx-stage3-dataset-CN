@@ -17,7 +17,7 @@ from .state_labeling import (
     read_jsonl,
     validate_structured_labels,
 )
-from .openrouter_client import NETWORK_ROUTE_POLICY
+from .openrouter_client import LEGACY_NETWORK_ROUTE_POLICY
 
 
 def finalize_state_labels(
@@ -54,7 +54,7 @@ def finalize_state_labels(
             )
             if result["model"] != MODEL_ID:
                 raise ValueError(f"model drift: {result['model']} != {MODEL_ID}")
-            if result.get("network_route_policy") != NETWORK_ROUTE_POLICY:
+            if result.get("network_route_policy") != LEGACY_NETWORK_ROUTE_POLICY:
                 raise ValueError("network route provenance is missing or wrong")
             providers[str(result.get("provider"))] += 1
             schema_attempts[str(result.get("schema_attempt", 0))] += 1
@@ -75,7 +75,7 @@ def finalize_state_labels(
                     "model_standard_name": MODEL_STANDARD_NAME,
                     "model_api_slug": MODEL_ID,
                     "provider": result.get("provider"),
-                    "network_route_policy": NETWORK_ROUTE_POLICY,
+                    "network_route_policy": LEGACY_NETWORK_ROUTE_POLICY,
                     "prompt_version": request_record["prompt_version"],
                     "prompt_sha256": request_record["prompt_sha256"],
                     "schema_version": request_record["schema_version"],
@@ -154,7 +154,7 @@ def finalize_state_labels(
                 "model_api_slug": MODEL_ID,
                 "request_count": len(results),
                 "event_count": len(qwen_labels),
-                "network_route_policy": NETWORK_ROUTE_POLICY,
+                "network_route_policy": LEGACY_NETWORK_ROUTE_POLICY,
                 "providers": dict(sorted(providers.items())),
                 "schema_attempts": dict(sorted(schema_attempts.items())),
                 "accepted_response_usage": dict(sorted(accepted_usage.items())),

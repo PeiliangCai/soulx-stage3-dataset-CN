@@ -1,8 +1,9 @@
-"""Minimal no-proxy OpenRouter client with strict cache validation."""
+"""Minimal OpenRouter client with explicit routing and strict cache validation."""
 
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import http.client
 import json
@@ -21,8 +22,14 @@ from .state_labeling import (
 )
 
 
-NETWORK_ROUTE_POLICY = "direct-no-proxy-domestic-model-v1"
-DOMESTIC_MODEL_PREFIXES = ("qwen/",)
+LEGACY_NETWORK_ROUTE_POLICY = "direct-no-proxy-domestic-model-v1"
+DEFAULT_NETWORK_ROUTE_POLICY = "environment-proxy-aware-v2"
+DIRECT_NETWORK_ROUTE_POLICY = "direct-no-proxy-v2"
+SUPPORTED_NETWORK_ROUTE_POLICIES = (
+    DEFAULT_NETWORK_ROUTE_POLICY,
+    DIRECT_NETWORK_ROUTE_POLICY,
+    LEGACY_NETWORK_ROUTE_POLICY,
+)
 
 
 class OpenRouterClient:
@@ -33,7 +40,7 @@ class OpenRouterClient:
         timeout_seconds: float = 120,
         http_retries: int = 4,
         schema_retries: int = 2,
-        network_route_policy: str = NETWORK_ROUTE_POLICY,
+        network_route_policy: str = DEFAULT_NETWORK_ROUTE_POLICY,
     ) -> None:
         if not api_key:
             raise ValueError("API key is empty")
@@ -41,11 +48,19 @@ class OpenRouterClient:
         self.timeout_seconds = timeout_seconds
         self.http_retries = http_retries
         self.schema_retries = schema_retries
-        if network_route_policy != NETWORK_ROUTE_POLICY:
+        if network_route_policy not in SUPPORTED_NETWORK_ROUTE_POLICIES:
             raise ValueError(f"unsupported network route policy: {network_route_policy}")
         self.network_route_policy = network_route_policy
-        # An empty ProxyHandler prevents urllib from inheriting HTTP(S)_PROXY.
-        self._opener = request.build_opener(request.ProxyHandler({}))
+        if network_route_policy in {
+            DIRECT_NETWORK_ROUTE_POLICY,
+            LEGACY_NETWORK_ROUTE_POLICY,
+        }:
+            # An empty ProxyHandler prevents urllib from inheriting HTTP(S)_PROXY.
+            self._opener = request.build_opener(request.ProxyHandler({}))
+        else:
+            # Respect the currently selected environment route, including an
+            # AutoDL or user-provided proxy when one is configured.
+            self._opener = request.build_opener()
 
     @staticmethod
     def _body(record: dict[str, Any], messages: list[dict[str, str]]) -> dict[str, Any]:
@@ -119,10 +134,6 @@ class OpenRouterClient:
         raise ValueError("response content is not text")
 
     def execute(self, record: dict[str, Any]) -> dict[str, Any]:
-        if not record["model"].startswith(DOMESTIC_MODEL_PREFIXES):
-            raise ValueError(
-                "the direct/no-proxy policy is only approved for configured domestic models"
-            )
         messages = list(record["messages"])
         last_error: Exception | None = None
         for schema_attempt in range(self.schema_retries + 1):
@@ -189,7 +200,10 @@ def run_requests(
     full_run_confirmation: str | None = None,
     workers: int = 1,
     source_ids: Sequence[str] | None = None,
+    network_route_policy: str = DEFAULT_NETWORK_ROUTE_POLICY,
 ) -> dict[str, Any]:
+    if network_route_policy not in SUPPORTED_NETWORK_ROUTE_POLICIES:
+        raise ValueError(f"unsupported network route policy: {network_route_policy}")
     records = _load_request_records(request_file)
     if source_ids:
         requested_sources = set(source_ids)
@@ -221,13 +235,18 @@ def run_requests(
             validate_structured_labels(
                 {"labels": cached["labels"]}, record["target_event_ids"]
             )
+            cached_route = cached.get("network_route_policy")
+            if cached_route not in SUPPORTED_NETWORK_ROUTE_POLICIES:
+                raise ValueError(f"cache network route provenance is invalid: {cache_path}")
             result = {
                 **cached,
                 "kind": record["kind"],
-                "network_route_policy": NETWORK_ROUTE_POLICY,
             }
         else:
-            client = OpenRouterClient(api_key)
+            client = OpenRouterClient(
+                api_key,
+                network_route_policy=network_route_policy,
+            )
             result = client.execute(record)
             temporary = cache_path.with_suffix(".json.tmp")
             temporary.write_text(
@@ -266,7 +285,10 @@ def run_requests(
             len(item["target_event_ids"]) for item in finalized_results
         ),
         "result_file": str(result_file),
-        "network_route_policy": NETWORK_ROUTE_POLICY,
+        "requested_network_route_policy": network_route_policy,
+        "result_network_route_policy_counts": dict(
+            sorted(Counter(item["network_route_policy"] for item in finalized_results).items())
+        ),
     }
 
 
@@ -280,6 +302,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--full-run-confirmation")
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--source-id", action="append")
+    parser.add_argument(
+        "--network-route-policy",
+        choices=(DEFAULT_NETWORK_ROUTE_POLICY, DIRECT_NETWORK_ROUTE_POLICY),
+        default=DEFAULT_NETWORK_ROUTE_POLICY,
+        help=(
+            "Use environment-proxy-aware-v2 to respect the selected environment "
+            "route, or direct-no-proxy-v2 to bypass proxies explicitly."
+        ),
+    )
     return parser
 
 
@@ -294,6 +325,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         full_run_confirmation=args.full_run_confirmation,
         workers=args.workers,
         source_ids=args.source_id,
+        network_route_policy=args.network_route_policy,
     )
     print(json.dumps(summary, ensure_ascii=False, sort_keys=True, indent=2))
     return 0

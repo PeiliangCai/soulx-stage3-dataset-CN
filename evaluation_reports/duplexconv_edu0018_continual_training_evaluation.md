@@ -207,6 +207,10 @@ estimate_confidence = low
 | --- | --- | ---: | ---: | ---: | --- |
 | ZH | 在线服务语义：`complete` 立即结束，`incomplete` 暂存并继续监听 | 269/300（89.67%） | 191/300（63.67%） | 76.67% | Complete 与论文仅差 1 条，但 Incomplete 少 47 条；不能作为表 3 复现协议 |
 
+`no_decision` 是本项目 runner 的审计结果，不是 SoulX 状态标签：它表示完整音频和预设尾部静音均输入后，按当前读出策略仍未得到可用于 Complete/Incomplete 分类的终态。它一律计为错误，不能映射或猜成任一标签。
+
+官方部署配置的 `far_field_threshold=0.02` 是对归一化 160 ms 音频块的 RMS 振幅门限（约 `-34 dBFS`），不是模型置信度。当尚未接受到语音、模型原始输出为 `user_nonidle` 且当前块 RMS 低于门限时，服务层会重置并返回 idle，以过滤噪声环境中的低振幅输入。中文 Incomplete 诊断中共有 18 条因此成为 `no_decision`；在只将这 18 条以 `far_field_threshold=0` 定向重跑的受控实验中，14 条变为正确 Incomplete、4 条变为 Complete。该结果证明部署门限造成部分差异，但即使只替换这 18 条，Incomplete 也仅从 191/300 提高到 205/300，仍不能解释论文的 238/300。
+
 该诊断的完整逐 chunk 轨迹保存在数据盘：
 
 ```text
@@ -218,6 +222,8 @@ decision_policy: complete-immediate-incomplete-provisional-v1
 `configs/soulx_easy_turn_zh_no_farfield_diagnostic.yaml` 仅用于审计部署端 `far_field_threshold` 对预切分低响度样本的影响；它不会替换 `configs/soulx_official_easy_turn_eval.yaml`，其结果也不计作正式基线。
 
 在读出协议复现前，中文官方基线保持 `TBD`，不启动正式续训练，也不运行英文全量测试浪费算力。
+
+下一步不是继续搜索更接近论文数字的组合，而是先建立并冻结协议证据表。音频处理、部署 RMS 门限、尾部静音、状态读取时点和多终态处理只能由论文、官方代码/配置、数据说明或作者确认决定；冻结后只运行一次正式中文基线。runner 还需在不修改官方权重的前提下记录每块 RMS、raw/service state、teacher-ASR 文本和 Complete/Incomplete logits。若官方样本级协议无法取得，或唯一预注册协议仍不能复现，项目保持在 benchmark Gate，不启动续训练，也不以最接近论文的诊断结果替代基线。
 
 延迟：论文给出 240 ms 理论延迟和 L20 上 205 ms 部署测量。本机硬件不同，因此回填本机 median、p90、p95、首个有效 state latency、样本实时率和 CUDA 配置，不把硬件差异误判为模型退化。
 
