@@ -188,7 +188,7 @@ estimate_confidence = low
 
 评测前只做协议规定的单声道化和 16 kHz 重采样，不做响度或语义相关的 test-set 调参。按官方推理参数以 160 ms chunk 模拟在线输入；中文 teacher ASR 为 Paraformer，英文为 SenseVoice Small。
 
-论文和已发布代码尚未给出 Easy Turn 的样本级流式读出脚本。官方在线服务中，`complete` 会立即交出话轮，`incomplete` 则继续监听；但不能未经验证就把服务控制语义当成论文表 3 的离线分类协议。正式基线必须先确认论文对预切分音频的判定时点、尾部静音和多次状态输出处理，再冻结协议。
+论文和已发布代码尚未给出 Easy Turn 的样本级计分脚本。官方在线服务 `TurnModel` 中，`complete` 会立即交出话轮，`incomplete` 则继续监听；这是部署控制语义，不是论文明确要求的 Table 3 组件。另一台服务器提供的复现包表明，更接近论文的候选路径是直接调用 clean `training-code@928b065` 的流式推理函数：函数内部追加 2 秒静音并输出完整 state trace，不经过部署 RMS 过滤。
 
 论文目标和本地复现：
 
@@ -221,9 +221,15 @@ decision_policy: complete-immediate-incomplete-provisional-v1
 
 `configs/soulx_easy_turn_zh_no_farfield_diagnostic.yaml` 仅用于审计部署端 `far_field_threshold` 对预切分低响度样本的影响；它不会替换 `configs/soulx_official_easy_turn_eval.yaml`，其结果也不计作正式基线。
 
-在读出协议复现前，中文官方基线保持 `TBD`，不启动正式续训练，也不运行英文全量测试浪费算力。
+收到的 bundle 历史结果为 EN Complete 247/318、EN Incomplete 266/299、ZH Complete 266/300、ZH Incomplete 238/300，数值确实接近论文；逐样本预测也能由所附轨迹中的最后一个 `speak/wait` 重算。但这些 JSON 是从较早轨迹事后规范化而来，包内还存在直接比较四种规则与论文目标的脚本，并缺少规范化前原始结果、Teacher-ASR 缓存和完整运行日志。因此历史结果只作为参考，不能回填上表“官方权重本地结果”。
 
-下一步不是继续搜索更接近论文数字的组合，而是先建立并冻结协议证据表。音频处理、部署 RMS 门限、尾部静音、状态读取时点和多终态处理只能由论文、官方代码/配置、数据说明或作者确认决定；冻结后只运行一次正式中文基线。runner 还需在不修改官方权重的前提下记录每块 RMS、raw/service state、teacher-ASR 文本和 Complete/Incomplete logits。若官方样本级协议无法取得，或唯一预注册协议仍不能复现，项目保持在 benchmark Gate，不启动续训练，也不以最接近论文的诊断结果替代基线。
+本机正式运行前已冻结 `frozen-candidate-v1`：最后一个 terminal 是唯一主规则；first terminal、closest-to-endpoint 和 first-at/after-endpoint 只作敏感性分析。四类各用新进程、seed 42、独立空 ASR 文本缓存，严格 gate 从完整轨迹重新计算 summary，并核对官方 checkpoint、上游 commit/script、配置、数据、模型、ASR、依赖和日志。配置中的 `precision: bf16` 在官方 training-code 推理函数内没有被使用，本机报告必须同时记录该字段和真实参数 dtype，不能把配置值误报为有效 BF16 推理。
+
+官方 checkpoint 在该 training-code 初始化路径中会因 `embed_tokens_func.weight` 这个晚注册别名触发 `strict=False` 回退。本机已确认 checkpoint 中该别名与正式 embedding、LM head 是同一 tensor，最终 679 个模型键全部匹配，无缺失键、形状差异或其他多余键。审计 gate 只允许这一项固定差异，不把任意 `strict=False` 当作成功。
+
+在候选协议本机独立复现完成前，官方基线保持 `TBD`，不启动正式续训练。
+
+EN/SenseVoice 与 ZH/Paraformer 各一条 diagnostic smoke 已在精确核心依赖环境中端到端通过，且只使用本地模型。下一步以冻结配置运行四个全量进程。不得根据 smoke 或全量汇总切换主规则；若候选协议无法复现，项目保持在 benchmark Gate。作者确认仍需并行推进，用于把“候选协议独立复现”提升为“官方样本级协议复现”。
 
 延迟：论文给出 240 ms 理论延迟和 L20 上 205 ms 部署测量。本机硬件不同，因此回填本机 median、p90、p95、首个有效 state latency、样本实时率和 CUDA 配置，不把硬件差异误判为模型退化。
 

@@ -820,6 +820,12 @@ estimate_confidence = low
 
 协议选择必须先有外部或实现依据，再运行汇总指标。允许的依据仅包括论文、官方代码/配置、官方数据说明和作者确认；禁止根据“哪种规则更接近 89.33%/79.33%”反向选择门限、尾部静音或状态读出。诊断实验全部保留且明确标为 diagnostic。若官方样本级协议仍不可获得，或按唯一预注册协议运行后仍未达到门禁，则 Gate 9 保持关闭并向项目负责人报告阻塞，不以最接近论文的诊断结果代替基线。
 
+2026-08-20 收到另一台服务器的只读复现包 `soulx-table3-reproduction-bundle-20260820`。包内历史结果与论文接近，但不是由最终 runner 一次性前瞻运行产生：历史轨迹曾比较 first/last/endpoint 等读出规则，随后以最后一个 `speak/wait` 重新聚合；原始聚合前 JSON、Teacher-ASR 缓存和完整日志也未随包提供。因此该包只能作为高价值候选协议和历史参考，不能直接当成本机正式基线或无造假证明。
+
+经项目负责人确认，本机正式运行前冻结候选协议 `frozen-candidate-v1`：直接调用 clean `training-code@928b065` 的 `duplex_predict_160_cascade_asr`；使用官方函数自带 2 秒尾静音；不经过部署 `TurnModel`、不启用 `far_field_threshold`；主规则固定为完整轨迹的最后一个 `speak/wait`。first terminal、离原音频终点最近的 terminal、原音频终点后第一个 terminal 只作为预声明敏感性结果，不得替换主结果。EN 按官方未排序 `os.walk` 顺序，ZH 按发布 `.list` 顺序，四个语言/类别各用新进程、seed 42 和独立空 ASR 文本缓存。由于作者尚未确认最后终态及样本顺序，该结果在获得外部确认前应写作“候选协议独立复现”。
+
+官方 checkpoint 在 clean training-code 中会触发一次 `strict=False` 回退，唯一原因是 `embed_tokens_func.weight` 在类初始化末尾才注册，而导出的 checkpoint 已包含该别名。审计确认它与正式 `llm...embed_tokens.weight`、`lm_head.weight` 共用同一 tensor，且不存在缺失键、形状不匹配或其他多余键。候选 runner 只允许这一项固定别名；任一新增差异立即失败，并把兼容审计写入结果。
+
 ## 18. 实际执行 TODO 与门禁
 
 ### Gate 0：计划确认
@@ -926,8 +932,11 @@ estimate_confidence = low
 - [x] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 输出和精简 Conda 环境运行链；真实 smoke 分别完成 ZH 2 条和 EN 2 条。论文表 3 的样本级读出协议仍待复现。
 - [x] 完成 ZH 600 条在线服务语义诊断，确认 Complete 269/300、Incomplete 191/300；该结果不计作官方基线。
 - [x] 定向重跑 18 条 `no_decision`：关闭部署 RMS 门限后 14 条为 Incomplete、4 条为 Complete，证明门限只能解释部分差异。
-- [ ] 在查看下一轮汇总结果前冻结 Easy Turn 协议证据表：单声道/重采样、是否使用部署 RMS 门限、尾部静音、终态读取时点和多终态处理均须有官方依据。
-- [ ] 扩展审计轨迹，记录每块 RMS、raw state、service state、ASR 文本和 Complete/Incomplete logits；不得修改官方模型权重或按标签分支处理。
+- [x] 只读审计另一台服务器的 Table 3 bundle；确认数据/权重/上游哈希和历史轨迹内部一致，同时记录事后聚合、弱 gate、缺失 ASR 缓存/日志及 `bf16` 字段未实际生效等风险。
+- [x] 在本机正式运行前冻结候选协议证据表：training-code 直推理、2 秒尾静音、无部署 RMS 门限、last-terminal 主规则及三项固定敏感性规则。
+- [x] 新增独立审计 runner 和严格 gate：全新 per-class ASR cache、禁止 resume、保存 Teacher-ASR 文本/完整 state/状态 logits/日志，并从逐样本证据重新计分；历史 bundle 保持原封不动。
+- [x] 建立匹配历史核心版本的独立 Conda 环境；核心包版本、`pip check` 和 60 项单元测试通过。
+- [x] 完成新 runner 的每语言一条 diagnostic smoke；EN/SenseVoice 与 ZH/Paraformer 均使用本地模型端到端通过，并生成 checkpoint、ASR、state trace 和 logits 审计证据。
 - [ ] 向作者确认或取得 Easy Turn 样本级评测脚本；至少确认 `far_field_threshold`、尾部静音长度、终态读取规则和预切分音频的结束点处理。
 - [ ] 全量运行官方 checkpoint 的 Easy Turn baseline。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
@@ -935,7 +944,7 @@ estimate_confidence = low
 ### Gate 9：基线一致性
 
 - [ ] Easy Turn 四个类别达到论文对应正确样本数，或差异不超过预定义 ±1 条且原因已完全解释。
-- [ ] 使用在结果前冻结、且有官方依据的唯一协议；没有阈值搜索、规则择优、标签条件分支或样本排除。
+- [ ] 使用本机运行前冻结的唯一候选主协议；没有阈值搜索、规则择优、标签条件分支或样本排除，并单独披露其尚缺作者确认。
 - [ ] Full-Duplex-Bench 主要指标达到预定义复现容差，随机运行统计和环境差异完整。
 - [ ] 固定 baseline predictions、配置、日志、软件/硬件版本和 checksum。
 

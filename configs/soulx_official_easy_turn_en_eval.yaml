@@ -1,3 +1,4 @@
+# Deployment-service diagnostic only. Not the paper Table 3 protocol.
 model_config:
   task: state_prediction
   glm_tokenizer_path: /root/SoulX-stage3-dataset/pretrained_models/glm-4-voice-tokenizer

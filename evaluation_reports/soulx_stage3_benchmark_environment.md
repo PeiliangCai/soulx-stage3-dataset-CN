@@ -1,11 +1,11 @@
 # SoulX Stage 3 与 benchmark 运行环境
 
 更新时间：2026-08-20
-状态：已完成精简环境安装及基础验收；正式 benchmark 基线尚未完成。
+状态：已完成部署诊断环境和独立 Table 3 审计环境；正式基线尚未完成。
 
 ## 1. 决策与用途
 
-本项目使用一个共享的 Python 3.10 Conda 环境，优先覆盖：
+本项目保留现有共享 Python 3.10 Conda 环境用于 Stage 3 和部署诊断；Table 3 候选复现另建独立环境，避免为匹配论文复现依赖而污染已验收环境。用途包括：
 
 1. SoulX 官方推理服务与 Bilingual Easy Turn benchmark；
 2. SoulX Stage 3 状态预测续训练；
@@ -18,10 +18,13 @@
 ```text
 实际环境：
 /root/autodl-tmp/conda_envs/soulx-duplug-official
+/root/autodl-tmp/conda_envs/soulx-table3-audit
 
 项目内软链接：
 /root/SoulX-stage3-dataset/.conda-envs/soulx-duplug-official
   -> /root/autodl-tmp/conda_envs/soulx-duplug-official
+/root/SoulX-stage3-dataset/.conda-envs/soulx-table3-audit
+  -> /root/autodl-tmp/conda_envs/soulx-table3-audit
 ```
 
 环境位于数据盘，项目代码仍位于系统盘。当前环境约占 7.2 GiB。
@@ -69,7 +72,7 @@ GPU NVIDIA vGPU-32GB
 - `pip check`：通过，无 broken requirements；
 - 官方 benchmark 入口：`TurnModel`、`ParaformerASR`、`SensevoiceASR` 导入通过；
 - 官方 Stage 3 入口：`finetune`、DataModule、Dataset、Model 导入通过；
-- 项目测试：48/48 通过；
+- 项目测试：61/61 通过；
 - CUDA：可用，PyTorch 能识别 `NVIDIA vGPU-32GB`。
 
 真实执行链 smoke：
@@ -82,3 +85,15 @@ GPU NVIDIA vGPU-32GB
 smoke 中发现并补齐了 ModelScope 运行时实际需要、但其包元数据未完整声明的 `addict==2.4.0`、`simplejson==3.20.1` 和 `sortedcontainers==2.4.0`；同时按 SoulX 官方快照将 `setuptools` 从 83.0.0 固定为 78.1.1，以保留 ModelScope 仍调用的 `pkg_resources`。这些是已由真实执行证明必要的依赖，不是从 404 项快照中照搬的无关包。
 
 benchmark runner 会在每个新结果中记录 Python、关键包版本、CUDA/GPU 信息、最小依赖清单哈希，以及官方推理仓库 commit/tree/dirty 状态。旧结果不含这些字段，不应与新结果混为同一批正式实验。
+
+## 6. Table 3 独立审计环境
+
+另一台服务器的已知核心版本为 Python 3.10、torch/torchaudio 2.6.0、transformers 4.55.0、pytorch-lightning 2.5.2、funasr 1.2.6、modelscope 1.28.2、numpy 1.24.4、omegaconf 2.3.0、soundfile 0.12.1、soxr 0.5.0.post1。现有环境的 transformers 4.52.1 和 numpy 1.26.4 不满足该身份，因此不得用于正式 Table 3 结果。
+
+新环境放在数据盘 `/root/autodl-tmp/conda_envs/soulx-table3-audit`，并从项目 `.conda-envs/soulx-table3-audit` 软链接进入。审计 runner 会在加载模型前硬检查上述版本；YAML 中的 `precision: bf16` 只是上游未消费的配置字段，正式结果以模型参数实际 dtype 和 runner 是否启用 autocast 为准。
+
+2026-08-20 已从现有环境克隆该独立环境，并只按官方 training-code 清单将 transformers 固定到 4.55.0、numpy 固定到 1.24.4；其余核心包已匹配。安装使用阿里云 PyPI 镜像，`pip check` 无冲突，项目测试 61/61 通过。环境约 7.2 GiB，数据盘剩余约 24 GiB。
+
+候选 Table 3 runner 已分别完成 EN Complete 1 条和 ZH Complete 1 条 diagnostic smoke。两条均端到端成功，英文使用本地 SenseVoice Small，中文使用本地 Paraformer，未发生运行时下载。smoke 保存了每次 teacher-ASR 文本、完整状态轨迹、五个状态 token logits、初始化日志及全部输入/模型哈希。
+
+官方 checkpoint 加载时会报告唯一多余键 `embed_tokens_func.weight` 并由上游回退到 `strict=False`。源码和 tensor 审计确认：该键是在 checkpoint 加载后才注册的嵌入层别名，与 checkpoint 中正式 embedding 和 LM head 共用同一存储；679 个最终模型键全部闭合、无缺失键和形状差异。runner/gate 只对白名单中的这一固定别名放行，任何其他差异都会失败。

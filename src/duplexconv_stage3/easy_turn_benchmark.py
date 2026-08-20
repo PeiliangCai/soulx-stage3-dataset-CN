@@ -1,4 +1,4 @@
-"""Auditable Easy Turn benchmark runner for the official SoulX inference path."""
+"""Deployment-service diagnostic for Easy Turn; not the Table 3 protocol."""
 
 from __future__ import annotations
 
@@ -481,7 +481,12 @@ def load_official_turn_model(
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run official SoulX on Easy Turn with per-chunk audit output.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Diagnose the deployed SoulX TurnModel on Easy Turn. This is not the "
+            "paper Table 3 reproduction entry point."
+        )
+    )
     parser.add_argument("--language", choices=("en", "zh"), required=True)
     parser.add_argument("--dataset-root", type=Path, required=True)
     parser.add_argument("--official-root", type=Path, required=True)
