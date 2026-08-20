@@ -6,11 +6,14 @@ import argparse
 from dataclasses import asdict, dataclass
 import hashlib
 import importlib
+import importlib.metadata
 import json
 import math
 import os
 from pathlib import Path
+import platform
 import re
+import subprocess
 import sys
 import time
 from typing import Any, Iterable, Sequence
@@ -26,6 +29,27 @@ TERMINAL_STATES = {
     "<|user_complete|>": "complete",
     "<|user_incomplete|>": "incomplete",
 }
+
+RUNTIME_DISTRIBUTIONS = (
+    "setuptools",
+    "torch",
+    "torchaudio",
+    "torchvision",
+    "transformers",
+    "tokenizers",
+    "peft",
+    "accelerate",
+    "pytorch-lightning",
+    "modelscope",
+    "funasr",
+    "datasets",
+    "numpy",
+    "soundfile",
+    "soxr",
+    "addict",
+    "simplejson",
+    "sortedcontainers",
+)
 
 
 @dataclass(frozen=True)
@@ -50,6 +74,66 @@ def sha256_lines(lines: Sequence[str]) -> str:
         digest.update(line.encode("utf-8"))
         digest.update(b"\n")
     return digest.hexdigest()
+
+
+def _git_output(repository: Path, *arguments: str) -> str | None:
+    result = subprocess.run(
+        ["git", "-C", str(repository), *arguments],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    value = result.stdout.strip()
+    return value if result.returncode == 0 and value else None
+
+
+def collect_runtime_environment(official_root: Path) -> dict[str, Any]:
+    """Collect enough runtime identity to make benchmark results reproducible."""
+    import torch
+
+    packages = {}
+    for distribution in RUNTIME_DISTRIBUTIONS:
+        try:
+            packages[distribution] = importlib.metadata.version(distribution)
+        except importlib.metadata.PackageNotFoundError:
+            packages[distribution] = None
+
+    gpu_name = None
+    cuda_available = torch.cuda.is_available()
+    if cuda_available:
+        try:
+            gpu_name = torch.cuda.get_device_name(0)
+        except Exception:
+            gpu_name = "unavailable"
+
+    project_root = Path(__file__).resolve().parents[2]
+    requirements_path = (
+        project_root / "requirements" / "soulx_stage3_benchmark_minimal.txt"
+    )
+    return {
+        "python": platform.python_version(),
+        "python_executable": sys.executable,
+        "platform": platform.platform(),
+        "packages": packages,
+        "cuda": {
+            "available": cuda_available,
+            "torch_cuda_version": torch.version.cuda,
+            "cudnn_version": torch.backends.cudnn.version(),
+            "device_count": torch.cuda.device_count() if cuda_available else 0,
+            "device_name_0": gpu_name,
+        },
+        "official_git": {
+            "commit": _git_output(official_root, "rev-parse", "HEAD"),
+            "tree": _git_output(official_root, "rev-parse", "HEAD^{tree}"),
+            "dirty": bool(_git_output(official_root, "status", "--porcelain")),
+        },
+        "minimal_requirements_path": (
+            str(requirements_path) if requirements_path.is_file() else None
+        ),
+        "minimal_requirements_sha256": (
+            sha256_file(requirements_path) if requirements_path.is_file() else None
+        ),
+    }
 
 
 def discover_samples(root: Path, language: str) -> list[EasyTurnSample]:
@@ -427,6 +511,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "tail_silence_ms": args.tail_silence_ms,
         "sample_count": len(samples),
         "sample_inventory_sha256": sha256_lines([sample.sample_id for sample in samples]),
+        "runtime_environment": collect_runtime_environment(resolved_official_root),
     }
     progress_path = progress_path_for(output)
     started_at, records = load_or_create_progress(progress_path, run_metadata, args.resume)

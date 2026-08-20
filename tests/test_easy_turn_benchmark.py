@@ -9,6 +9,7 @@ from duplexconv_stage3.easy_turn_benchmark import (
     EasyTurnSample,
     append_progress_record,
     attach_raw_state_capture,
+    collect_runtime_environment,
     evaluate_sample,
     load_audio_16k_mono,
     load_or_create_progress,
@@ -37,6 +38,15 @@ class FakeTurnModel:
 
 
 class EasyTurnBenchmarkTests(unittest.TestCase):
+    def test_runtime_environment_records_packages_and_git_identity(self):
+        runtime = collect_runtime_environment(
+            Path("third_party/SoulX-Duplug-inference-a0b9063").resolve()
+        )
+        self.assertEqual(runtime["packages"]["torch"], "2.6.0")
+        self.assertEqual(runtime["packages"]["setuptools"], "78.1.1")
+        self.assertTrue(runtime["official_git"]["commit"])
+        self.assertIn("available", runtime["cuda"])
+
     def test_progress_journal_can_resume(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "progress.jsonl"

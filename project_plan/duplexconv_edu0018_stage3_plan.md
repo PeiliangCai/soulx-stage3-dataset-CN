@@ -1,7 +1,7 @@
 # DuplexConv Edu_0018：SoulX Stage 3 中文训练数据构造与训练计划
 
 更新时间：2026-08-20  
-状态：执行中。Gate 0–6、NaN/runtime 验收和真实 5-step 预检已通过；旧 300-step pilot 已撤销，当前先复现论文 benchmark，基线通过前禁止正式续训练。
+状态：执行中。Gate 0–6、NaN/runtime 验收、真实 5-step 预检，以及 Stage 3/benchmark 精简 Conda 环境验收已通过；旧 300-step pilot 已撤销，当前先复现论文 benchmark，基线通过前禁止正式续训练。
 
 > 本文件覆盖当前 DuplexConv `Edu_0018` 项目的全部工作，包括工作区整理、旧资产清理、多声道处理、状态补标、Paraformer 伪转录、model-ready 导出、SoulX NaN 修复和真实训练。以后处理另一个完全独立的数据集时，才在 `project_plan/` 下新增另一份计划文件。
 
@@ -126,10 +126,12 @@ chunk_profile = 160ms-glm2-v1
 │   └── SoulX-Duplug-upstream/
 ├── runtimes/
 ├── pretrained_models/
+├── .conda-envs/
+│   └── soulx-duplug-official -> /root/autodl-tmp/conda_envs/soulx-duplug-official
 └── dataset -> /root/autodl-tmp/dataset
 ```
 
-数据盘只建立统一 dataset 根，每个独立数据集一个子目录：
+数据盘存放统一 dataset 根和空间占用较大的 Conda 环境；每个独立数据集仍使用一个子目录：
 
 ```text
 /root/autodl-tmp/dataset/
@@ -145,16 +147,28 @@ chunk_profile = 160ms-glm2-v1
     ├── raw/
     ├── extracted/
     └── reports/
+/root/autodl-tmp/conda_envs/
+└── soulx-duplug-official/
 ```
 
-项目中只创建一个数据软链接：
+项目代码目录中允许创建两类软链接：统一数据根，以及指向数据盘 Conda 环境的项目内入口：
 
 ```text
 /root/SoulX-stage3-dataset/dataset
   -> /root/autodl-tmp/dataset
+/root/SoulX-stage3-dataset/.conda-envs/soulx-duplug-official
+  -> /root/autodl-tmp/conda_envs/soulx-duplug-official
 ```
 
-创建后使用 `readlink -e` 验证，不允许悬空链接或继续跳转到旧项目目录。当前发现的 `/root/miniconda3/envs` 等系统/环境链接不属于本项目，不纳入清理。
+创建后使用 `readlink -e` 验证，不允许悬空链接或继续跳转到旧项目目录。不得移动或删除仍在使用的实际 Conda 环境；旧环境只有在确认不被任何项目引用后，才按精确路径单独清理。
+
+Stage 3 和官方 benchmark 共用一个 Python 3.10 Conda 环境。按项目负责人最新决定，不再安装官方快照中的全部 404 个包；只安装两条执行链实际导入的依赖，并以 benchmark 分支的冲突版本为优先。直接依赖固定在：
+
+```text
+requirements/soulx_stage3_benchmark_minimal.txt
+```
+
+解析后的完整版本清单另行保存，benchmark JSON 同时记录 Python、关键包、CUDA、GPU、requirements 哈希和官方推理代码 commit。`vLLM`、TensorRT、Gradio/Jupyter、ONNX Runtime、DeepSpeed、bitsandbytes、diffusion/TTS 等当前执行链未使用的包不安装；以后某条实际命令出现缺失导入时，再以可验证的最小增量补充。
 
 ## 6. 必需资产迁移和 SoulX 官方代码
 
@@ -900,8 +914,9 @@ estimate_confidence = low
 - [x] 固定官方推理 commit `a0b9063` 和训练 commit `928b065`。
 - [x] 下载并验收 EN/ZH Easy Turn 与 ZH Full-Duplex-Bench 官方资产。
 - [ ] 获取并固定 English Full-Duplex-Bench、Qwen2.5-7B-Instruct、IndexTTS-1.5 及端到端系统依赖。
-- [ ] 实现逐样本可审计的 Easy Turn runner、指标汇总和统计检验。
-- [ ] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 和 Complete/Incomplete 判定语义。
+- [x] 实现逐样本可审计、可中断续跑的 Easy Turn runner和指标汇总；结果记录环境、代码、配置、模型与样本身份。
+- [ ] 在 checkpoint 对比汇总中补充 paired bootstrap 和 McNemar 统计检验。
+- [x] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 和 Complete/Incomplete 判定语义；精简 Conda 环境真实 smoke 分别完成 ZH 2 条和 EN 2 条。
 - [ ] 全量运行官方 checkpoint 的 Easy Turn baseline。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
 
