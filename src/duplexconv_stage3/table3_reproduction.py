@@ -226,6 +226,7 @@ class StrictParaformerASR:
             disable_pbar=True,
             disable_update=True,
         )
+        self.last_diagnostic = None
 
     def recognize(self, audio_chunk, sample_rate=16_000, **_kwargs):
         import numpy as np
@@ -236,8 +237,19 @@ class StrictParaformerASR:
             audio = audio.mean(axis=1)
         if sample_rate != 16_000:
             audio = soxr.resample(audio, sample_rate, 16_000)
-        result = self.pipeline(audio)
-        return result[0]["text"].strip()
+        self.last_diagnostic = None
+        try:
+            return self.pipeline(audio)[0]["text"].strip()
+        except Exception as exc:
+            # This mirrors the pinned upstream ParaformerASR behavior while
+            # preserving structured evidence instead of silently swallowing it.
+            self.last_diagnostic = {
+                "outcome": "official-empty-string-fallback",
+                "exception_type": type(exc).__name__,
+                "message": str(exc),
+            }
+            print(f"ASR recognition failed: {exc}")
+            return ""
 
 
 class StrictSensevoiceASR:
@@ -254,6 +266,7 @@ class StrictSensevoiceASR:
         )
         self.language = language
         self.postprocess = rich_transcription_postprocess
+        self.last_diagnostic = None
         remove_set = {
             "😊",
             "😔",
@@ -280,18 +293,29 @@ class StrictSensevoiceASR:
         if sample_rate != 16_000:
             audio = soxr.resample(audio, sample_rate, 16_000)
         selected_language = language or self.language
-        value = self.postprocess(
-            self.model.generate(
-                input=audio,
-                cache={},
-                language=selected_language,
-                use_itn=True,
-                batch_size=16,
-            )[0]["text"]
-        ).strip()
-        if not re.search(r"[\u4e00-\u9fff]|[a-zA-Z]", value):
+        self.last_diagnostic = None
+        try:
+            value = self.postprocess(
+                self.model.generate(
+                    input=audio,
+                    cache={},
+                    language=selected_language,
+                    use_itn=True,
+                    batch_size=16,
+                )[0]["text"]
+            ).strip()
+            if not re.search(r"[\u4e00-\u9fff]|[a-zA-Z]", value):
+                return ""
+            return re.sub(self.pattern, "", value)
+        except Exception as exc:
+            # Match the pinned upstream SensevoiceASR empty-string fallback.
+            self.last_diagnostic = {
+                "outcome": "official-empty-string-fallback",
+                "exception_type": type(exc).__name__,
+                "message": str(exc),
+            }
+            print(f"ASR recognition failed: {exc}")
             return ""
-        return re.sub(self.pattern, "", value)
 
 
 class FreshAuditedASRCache:
@@ -311,6 +335,7 @@ class FreshAuditedASRCache:
         self.backend_identity = backend_identity
         self.backend = None
         self.values: dict[str, str] = {}
+        self.diagnostics: dict[str, dict[str, str] | None] = {}
         self.sample_calls: list[dict[str, Any]] = []
         self.hits = 0
         self.misses = 0
@@ -337,6 +362,7 @@ class FreshAuditedASRCache:
         if cache_hit:
             self.hits += 1
             text = self.values[key]
+            diagnostic = self.diagnostics[key]
         else:
             self.misses += 1
             self.initialize()
@@ -345,11 +371,16 @@ class FreshAuditedASRCache:
             )
             if not isinstance(text, str):
                 raise TypeError("teacher ASR returned non-text output")
+            diagnostic = getattr(self.backend, "last_diagnostic", None)
+            if diagnostic is not None and not isinstance(diagnostic, dict):
+                raise TypeError("teacher ASR returned invalid diagnostic metadata")
             self.values[key] = text
+            self.diagnostics[key] = diagnostic
             row = {
                 "key": key,
                 "text": text,
                 "backend_identity": self.backend_identity,
+                "backend_diagnostic": diagnostic,
             }
             with self.path.open("a", encoding="utf-8") as handle:
                 handle.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
@@ -362,6 +393,7 @@ class FreshAuditedASRCache:
             "sample_rate": sample_rate,
             "dtype": str(array.dtype),
             "shape": list(array.shape),
+            "backend_diagnostic": diagnostic,
         }
         self.sample_calls.append(call)
         return text
@@ -373,6 +405,9 @@ class FreshAuditedASRCache:
             "entries": len(self.values),
             "hits": self.hits,
             "misses": self.misses,
+            "fallback_entries": sum(
+                diagnostic is not None for diagnostic in self.diagnostics.values()
+            ),
             "sha256": sha256_file(self.path) if self.path.is_file() else None,
         }
 
@@ -633,6 +668,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         help="Run a non-gating prefix only; omission is required for a formal run.",
     )
+    parser.add_argument(
+        "--diagnostic-start-index",
+        type=int,
+        default=0,
+        help="Zero-based diagnostic slice start; requires --diagnostic-limit.",
+    )
     return parser
 
 
@@ -640,6 +681,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.diagnostic_limit is not None and args.diagnostic_limit <= 0:
         raise ValueError("--diagnostic-limit must be positive")
+    if args.diagnostic_start_index < 0:
+        raise ValueError("--diagnostic-start-index must be non-negative")
+    if args.diagnostic_limit is None and args.diagnostic_start_index != 0:
+        raise ValueError(
+            "--diagnostic-start-index is forbidden without --diagnostic-limit"
+        )
     output = args.output.absolute()
     trace_dir = args.trace_dir.absolute()
     cache_path = args.asr_cache.absolute()
@@ -675,12 +722,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             "Table 3 dataset identity drift: "
             f"{source_class_identity_sha256} != {expected_dataset_identity}"
         )
-    samples = (
-        all_samples[: args.diagnostic_limit]
-        if args.diagnostic_limit is not None
-        else all_samples
-    )
-    inventory = full_inventory[: len(samples)]
+    if args.diagnostic_limit is None:
+        samples = all_samples
+        inventory = full_inventory
+    else:
+        stop = args.diagnostic_start_index + args.diagnostic_limit
+        if stop > len(all_samples):
+            raise ValueError(
+                "diagnostic slice exceeds class inventory: "
+                f"{args.diagnostic_start_index}:{stop} > {len(all_samples)}"
+            )
+        samples = all_samples[args.diagnostic_start_index : stop]
+        inventory = full_inventory[args.diagnostic_start_index : stop]
     evaluated_inventory_identity_sha256 = portable_inventory_identity(
         inventory, args.dataset_root
     )

@@ -937,6 +937,7 @@ estimate_confidence = low
 - [x] 新增独立审计 runner 和严格 gate：全新 per-class ASR cache、禁止 resume、保存 Teacher-ASR 文本/完整 state/状态 logits/日志，并从逐样本证据重新计分；历史 bundle 保持原封不动。
 - [x] 建立匹配历史核心版本的独立 Conda 环境；核心包版本、`pip check` 和 60 项单元测试通过。
 - [x] 完成新 runner 的每语言一条 diagnostic smoke；EN/SenseVoice 与 ZH/Paraformer 均使用本地模型端到端通过，并生成 checkpoint、ASR、state trace 和 logits 审计证据。
+- [x] 首次正式候选运行在 ZH Complete 第 120 条暴露 Paraformer 空列表；确认官方 ASR 包装器会记录异常并返回空字符串后，补齐同语义的结构化 fallback。旧 partial 与旧提交下 EN 结果仅保留审计，不跨提交拼接。
 - [ ] 向作者确认或取得 Easy Turn 样本级评测脚本；至少确认 `far_field_threshold`、尾部静音长度、终态读取规则和预切分音频的结束点处理。
 - [ ] 全量运行官方 checkpoint 的 Easy Turn baseline。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。

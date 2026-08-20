@@ -293,6 +293,14 @@ def audit_result(
             raise ValueError(f"invalid or duplicate teacher ASR cache key: {key!r}")
         if not isinstance(row.get("text"), str):
             raise ValueError(f"invalid teacher ASR cache text for key: {key}")
+        diagnostic = row.get("backend_diagnostic")
+        if diagnostic is not None and (
+            not isinstance(diagnostic, dict)
+            or diagnostic.get("outcome") != "official-empty-string-fallback"
+            or not isinstance(diagnostic.get("exception_type"), str)
+            or not isinstance(diagnostic.get("message"), str)
+        ):
+            raise ValueError(f"invalid teacher ASR fallback evidence for key: {key}")
         require_equal(
             row.get("backend_identity"),
             asr_cache.get("backend_identity"),
@@ -417,6 +425,11 @@ def audit_result(
         if cached is None:
             raise ValueError(f"teacher ASR call is absent from cache JSONL: {key}")
         require_equal(call["text"], cached["text"], "teacher ASR cached text")
+        require_equal(
+            call.get("backend_diagnostic"),
+            cached.get("backend_diagnostic"),
+            "teacher ASR fallback evidence",
+        )
         if expected_hit:
             observed_hits += 1
         else:
@@ -426,6 +439,11 @@ def audit_result(
     require_equal(asr_cache.get("entries"), len(asr_cache_rows), "ASR cache entries")
     require_equal(asr_cache.get("misses"), observed_misses, "ASR cache misses")
     require_equal(asr_cache.get("hits"), observed_hits, "ASR cache hits")
+    require_equal(
+        asr_cache.get("fallback_entries"),
+        sum(row.get("backend_diagnostic") is not None for row in asr_cache_rows),
+        "ASR cache fallback entries",
+    )
 
     recomputed_summary = summarize_records(records)
     require_equal(payload.get("summary"), recomputed_summary, "summary")

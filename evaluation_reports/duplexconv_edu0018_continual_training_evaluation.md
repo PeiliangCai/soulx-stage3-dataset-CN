@@ -227,6 +227,8 @@ decision_policy: complete-immediate-incomplete-provisional-v1
 
 官方 checkpoint 在该 training-code 初始化路径中会因 `embed_tokens_func.weight` 这个晚注册别名触发 `strict=False` 回退。本机已确认 checkpoint 中该别名与正式 embedding、LM head 是同一 tensor，最终 679 个模型键全部匹配，无缺失键、形状差异或其他多余键。审计 gate 只允许这一项固定差异，不把任意 `strict=False` 当作成功。
 
+首次正式候选运行在 ZH Complete 第 120 条遇到 Paraformer 空列表后停止。核对 pinned training-code 发现官方 `ParaformerASR` 会记录异常并返回空字符串；本机包装器已补齐相同行为并增加结构化 fallback 证据，定向真实样本验证为 18 次 ASR 调用中恰好 1 次 `IndexError` fallback。为保持四类 runner 提交一致，旧 partial 和旧提交下英文结果均不与修复后的正式结果拼接，四类从新路径重新运行。
+
 在候选协议本机独立复现完成前，官方基线保持 `TBD`，不启动正式续训练。
 
 EN/SenseVoice 与 ZH/Paraformer 各一条 diagnostic smoke 已在精确核心依赖环境中端到端通过，且只使用本地模型。下一步以冻结配置运行四个全量进程。不得根据 smoke 或全量汇总切换主规则；若候选协议无法复现，项目保持在 benchmark Gate。作者确认仍需并行推进，用于把“候选协议独立复现”提升为“官方样本级协议复现”。

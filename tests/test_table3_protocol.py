@@ -1,4 +1,6 @@
 import json
+import contextlib
+import io
 import tempfile
 import unittest
 from pathlib import Path
@@ -15,6 +17,7 @@ from duplexconv_stage3.table3_protocol import (
     EXPECTED_RUNTIME_VERSIONS,
     EXPECTED_UPSTREAM_COMMIT,
     EXPECTED_UPSTREAM_SCRIPT_SHA256,
+    SCHEMA_VERSION,
     canonical_sha256,
     classify_trace,
     discover_samples,
@@ -24,7 +27,9 @@ from duplexconv_stage3.table3_protocol import (
 )
 from duplexconv_stage3.table3_reproduction import (
     FreshAuditedASRCache,
+    StrictParaformerASR,
     audit_checkpoint_compatibility,
+    build_parser,
 )
 
 
@@ -115,9 +120,55 @@ class Table3ProtocolTests(unittest.TestCase):
             self.assertEqual(cache.recognize(audio), "text-16000-1")
             self.assertEqual(cache.stats()["misses"], 1)
             self.assertEqual(cache.stats()["hits"], 1)
+            self.assertEqual(cache.stats()["fallback_entries"], 0)
             self.assertEqual(len(cache.sample_calls), 2)
             with self.assertRaises(FileExistsError):
                 FreshAuditedASRCache(path, lambda: backend, "fake-v1")
+
+    def test_paraformer_empty_result_uses_audited_official_fallback(self):
+        backend = StrictParaformerASR.__new__(StrictParaformerASR)
+        backend.pipeline = lambda _audio: []
+        backend.last_diagnostic = None
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(backend.recognize(np.zeros(16, dtype=np.float32)), "")
+        self.assertEqual(
+            backend.last_diagnostic,
+            {
+                "outcome": "official-empty-string-fallback",
+                "exception_type": "IndexError",
+                "message": "list index out of range",
+            },
+        )
+
+    def test_diagnostic_start_index_defaults_to_zero(self):
+        parser = build_parser()
+        args = parser.parse_args(
+            [
+                "--language",
+                "zh",
+                "--label",
+                "complete",
+                "--dataset-root",
+                "data",
+                "--official-root",
+                "official",
+                "--config",
+                "config.yaml",
+                "--asr-model-dir",
+                "asr",
+                "--trace-dir",
+                "trace",
+                "--asr-cache",
+                "cache.jsonl",
+                "--output",
+                "result.json",
+                "--run-id",
+                "diagnostic",
+                "--diagnostic-limit",
+                "1",
+            ]
+        )
+        self.assertEqual(args.diagnostic_start_index, 0)
 
     def test_checkpoint_audit_accepts_only_the_tied_late_bound_alias(self):
         import torch
@@ -169,6 +220,7 @@ class Table3ProtocolTests(unittest.TestCase):
                     "key": "key",
                     "text": "hello",
                     "backend_identity": "fake-asr",
+                    "backend_diagnostic": None,
                 }
             )
             + "\n"
@@ -197,7 +249,12 @@ class Table3ProtocolTests(unittest.TestCase):
             "log_sha256": "log-hash",
             "trace": trace,
             "teacher_asr_calls": [
-                {"key": "key", "text": "hello", "cache_hit": False}
+                {
+                    "key": "key",
+                    "text": "hello",
+                    "cache_hit": False,
+                    "backend_diagnostic": None,
+                }
             ],
             "llm_forward_audit": [
                 {
@@ -225,7 +282,7 @@ class Table3ProtocolTests(unittest.TestCase):
             }
         ]
         payload = {
-            "schema_version": 1,
+            "schema_version": SCHEMA_VERSION,
             "status": "complete",
             "run_mode": "formal",
             "run_id": "audit",
@@ -305,6 +362,7 @@ class Table3ProtocolTests(unittest.TestCase):
                 "entries": 1,
                 "hits": 0,
                 "misses": 1,
+                "fallback_entries": 0,
             },
             "dataset": {
                 "root": str(root),

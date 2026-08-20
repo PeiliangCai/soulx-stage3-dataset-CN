@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 PRIMARY_RULE = "last-terminal-v1"
 SENSITIVITY_RULES = (
     "first-terminal-v1",

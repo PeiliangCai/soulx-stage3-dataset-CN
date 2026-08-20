@@ -72,7 +72,7 @@ GPU NVIDIA vGPU-32GB
 - `pip check`：通过，无 broken requirements；
 - 官方 benchmark 入口：`TurnModel`、`ParaformerASR`、`SensevoiceASR` 导入通过；
 - 官方 Stage 3 入口：`finetune`、DataModule、Dataset、Model 导入通过；
-- 项目测试：61/61 通过；
+- 项目测试：63/63 通过；
 - CUDA：可用，PyTorch 能识别 `NVIDIA vGPU-32GB`。
 
 真实执行链 smoke：
@@ -92,8 +92,10 @@ benchmark runner 会在每个新结果中记录 Python、关键包版本、CUDA/
 
 新环境放在数据盘 `/root/autodl-tmp/conda_envs/soulx-table3-audit`，并从项目 `.conda-envs/soulx-table3-audit` 软链接进入。审计 runner 会在加载模型前硬检查上述版本；YAML 中的 `precision: bf16` 只是上游未消费的配置字段，正式结果以模型参数实际 dtype 和 runner 是否启用 autocast 为准。
 
-2026-08-20 已从现有环境克隆该独立环境，并只按官方 training-code 清单将 transformers 固定到 4.55.0、numpy 固定到 1.24.4；其余核心包已匹配。安装使用阿里云 PyPI 镜像，`pip check` 无冲突，项目测试 61/61 通过。环境约 7.2 GiB，数据盘剩余约 24 GiB。
+2026-08-20 已从现有环境克隆该独立环境，并只按官方 training-code 清单将 transformers 固定到 4.55.0、numpy 固定到 1.24.4；其余核心包已匹配。安装使用阿里云 PyPI 镜像，`pip check` 无冲突，项目测试 63/63 通过。环境约 7.2 GiB，数据盘剩余约 24 GiB。
 
 候选 Table 3 runner 已分别完成 EN Complete 1 条和 ZH Complete 1 条 diagnostic smoke。两条均端到端成功，英文使用本地 SenseVoice Small，中文使用本地 Paraformer，未发生运行时下载。smoke 保存了每次 teacher-ASR 文本、完整状态轨迹、五个状态 token logits、初始化日志及全部输入/模型哈希。
 
 官方 checkpoint 加载时会报告唯一多余键 `embed_tokens_func.weight` 并由上游回退到 `strict=False`。源码和 tensor 审计确认：该键是在 checkpoint 加载后才注册的嵌入层别名，与 checkpoint 中正式 embedding 和 LM head 共用同一存储；679 个最终模型键全部闭合、无缺失键和形状差异。runner/gate 只对白名单中的这一固定别名放行，任何其他差异都会失败。
+
+首次正式候选运行在 ZH Complete 第 120 条遇到 Paraformer 返回空列表。官方 training-code 的 `ParaformerASR.recognize` 会捕获该异常、打印日志并返回空字符串；本地严格模型路径包装器已补齐相同行为，并额外把异常类型和信息写入 cache/逐样本证据。旧 partial 不续跑，旧提交下已完成的英文结果也不与新提交结果混用。
