@@ -1,7 +1,7 @@
 # SoulX Stage 3 与 benchmark 运行环境
 
-更新时间：2026-08-20
-状态：已完成部署诊断环境和独立 Table 3 审计环境；正式基线尚未完成。
+更新时间：2026-08-21
+状态：已完成部署诊断环境和独立 Table 3 审计环境；已完成全量候选协议基线，证据审计通过但数值门禁失败。
 
 ## 1. 决策与用途
 
@@ -99,3 +99,5 @@ benchmark runner 会在每个新结果中记录 Python、关键包版本、CUDA/
 官方 checkpoint 加载时会报告唯一多余键 `embed_tokens_func.weight` 并由上游回退到 `strict=False`。源码和 tensor 审计确认：该键是在 checkpoint 加载后才注册的嵌入层别名，与 checkpoint 中正式 embedding 和 LM head 共用同一存储；679 个最终模型键全部闭合、无缺失键和形状差异。runner/gate 只对白名单中的这一固定别名放行，任何其他差异都会失败。
 
 首次正式候选运行在 ZH Complete 第 120 条遇到 Paraformer 返回空列表。官方 training-code 的 `ParaformerASR.recognize` 会捕获该异常、打印日志并返回空字符串；本地严格模型路径包装器已补齐相同行为，并额外把异常类型和信息写入 cache/逐样本证据。旧 partial 不续跑，旧提交下已完成的英文结果也不与新提交结果混用。
+
+修复后的正式运行固定在项目 commit `ac8fcf1`，run ID 为 `formal-candidate-v1-ac8fcf1`。EN Complete、EN Incomplete、ZH Complete、ZH Incomplete 分别为 251/318、268/299、263/300、241/300。严格 gate 对 1,217 个样本的轨迹、state logits、ASR 调用/缓存、输入哈希、模型清单、代码身份和日志全部重算通过，但 EN Complete 和 ZH Complete 超出 ±1.0 pp 数值范围，故 `continued_training_authorized=false`。完整产物在数据盘 `dataset/soulx_duplug_eval/table3_audit/formal-candidate-v1-ac8fcf1`，共 2,447 个文件、约 57 MiB；gate 报告 SHA-256 为 `e013f7ee866498a7797f5226cb0558be42c41675cc76ef8732461877d87336c9`。

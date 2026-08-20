@@ -1,8 +1,8 @@
 # SoulX-Duplug Stage 3 中文续训练模型性能评估
 
-更新时间：2026-08-20  
-用途：课题组会议/导师汇报  
-状态：工作稿。数据集已构造，benchmark 资产已固定；官方模型基线、正式续训练和 checkpoint 评测尚未完成。所有 `TBD` 必须用真实实验结果回填，不得用预期值代替。
+更新时间：2026-08-21
+用途：课题组会议/导师汇报
+状态：工作稿。数据集已构造，benchmark 资产已固定；官方权重的 Table 3 候选协议独立复现已完成，证据审计通过但数值门禁失败，因此正式续训练和 checkpoint 评测尚未开始。所有 `TBD` 必须用真实实验结果回填，不得用预期值代替。
 
 ## 1. 汇报摘要
 
@@ -23,14 +23,14 @@
 | 官方 loader、NaN 修复、真实 5-step 训练和 checkpoint 重载 | 已通过 |
 | 官方论文、benchmark、推理代码和权重 step 元数据核对 | 已完成 |
 | EN/ZH Easy Turn 与 ZH Full-Duplex-Bench 资产固定 | 已完成 |
-| 官方 checkpoint 的论文指标复现 | TBD |
+| 官方 checkpoint 的论文指标复现 | Table 3 候选协议全量完成；证据审计通过，数值门禁失败 |
 | group-aware split 与 LR 校准 | TBD |
 | 正式 continuation step sweep | TBD |
 | 最后无明显下降点、首次明显下降点和推荐模型 | TBD |
 
 ### 1.3 最终结论
 
-> TBD：在实验全部完成后，用 3–5 句话给出官方基线是否复现、中文收益、英文遗忘、最后稳定 step、首次明显下降 step 和推荐 checkpoint。
+> 当前阶段结论：固定 `frozen-candidate-v1` 的四类全量运行和证据审计已完成，但 EN Complete 与 ZH Complete 未达到数值门禁，Gate 9 保持关闭，没有启动正式续训练。中文收益、英文遗忘、最后稳定 step 和推荐 checkpoint 仍为 `TBD`。
 
 ## 2. 基础模型与续训练定义
 
@@ -192,14 +192,37 @@ estimate_confidence = low
 
 论文目标和本地复现：
 
-| 语言 | 指标 | 论文 | 官方权重本地结果 | 差异 |
+| 语言 | 指标 | 论文 | 官方权重本地候选结果 | 差异 |
 | --- | --- | ---: | ---: | ---: |
-| EN | Complete ACC | 77.67%（约 247/318） | TBD | TBD |
-| EN | Incomplete ACC | 88.96%（约 266/299） | TBD | TBD |
-| EN | Macro Avg. ACC | 83.32% | TBD | TBD |
-| ZH | Complete ACC | 89.33%（268/300） | TBD | TBD |
-| ZH | Incomplete ACC | 79.33%（238/300） | TBD | TBD |
-| ZH | Macro Avg. ACC | 84.33% | TBD | TBD |
+| EN | Complete ACC | 77.67%（247/318） | 78.93%（251/318） | +1.26 pp |
+| EN | Incomplete ACC | 88.96%（266/299） | 89.63%（268/299） | +0.67 pp |
+| EN | Macro Avg. ACC | 83.32% | 84.28% | +0.96 pp |
+| ZH | Complete ACC | 89.33%（268/300） | 87.67%（263/300） | -1.67 pp |
+| ZH | Incomplete ACC | 79.33%（238/300） | 80.33%（241/300） | +1.00 pp |
+| ZH | Macro Avg. ACC | 84.33% | 84.00% | -0.33 pp |
+
+上表是官方权重在本机冻结候选协议下的独立运行结果，不写作“官方样本级协议已复现”。机器 gate 的预注册数值条件是四类准确率均与论文相差不超过 `1.0 pp`：EN Incomplete 和 ZH Incomplete 通过，EN Complete 和 ZH Complete 失败，因此总 gate 失败。原计划中“对应正确数或有完整解释的 ±1 条”是更严的验收语义；ZH Incomplete 虽通过 `1.0 pp` 机器筛查，仍与论文相差 3 条。无论采用哪一层标准，本轮都不能放行续训练。
+
+四个结果 JSON、独立 Teacher-ASR JSONL 缓存、2,447 个轨迹/日志/汇总文件和 gate 报告已保存在：
+
+```text
+/root/autodl-tmp/dataset/soulx_duplug_eval/table3_audit/formal-candidate-v1-ac8fcf1
+run_id: formal-candidate-v1-ac8fcf1
+runner commit: ac8fcf1
+gate report SHA-256: e013f7ee866498a7797f5226cb0558be42c41675cc76ef8732461877d87336c9
+evidence_audit_passed: true
+accuracy_gate_passed: false
+continued_training_authorized: false
+```
+
+候选主规则和三个预声明敏感性规则的正确数如下。敏感性结果是从同一批已保存轨迹重算，没有替换主结果：
+
+| 读出规则 | EN Complete | EN Incomplete | ZH Complete | ZH Incomplete |
+| --- | ---: | ---: | ---: | ---: |
+| last terminal（预注册主规则） | 251/318（78.93%） | 268/299（89.63%） | 263/300（87.67%） | 241/300（80.33%） |
+| first terminal | 242/318（76.10%） | 256/299（85.62%） | 223/300（74.33%） | 224/300（74.67%） |
+| closest to file endpoint | 252/318（79.25%） | 264/299（88.29%） | 263/300（87.67%） | 240/300（80.00%） |
+| first at/after file endpoint | 69/318（21.70%） | 250/299（83.61%） | 60/300（20.00%） | 99/300（33.00%） |
 
 协议诊断（不计作官方基线）：
 
@@ -229,9 +252,13 @@ decision_policy: complete-immediate-incomplete-provisional-v1
 
 首次正式候选运行在 ZH Complete 第 120 条遇到 Paraformer 空列表后停止。核对 pinned training-code 发现官方 `ParaformerASR` 会记录异常并返回空字符串；本机包装器已补齐相同行为并增加结构化 fallback 证据，定向真实样本验证为 18 次 ASR 调用中恰好 1 次 `IndexError` fallback。为保持四类 runner 提交一致，旧 partial 和旧提交下英文结果均不与修复后的正式结果拼接，四类从新路径重新运行。
 
-在候选协议本机独立复现完成前，官方基线保持 `TBD`，不启动正式续训练。
+修复后的正式候选运行中，ZH Teacher-ASR 的 11,500 个 cache entry 中有 6 次调用按官方包装器语义回退为空字符串，分布于 5 个样本；EN 的 8,451 次无 fallback。异常类型、信息、空文本和对应样本均写入 JSONL/逐样本证据，严格 gate 已核对调用顺序和缓存一致性。
 
-EN/SenseVoice 与 ZH/Paraformer 各一条 diagnostic smoke 已在精确核心依赖环境中端到端通过，且只使用本地模型。下一步以冻结配置运行四个全量进程。不得根据 smoke 或全量汇总切换主规则；若候选协议无法复现，项目保持在 benchmark Gate。作者确认仍需并行推进，用于把“候选协议独立复现”提升为“官方样本级协议复现”。
+各类单样本 runner 耗时的 median/p90/p95 分别为：EN Complete `3.957/5.098/5.380 s`，EN Incomplete `2.830/3.951/4.307 s`，ZH Complete `5.806/8.742/10.010 s`，ZH Incomplete `4.633/6.651/7.255 s`。这些是包含整条音频、Teacher-ASR、SoulX 和证据落盘的离线 wall-clock 时间，不是论文所报的单次流式决策延迟，不与 205/240 ms 直接比较。
+
+本机结果与 bundle 历史规范化预测在 EN Complete、EN Incomplete、ZH Complete、ZH Incomplete 分别有 16、14、9、5 条预测不同。因 bundle 缺少原始 Teacher-ASR 缓存、完整运行日志和规范化前结果，当前不能把差异归因为某一个已证实因素，也不用 bundle 预测覆盖本机结果。
+
+候选协议全量独立复现已完成，但数值门禁失败；官方基线不得标记为“已复现”，不启动正式续训练。下一步是取得作者的样本级协议/评测脚本，或在不查看标签方向、不切换主规则的前提下定位可审计的实现差异。
 
 延迟：论文给出 240 ms 理论延迟和 L20 上 205 ms 部署测量。本机硬件不同，因此回填本机 median、p90、p95、首个有效 state latency、样本实时率和 CUDA 配置，不把硬件差异误判为模型退化。
 

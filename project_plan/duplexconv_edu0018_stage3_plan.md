@@ -826,6 +826,8 @@ estimate_confidence = low
 
 官方 checkpoint 在 clean training-code 中会触发一次 `strict=False` 回退，唯一原因是 `embed_tokens_func.weight` 在类初始化末尾才注册，而导出的 checkpoint 已包含该别名。审计确认它与正式 `llm...embed_tokens.weight`、`lm_head.weight` 共用同一 tensor，且不存在缺失键、形状不匹配或其他多余键。候选 runner 只允许这一项固定别名；任一新增差异立即失败，并把兼容审计写入结果。
 
+2026-08-21 完成修复后的四类全量候选运行 `formal-candidate-v1-ac8fcf1`。主规则结果为 EN Complete 251/318（78.93%）、EN Incomplete 268/299（89.63%）、ZH Complete 263/300（87.67%）、ZH Incomplete 241/300（80.33%）。逐样本轨迹、状态 logits、Teacher-ASR 缓存、模型/数据/代码哈希和日志的严格证据审计通过；但 EN Complete（+1.26 pp）和 ZH Complete（-1.67 pp）超出机器 gate 的 ±1.0 pp 筛查范围，因此 `accuracy_gate_passed=false`、`continued_training_authorized=false`。候选全量运行已完成不等于官方样本级协议已复现。
+
 ## 18. 实际执行 TODO 与门禁
 
 ### Gate 0：计划确认
@@ -939,15 +941,15 @@ estimate_confidence = low
 - [x] 完成新 runner 的每语言一条 diagnostic smoke；EN/SenseVoice 与 ZH/Paraformer 均使用本地模型端到端通过，并生成 checkpoint、ASR、state trace 和 logits 审计证据。
 - [x] 首次正式候选运行在 ZH Complete 第 120 条暴露 Paraformer 空列表；确认官方 ASR 包装器会记录异常并返回空字符串后，补齐同语义的结构化 fallback。旧 partial 与旧提交下 EN 结果仅保留审计，不跨提交拼接。
 - [ ] 向作者确认或取得 Easy Turn 样本级评测脚本；至少确认 `far_field_threshold`、尾部静音长度、终态读取规则和预切分音频的结束点处理。
-- [ ] 全量运行官方 checkpoint 的 Easy Turn baseline。
+- [x] 全量运行官方 checkpoint 的冻结候选 Easy Turn baseline；证据审计通过，数值门禁失败。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
 
 ### Gate 9：基线一致性
 
-- [ ] Easy Turn 四个类别达到论文对应正确样本数，或差异不超过预定义 ±1 条且原因已完全解释。
-- [ ] 使用本机运行前冻结的唯一候选主协议；没有阈值搜索、规则择优、标签条件分支或样本排除，并单独披露其尚缺作者确认。
+- [ ] Easy Turn 四个类别达到论文对应正确样本数，或差异不超过预定义 ±1 条且原因已完全解释。本轮失败；即使按较宽的 ±1.0 pp 机器筛查，仍有两类超限。
+- [x] 使用本机运行前冻结的唯一候选主协议；没有阈值搜索、规则择优、标签条件分支或样本排除，并单独披露其尚缺作者确认。
 - [ ] Full-Duplex-Bench 主要指标达到预定义复现容差，随机运行统计和环境差异完整。
-- [ ] 固定 baseline predictions、配置、日志、软件/硬件版本和 checksum。
+- [x] 固定 Easy Turn 候选 baseline predictions、配置、日志、软件/硬件版本和 checksum；产物位于 `dataset/soulx_duplug_eval/table3_audit/formal-candidate-v1-ac8fcf1`。
 
 ### Phase 10：正式训练前冻结
 
