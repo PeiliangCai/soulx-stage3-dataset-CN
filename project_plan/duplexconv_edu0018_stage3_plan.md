@@ -657,10 +657,15 @@ return logits.reshape(-1)[0].float() * 0.0
 
 正式续训练前先冻结和复现论文评测场景。否则续训练后即使指标发生变化，也无法区分是模型权重、推理协议、teacher ASR、测试数据版本或端到端系统组件造成的。
 
-评测分为两层：
+评估分为三层：
 
-1. **模型级主门禁：Bilingual Easy Turn**。直接衡量 SoulX 状态预测模块的 Complete/Incomplete 准确率与流式延迟，是续训练 checkpoint 比较的主要依据。
-2. **系统级外部验证：Bilingual Full-Duplex-Bench**。将 SoulX 接入论文相同的 Qwen2.5-7B-Instruct 和 IndexTTS-1.5 系统，验证 Pause Handling、Turn Taking、User Backchannel 和 User Interruption。该层会受到 LLM、TTS、ASR 和调度抖动影响，不能代替模型级诊断。
+1. **训练期内部验证**。只使用本项目训练语料中按完整源会话分组留出的 validation，监控 loss、七个 token head 的 accuracy 和学习率，用于 checkpoint 保存、LR 校准及停止判断。
+2. **模型级外部测试：Bilingual Easy Turn（论文表 3）**。直接衡量 SoulX 状态预测模块的 Complete/Incomplete 准确率与流式延迟，用于报告固定 checkpoint 的泛化性能和与论文结果对齐。
+3. **系统级外部测试：Bilingual Full-Duplex-Bench（论文表 2）**。将 SoulX 接入论文相同的 Qwen2.5-7B-Instruct 和 IndexTTS-1.5 系统，验证 Pause Handling、Turn Taking、User Backchannel 和 User Interruption。该层会受到 LLM、TTS、ASR 和调度抖动影响，不能代替模型级诊断。
+
+三者用途严格分开：Stage 3 训练过程只使用按源会话分组的 train/validation；论文表 3 的 Bilingual Easy Turn 是固定的 Stage 3 checkpoint 外部测试；论文表 2 的 Bilingual Full-Duplex-Bench 只用于完整对话系统验证。任何 benchmark test set 都不参与 LR、停止点或其他训练超参数选择。
+
+官方公开的 Stage 3 **重实现训练代码**没有在 `trainer.fit()` 中调用表 2 或表 3。其 `train_config.yaml` 默认从训练集随机切出 2% 作为 validation、每 1,000 optimizer step 验证一次，并以 `val_acc` 保存 top-2 checkpoint；`val_acc` 是 text、EOS、idle、nonidle、user_complete、user_incomplete、user_backchannel 七个 token head accuracy 的等权平均，`test_step` 为空。由于 README 明确称其为重实现流程，只能据此确认公开代码行为，不能断言论文内部原始训练脚本完全相同。本项目不沿用其样本级随机切分，而使用 17.3 节的会话级分组切分防止相邻窗口泄漏。
 
 已固定的官方评测资产：
 
@@ -916,7 +921,7 @@ estimate_confidence = low
 - [ ] 获取并固定 English Full-Duplex-Bench、Qwen2.5-7B-Instruct、IndexTTS-1.5 及端到端系统依赖。
 - [x] 实现逐样本可审计、可中断续跑的 Easy Turn runner和指标汇总；结果记录环境、代码、配置、模型与样本身份。
 - [ ] 在 checkpoint 对比汇总中补充 paired bootstrap 和 McNemar 统计检验。
-- [x] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 和 Complete/Incomplete 判定语义；精简 Conda 环境真实 smoke 分别完成 ZH 2 条和 EN 2 条。
+- [x] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 输出和精简 Conda 环境运行链；真实 smoke 分别完成 ZH 2 条和 EN 2 条。论文表 3 的样本级读出协议仍待复现。
 - [ ] 全量运行官方 checkpoint 的 Easy Turn baseline。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
 

@@ -25,10 +25,10 @@ import soxr
 
 SAMPLE_RATE = 16_000
 CHUNK_SAMPLES = 2_560
-TERMINAL_STATES = {
-    "<|user_complete|>": "complete",
-    "<|user_incomplete|>": "incomplete",
-}
+DECISION_POLICIES = (
+    "first-terminal-v1",
+    "complete-immediate-incomplete-provisional-v1",
+)
 
 RUNTIME_DISTRIBUTIONS = (
     "setuptools",
@@ -227,7 +227,14 @@ def attach_raw_state_capture(turn_model: Any) -> None:
     turn_model._benchmark_last_raw_state = None
 
 
-def evaluate_sample(turn_model: Any, sample: EasyTurnSample, tail_silence_ms: int) -> dict[str, Any]:
+def evaluate_sample(
+    turn_model: Any,
+    sample: EasyTurnSample,
+    tail_silence_ms: int,
+    decision_policy: str,
+) -> dict[str, Any]:
+    if decision_policy not in DECISION_POLICIES:
+        raise ValueError(f"unsupported decision policy: {decision_policy}")
     audio, audio_info = load_audio_16k_mono(sample.wav_path)
     turn_model.reset()
     turn_model._benchmark_last_raw_state = None
@@ -253,8 +260,17 @@ def evaluate_sample(turn_model: Any, sample: EasyTurnSample, tail_silence_ms: in
                 "elapsed_seconds": elapsed,
             }
         )
-        if saw_nonidle and raw_state in TERMINAL_STATES:
-            prediction = TERMINAL_STATES[raw_state]
+        if saw_nonidle and raw_state == "<|user_incomplete|>":
+            # In the official service, incomplete means "keep listening". It
+            # is provisional because later speech can complete the same turn.
+            # The first-terminal diagnostic instead stops on this state.
+            prediction = "incomplete"
+            decision_chunk = chunk_index
+            if decision_policy == "first-terminal-v1":
+                break
+        elif saw_nonidle and raw_state == "<|user_complete|>":
+            # Complete hands the turn to the assistant and ends this sample.
+            prediction = "complete"
             decision_chunk = chunk_index
             break
     total_elapsed = time.perf_counter() - started
@@ -266,6 +282,7 @@ def evaluate_sample(turn_model: Any, sample: EasyTurnSample, tail_silence_ms: in
         "correct": prediction == sample.label,
         "saw_nonidle": saw_nonidle,
         "decision_chunk": decision_chunk,
+        "decision_policy": decision_policy,
         "tail_silence_ms": tail_silence_ms,
         "total_elapsed_seconds": total_elapsed,
         "audio": audio_info,
@@ -472,6 +489,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--paraformer-model-dir", type=Path)
     parser.add_argument("--sensevoice-model-dir", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--decision-policy",
+        choices=DECISION_POLICIES,
+        required=True,
+        help="Explicit diagnostic readout policy; no paper protocol is assumed.",
+    )
     parser.add_argument("--tail-silence-ms", type=int, default=1600)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--limit-per-label", type=int)
@@ -511,6 +534,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "tail_silence_ms": args.tail_silence_ms,
         "sample_count": len(samples),
         "sample_inventory_sha256": sha256_lines([sample.sample_id for sample in samples]),
+        "decision_policy": args.decision_policy,
         "runtime_environment": collect_runtime_environment(resolved_official_root),
     }
     progress_path = progress_path_for(output)
@@ -531,7 +555,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     for sample in remaining:
         assert turn_model is not None
-        record = evaluate_sample(turn_model, sample, args.tail_silence_ms)
+        record = evaluate_sample(
+            turn_model,
+            sample,
+            args.tail_silence_ms,
+            args.decision_policy,
+        )
         records.append(record)
         append_progress_record(progress_path, record)
         print(json.dumps({k: record[k] for k in ("sample_id", "label", "prediction", "correct")}, ensure_ascii=False))

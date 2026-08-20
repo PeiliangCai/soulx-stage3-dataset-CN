@@ -104,9 +104,81 @@ class EasyTurnBenchmarkTests(unittest.TestCase):
             sample = EasyTurnSample("zh:test", "zh", "complete", path)
             model = FakeTurnModel(["<|user_nonidle|>", "<|user_complete|>"])
             attach_raw_state_capture(model)
-            result = evaluate_sample(model, sample, 320)
+            result = evaluate_sample(
+                model,
+                sample,
+                320,
+                "complete-immediate-incomplete-provisional-v1",
+            )
         self.assertEqual(result["prediction"], "complete")
         self.assertTrue(result["correct"])
+
+    def test_incomplete_is_provisional_until_later_complete(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.wav"
+            sf.write(path, np.zeros(10_240, dtype=np.float32), 16_000)
+            sample = EasyTurnSample("zh:test", "zh", "complete", path)
+            model = FakeTurnModel(
+                [
+                    "<|user_nonidle|>",
+                    "<|user_incomplete|>",
+                    "<|user_nonidle|>",
+                    "<|user_complete|>",
+                ]
+            )
+            attach_raw_state_capture(model)
+            result = evaluate_sample(
+                model,
+                sample,
+                0,
+                "complete-immediate-incomplete-provisional-v1",
+            )
+        self.assertEqual(result["prediction"], "complete")
+        self.assertEqual(result["decision_chunk"], 3)
+        self.assertEqual(len(result["trace"]), 4)
+
+    def test_incomplete_remains_without_later_complete(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.wav"
+            sf.write(path, np.zeros(5_120, dtype=np.float32), 16_000)
+            sample = EasyTurnSample("zh:test", "zh", "incomplete", path)
+            model = FakeTurnModel(
+                [
+                    "<|user_nonidle|>",
+                    "<|user_incomplete|>",
+                    "<|user_idle|>",
+                    "<|user_idle|>",
+                ]
+            )
+            attach_raw_state_capture(model)
+            result = evaluate_sample(
+                model,
+                sample,
+                320,
+                "complete-immediate-incomplete-provisional-v1",
+            )
+        self.assertEqual(result["prediction"], "incomplete")
+        self.assertEqual(result["decision_chunk"], 1)
+        self.assertEqual(len(result["trace"]), 4)
+
+    def test_first_terminal_policy_stops_on_incomplete(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.wav"
+            sf.write(path, np.zeros(10_240, dtype=np.float32), 16_000)
+            sample = EasyTurnSample("zh:test", "zh", "incomplete", path)
+            model = FakeTurnModel(
+                [
+                    "<|user_nonidle|>",
+                    "<|user_incomplete|>",
+                    "<|user_nonidle|>",
+                    "<|user_complete|>",
+                ]
+            )
+            attach_raw_state_capture(model)
+            result = evaluate_sample(model, sample, 0, "first-terminal-v1")
+        self.assertEqual(result["prediction"], "incomplete")
+        self.assertEqual(result["decision_chunk"], 1)
+        self.assertEqual(len(result["trace"]), 2)
 
     def test_summary_is_macro_average(self):
         records = [

@@ -173,6 +173,10 @@ estimate_confidence = low
 
 续训练前先用同一 runner 测试官方 checkpoint。只有官方模型能复现论文结果，后续 checkpoint 与 step 0 的差值才有可解释性。基线不通过时禁止正式续训练。
 
+这里要区分训练期验证与论文 benchmark。官方公开的 Stage 3 重实现训练代码从训练数据随机切出 2% 做 validation，默认每 1,000 optimizer step 计算一次 `val_loss`、七个 token head accuracy 及其等权平均 `val_acc`，并按 `val_acc` 保存 top-2 checkpoint；训练脚本的 `test_step` 为空，不会自动运行论文表 2 或表 3。
+
+本项目改用按完整源会话分组的 validation，避免同一会话相邻窗口跨 split 泄漏。表 3 Easy Turn 只承担固定 checkpoint 的模型级外部测试；表 2 Full-Duplex-Bench 只承担完整系统级外部测试。两者都不参与训练期 LR 和停止点选择。
+
 ### 5.2 模型级 benchmark：Bilingual Easy Turn
 
 固定测试资产：
@@ -184,6 +188,8 @@ estimate_confidence = low
 
 评测前只做协议规定的单声道化和 16 kHz 重采样，不做响度或语义相关的 test-set 调参。按官方推理参数以 160 ms chunk 模拟在线输入；中文 teacher ASR 为 Paraformer，英文为 SenseVoice Small。
 
+论文和已发布代码尚未给出 Easy Turn 的样本级流式读出脚本。官方在线服务中，`complete` 会立即交出话轮，`incomplete` 则继续监听；但不能未经验证就把服务控制语义当成论文表 3 的离线分类协议。正式基线必须先确认论文对预切分音频的判定时点、尾部静音和多次状态输出处理，再冻结协议。
+
 论文目标和本地复现：
 
 | 语言 | 指标 | 论文 | 官方权重本地结果 | 差异 |
@@ -194,6 +200,24 @@ estimate_confidence = low
 | ZH | Complete ACC | 89.33%（268/300） | TBD | TBD |
 | ZH | Incomplete ACC | 79.33%（238/300） | TBD | TBD |
 | ZH | Macro Avg. ACC | 84.33% | TBD | TBD |
+
+协议诊断（不计作官方基线）：
+
+| 语言 | 读出策略 | Complete | Incomplete | Macro | 结论 |
+| --- | --- | ---: | ---: | ---: | --- |
+| ZH | 在线服务语义：`complete` 立即结束，`incomplete` 暂存并继续监听 | 269/300（89.67%） | 191/300（63.67%） | 76.67% | Complete 与论文仅差 1 条，但 Incomplete 少 47 条；不能作为表 3 复现协议 |
+
+该诊断的完整逐 chunk 轨迹保存在数据盘：
+
+```text
+/root/autodl-tmp/dataset/soulx_duplug_eval/reports/easy_turn_zh_service_provisional_diagnostic.json
+SHA-256: a63d9c1de32506078aff6d4f28a863714d9dab2a0b1b4152f1a0ce1c729132ce
+decision_policy: complete-immediate-incomplete-provisional-v1
+```
+
+`configs/soulx_easy_turn_zh_no_farfield_diagnostic.yaml` 仅用于审计部署端 `far_field_threshold` 对预切分低响度样本的影响；它不会替换 `configs/soulx_official_easy_turn_eval.yaml`，其结果也不计作正式基线。
+
+在读出协议复现前，中文官方基线保持 `TBD`，不启动正式续训练，也不运行英文全量测试浪费算力。
 
 延迟：论文给出 240 ms 理论延迟和 L20 上 205 ms 部署测量。本机硬件不同，因此回填本机 median、p90、p95、首个有效 state latency、样本实时率和 CUDA 配置，不把硬件差异误判为模型退化。
 
