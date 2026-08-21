@@ -18,7 +18,6 @@ from .table3_protocol import (
     EXPECTED_SAMPLE_ORDER,
     EXPECTED_UPSTREAM_COMMIT,
     EXPECTED_UPSTREAM_SCRIPT_SHA256,
-    PAPER_CORRECT,
     PRIMARY_RULE,
     SCHEMA_VERSION,
     SENSITIVITY_RULES,
@@ -30,6 +29,16 @@ from .table3_protocol import (
     summarize_records,
 )
 from .table3_reproduction import atomic_json_write, validate_trace
+
+
+# Paper targets are intentionally isolated in the post-inference gate. The
+# inference runner and trace classifier never import or receive these values.
+PAPER_CORRECT = {
+    ("en", "complete"): 247,
+    ("en", "incomplete"): 266,
+    ("zh", "complete"): 268,
+    ("zh", "incomplete"): 238,
+}
 
 
 _VERIFIED_FILE_HASHES: dict[tuple[str, int, int], str] = {}

@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from duplexconv_stage3 import table3_gate
+from duplexconv_stage3 import table3_gate, table3_protocol, table3_reproduction
 from duplexconv_stage3.table3_gate import audit_result
 from duplexconv_stage3.table3_protocol import (
     EXPECTED_CHECKPOINT_LOAD_UNEXPECTED_KEYS,
@@ -43,6 +43,11 @@ class FakeASR:
 
 
 class Table3ProtocolTests(unittest.TestCase):
+    def test_paper_targets_are_isolated_from_inference_modules(self):
+        self.assertTrue(hasattr(table3_gate, "PAPER_CORRECT"))
+        self.assertFalse(hasattr(table3_protocol, "PAPER_CORRECT"))
+        self.assertFalse(hasattr(table3_reproduction, "PAPER_CORRECT"))
+
     def test_four_readout_rules_are_distinct_and_label_independent(self):
         trace = [
             {"state": "idle", "timestamp": [0.0, 0.16]},

@@ -72,7 +72,7 @@ GPU NVIDIA vGPU-32GB
 - `pip check`：通过，无 broken requirements；
 - 官方 benchmark 入口：`TurnModel`、`ParaformerASR`、`SensevoiceASR` 导入通过；
 - 官方 Stage 3 入口：`finetune`、DataModule、Dataset、Model 导入通过；
-- 项目测试：63/63 通过；
+- 项目测试：清理废弃 Table 3 实现后 52/52 通过；
 - CUDA：可用，PyTorch 能识别 `NVIDIA vGPU-32GB`。
 
 真实执行链 smoke：
@@ -92,7 +92,7 @@ benchmark runner 会在每个新结果中记录 Python、关键包版本、CUDA/
 
 新环境放在数据盘 `/root/autodl-tmp/conda_envs/soulx-table3-audit`，并从项目 `.conda-envs/soulx-table3-audit` 软链接进入。审计 runner 会在加载模型前硬检查上述版本；YAML 中的 `precision: bf16` 只是上游未消费的配置字段，正式结果以模型参数实际 dtype 和 runner 是否启用 autocast 为准。
 
-2026-08-20 已从现有环境克隆该独立环境，并只按官方 training-code 清单将 transformers 固定到 4.55.0、numpy 固定到 1.24.4；其余核心包已匹配。安装使用阿里云 PyPI 镜像，`pip check` 无冲突，项目测试 63/63 通过。环境约 7.2 GiB，数据盘剩余约 24 GiB。
+2026-08-20 已从现有环境克隆该独立环境，并只按官方 training-code 清单将 transformers 固定到 4.55.0、numpy 固定到 1.24.4；其余核心包已匹配。安装使用阿里云 PyPI 镜像，`pip check` 无冲突。环境约 7.2 GiB，数据盘剩余约 24 GiB。
 
 候选 Table 3 runner 已分别完成 EN Complete 1 条和 ZH Complete 1 条 diagnostic smoke。两条均端到端成功，英文使用本地 SenseVoice Small，中文使用本地 Paraformer，未发生运行时下载。smoke 保存了每次 teacher-ASR 文本、完整状态轨迹、五个状态 token logits、初始化日志及全部输入/模型哈希。
 

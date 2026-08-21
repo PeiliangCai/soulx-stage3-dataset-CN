@@ -52,12 +52,6 @@ EXPECTED_COUNTS = {
     ("zh", "complete"): 300,
     ("zh", "incomplete"): 300,
 }
-PAPER_CORRECT = {
-    ("en", "complete"): 247,
-    ("en", "incomplete"): 266,
-    ("zh", "complete"): 268,
-    ("zh", "incomplete"): 238,
-}
 EXPECTED_SAMPLE_ORDER = {"en": "official-os-walk", "zh": "official-list"}
 
 EXPECTED_RUNTIME_VERSIONS = {

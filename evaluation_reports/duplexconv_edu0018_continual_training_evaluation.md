@@ -242,7 +242,7 @@ SHA-256: a63d9c1de32506078aff6d4f28a863714d9dab2a0b1b4152f1a0ce1c729132ce
 decision_policy: complete-immediate-incomplete-provisional-v1
 ```
 
-`configs/soulx_easy_turn_zh_no_farfield_diagnostic.yaml` 仅用于审计部署端 `far_field_threshold` 对预切分低响度样本的影响；它不会替换 `configs/soulx_official_easy_turn_eval.yaml`，其结果也不计作正式基线。
+上述部署门限实验只是历史 diagnostic，不计作正式基线。在新候选 runner 完成审计后，旧 `TurnModel` 评测脚本及其三个专用配置已从代码仓库删除；历史结果 JSON 仅保留在数据盘作为审计证据。
 
 收到的 bundle 历史结果为 EN Complete 247/318、EN Incomplete 266/299、ZH Complete 266/300、ZH Incomplete 238/300，数值确实接近论文；逐样本预测也能由所附轨迹中的最后一个 `speak/wait` 重算。但这些 JSON 是从较早轨迹事后规范化而来，包内还存在直接比较四种规则与论文目标的脚本，并缺少规范化前原始结果、Teacher-ASR 缓存和完整运行日志。因此历史结果只作为参考，不能回填上表“官方权重本地结果”。
 
@@ -259,6 +259,10 @@ decision_policy: complete-immediate-incomplete-provisional-v1
 本机结果与 bundle 历史规范化预测在 EN Complete、EN Incomplete、ZH Complete、ZH Incomplete 分别有 16、14、9、5 条预测不同。因 bundle 缺少原始 Teacher-ASR 缓存、完整运行日志和规范化前结果，当前不能把差异归因为某一个已证实因素，也不用 bundle 预测覆盖本机结果。
 
 候选协议全量独立复现已完成，但数值门禁失败；官方基线不得标记为“已复现”，不启动正式续训练。下一步是取得作者的样本级协议/评测脚本，或在不查看标签方向、不切换主规则的前提下定位可审计的实现差异。
+
+2026-08-21 的专项反作假审计未发现预测篡改、标签入模、样本排除、分类别调参或事后切换主规则。但 `last-terminal-v1` 的来源包含已看过论文目标的历史 bundle，所以仍保留“候选协议、尚缺作者确认”这一限制。完整证据、数据选择核对和废弃代码清单见 `evaluation_reports/soulx_table3_anti_cheating_audit.md`。
+
+中文 600 条不是本项目随机抽样，而是发布方固定 Testset 中全部 300 Complete + 300 Incomplete；没有第二个同分布 600 条池可供重抽。按发布时已存在的子组重算，真人录音 Complete/Incomplete 为 92.00%/86.00%，合成语音为 83.33%/74.67%。后续 checkpoint 必须同时报告这四个子组，不只报 macro。
 
 延迟：论文给出 240 ms 理论延迟和 L20 上 205 ms 部署测量。本机硬件不同，因此回填本机 median、p90、p95、首个有效 state latency、样本实时率和 CUDA 配置，不把硬件差异误判为模型退化。
 

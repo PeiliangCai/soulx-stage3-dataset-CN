@@ -937,9 +937,12 @@ estimate_confidence = low
 - [x] 只读审计另一台服务器的 Table 3 bundle；确认数据/权重/上游哈希和历史轨迹内部一致，同时记录事后聚合、弱 gate、缺失 ASR 缓存/日志及 `bf16` 字段未实际生效等风险。
 - [x] 在本机正式运行前冻结候选协议证据表：training-code 直推理、2 秒尾静音、无部署 RMS 门限、last-terminal 主规则及三项固定敏感性规则。
 - [x] 新增独立审计 runner 和严格 gate：全新 per-class ASR cache、禁止 resume、保存 Teacher-ASR 文本/完整 state/状态 logits/日志，并从逐样本证据重新计分；历史 bundle 保持原封不动。
-- [x] 建立匹配历史核心版本的独立 Conda 环境；核心包版本、`pip check` 和 60 项单元测试通过。
+- [x] 建立匹配历史核心版本的独立 Conda 环境；核心包版本、`pip check` 和当前 52 项单元测试通过。
 - [x] 完成新 runner 的每语言一条 diagnostic smoke；EN/SenseVoice 与 ZH/Paraformer 均使用本地模型端到端通过，并生成 checkpoint、ASR、state trace 和 logits 审计证据。
 - [x] 首次正式候选运行在 ZH Complete 第 120 条暴露 Paraformer 空列表；确认官方 ASR 包装器会记录异常并返回空字符串后，补齐同语义的结构化 fallback。旧 partial 与旧提交下 EN 结果仅保留审计，不跨提交拼接。
+- [x] 完成最新 Table 3 runner 反作假审计；未发现预测篡改、标签入模、样本排除、分类别调参或事后换主规则，同时保留 last-terminal 尚未获作者确认的限制。
+- [x] 确认中文 600 条是发布包的完整固定 Testset，不是本项目随机抽样；无第二个同分布 600 条池，不伪造重抽实验。
+- [x] 删除已废弃的 `TurnModel` Easy Turn runner、单元测试和三个专用配置，代码仓库只保留最新 Table 3 候选实现。
 - [ ] 向作者确认或取得 Easy Turn 样本级评测脚本；至少确认 `far_field_threshold`、尾部静音长度、终态读取规则和预切分音频的结束点处理。
 - [x] 全量运行官方 checkpoint 的冻结候选 Easy Turn baseline；证据审计通过，数值门禁失败。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
