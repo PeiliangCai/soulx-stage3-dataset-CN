@@ -1,7 +1,7 @@
 # DuplexConv Edu_0018：SoulX Stage 3 中文训练数据构造与训练计划
 
-更新时间：2026-08-20  
-状态：执行中。Gate 0–6、NaN/runtime 验收、真实 5-step 预检，以及 Stage 3/benchmark 精简 Conda 环境验收已通过；旧 300-step pilot 已撤销，当前先复现论文 benchmark，基线通过前禁止正式续训练。
+更新时间：2026-08-21
+状态：执行中。数据构造、NaN/runtime、真实 5-step 预检、Table 3 候选基线与反作假审计已完成；项目负责人已接受该候选基线作为本项目 step 0 配对基线并于 2026-08-21 明确授权启动续训练。会话级 split 已冻结，当前执行 validation-only LR 校准与正式 checkpoint 网格。
 
 > 本文件覆盖当前 DuplexConv `Edu_0018` 项目的全部工作，包括工作区整理、旧资产清理、多声道处理、状态补标、Paraformer 伪转录、model-ready 导出、SoulX NaN 修复和真实训练。以后处理另一个完全独立的数据集时，才在 `project_plan/` 下新增另一份计划文件。
 
@@ -663,7 +663,7 @@ return logits.reshape(-1)[0].float() * 0.0
 2. **模型级外部测试：Bilingual Easy Turn（论文表 3）**。直接衡量 SoulX 状态预测模块的 Complete/Incomplete 准确率与流式延迟，用于报告固定 checkpoint 的泛化性能和与论文结果对齐。
 3. **系统级外部测试：Bilingual Full-Duplex-Bench（论文表 2）**。将 SoulX 接入论文相同的 Qwen2.5-7B-Instruct 和 IndexTTS-1.5 系统，验证 Pause Handling、Turn Taking、User Backchannel 和 User Interruption。该层会受到 LLM、TTS、ASR 和调度抖动影响，不能代替模型级诊断。
 
-三者用途严格分开：Stage 3 训练过程只使用按源会话分组的 train/validation；论文表 3 的 Bilingual Easy Turn 是固定的 Stage 3 checkpoint 外部测试；论文表 2 的 Bilingual Full-Duplex-Bench 只用于完整对话系统验证。任何 benchmark test set 都不参与 LR、停止点或其他训练超参数选择。
+三者用途严格分开：Stage 3 训练过程只使用按源会话分组的 train/validation；论文表 3 的 Bilingual Easy Turn 是固定的 Stage 3 checkpoint 外部测试；论文表 2 的 Bilingual Full-Duplex-Bench 只用于完整对话系统验证。任何 benchmark test set 都不参与 LR、训练数据、状态映射或训练超参数选择。Table 3 按预注册网格完整报告，用于事后描述稳定区间、最佳观测值和下降点；若据此推荐 checkpoint，必须明确披露这是 benchmark-informed selection，不能再把同一 Table 3 数值当作完全无偏的最终泛化估计。
 
 官方公开的 Stage 3 **重实现训练代码**没有在 `trainer.fit()` 中调用表 2 或表 3。其 `train_config.yaml` 默认从训练集随机切出 2% 作为 validation、每 1,000 optimizer step 验证一次，并以 `val_acc` 保存 top-2 checkpoint；`val_acc` 是 text、EOS、idle、nonidle、user_complete、user_incomplete、user_backchannel 七个 token head accuracy 的等权平均，`test_step` 为空。由于 README 明确称其为重实现流程，只能据此确认公开代码行为，不能断言论文内部原始训练脚本完全相同。本项目不沿用其样本级随机切分，而使用 17.3 节的会话级分组切分防止相邻窗口泄漏。
 
@@ -756,13 +756,15 @@ estimate_confidence = low
 
 双/三声道按自然比例混合，三声道不过采样。不能直接随机切分 2,168 个窗口，因为同一源会话或同一多声道视角的相邻窗口会泄漏到 train/validation。
 
-在训练前生成并冻结 group-aware split manifest：
+已生成并冻结 group-aware split manifest：
 
 - 以完整源会话为最小分组；
 - 同一个 WAV 的全部目标视角和全部窗口只能落入同一 split；
 - validation 目标为约 5%，同时报告会话数、视角数、窗口数、时长、声道数和状态分布；
 - Easy Turn 与 Full-Duplex-Bench 永不进入训练或 validation；
 - benchmark 结果不能反向修改标注、LR、状态映射或 split。
+
+冻结结果：475 个训练源会话、25 个验证源会话，会话泄漏为 0；训练 2,066 rows/约 19.921 h，验证 102 rows/约 1.147 h。split identity 为 `0f5060afcf27857af17b99755775921851125fdf7b96dbf6e233fbfb967c1f2b`。
 
 ### 17.4 正式续训练设置和 step 网格
 
@@ -816,9 +818,9 @@ estimate_confidence = low
 4. 每条样本保留逐 chunk state、触发时刻、最终分类和耗时；
 5. Easy Turn 四个类别准确率与论文对应正确样本数一致；若只能达到四舍五入误差 ±1 条，必须找到并记录协议差异后由项目负责人决定能否放行；
 6. 端到端 Full-Duplex-Bench 使用论文相同系统组件和官方评测脚本；随机组件至少重复 3 次并报告均值、标准差和 seed；
-7. 基线未通过时不得启动正式续训练，不能通过调 test-set 阈值制造一致结果。
+7. 原机器 gate 未通过时不得静默启动，必须报告差异并由项目负责人明确决定；无论是否放行，都不能通过调 test-set 阈值制造一致结果。
 
-协议选择必须先有外部或实现依据，再运行汇总指标。允许的依据仅包括论文、官方代码/配置、官方数据说明和作者确认；禁止根据“哪种规则更接近 89.33%/79.33%”反向选择门限、尾部静音或状态读出。诊断实验全部保留且明确标为 diagnostic。若官方样本级协议仍不可获得，或按唯一预注册协议运行后仍未达到门禁，则 Gate 9 保持关闭并向项目负责人报告阻塞，不以最接近论文的诊断结果代替基线。
+协议选择必须先有外部或实现依据，再运行汇总指标。允许的依据仅包括论文、官方代码/配置、官方数据说明和作者确认；禁止根据“哪种规则更接近 89.33%/79.33%”反向选择门限、尾部静音或状态读出。诊断实验全部保留且明确标为 diagnostic。若官方样本级协议仍不可获得，或按唯一预注册协议运行后仍未达到原机器门禁，则必须向项目负责人报告差异，不以最接近论文的诊断结果替代主结果。项目负责人可在完整证据与限制均披露后决定是否将候选协议作为本项目内部配对 step 0；该决定不把候选协议改称为作者确认的官方样本级协议。
 
 2026-08-20 收到另一台服务器的只读复现包 `soulx-table3-reproduction-bundle-20260820`。包内历史结果与论文接近，但不是由最终 runner 一次性前瞻运行产生：历史轨迹曾比较 first/last/endpoint 等读出规则，随后以最后一个 `speak/wait` 重新聚合；原始聚合前 JSON、Teacher-ASR 缓存和完整日志也未随包提供。因此该包只能作为高价值候选协议和历史参考，不能直接当成本机正式基线或无造假证明。
 
@@ -826,7 +828,7 @@ estimate_confidence = low
 
 官方 checkpoint 在 clean training-code 中会触发一次 `strict=False` 回退，唯一原因是 `embed_tokens_func.weight` 在类初始化末尾才注册，而导出的 checkpoint 已包含该别名。审计确认它与正式 `llm...embed_tokens.weight`、`lm_head.weight` 共用同一 tensor，且不存在缺失键、形状不匹配或其他多余键。候选 runner 只允许这一项固定别名；任一新增差异立即失败，并把兼容审计写入结果。
 
-2026-08-21 完成修复后的四类全量候选运行 `formal-candidate-v1-ac8fcf1`。主规则结果为 EN Complete 251/318（78.93%）、EN Incomplete 268/299（89.63%）、ZH Complete 263/300（87.67%）、ZH Incomplete 241/300（80.33%）。逐样本轨迹、状态 logits、Teacher-ASR 缓存、模型/数据/代码哈希和日志的严格证据审计通过；但 EN Complete（+1.26 pp）和 ZH Complete（-1.67 pp）超出机器 gate 的 ±1.0 pp 筛查范围，因此 `accuracy_gate_passed=false`、`continued_training_authorized=false`。候选全量运行已完成不等于官方样本级协议已复现。
+2026-08-21 完成修复后的四类全量候选运行 `formal-candidate-v1-ac8fcf1`。主规则结果为 EN Complete 251/318（78.93%）、EN Incomplete 268/299（89.63%）、ZH Complete 263/300（87.67%）、ZH Incomplete 241/300（80.33%）。逐样本轨迹、状态 logits、Teacher-ASR 缓存、模型/数据/代码哈希和日志的严格证据审计通过；但 EN Complete（+1.26 pp）和 ZH Complete（-1.67 pp）超出原机器 gate 的 ±1.0 pp 筛查范围，因此历史 gate JSON 保持 `accuracy_gate_passed=false`，不得篡改。专项反作假审计未发现预测篡改、标签入模、样本排除、分类别调参或事后换主规则。项目负责人随后认定四类结果与论文已基本一致，并明确要求开始续训练；因此该候选运行被固定为本项目内部 step 0 配对基线，同时继续披露 last-terminal 尚缺作者确认、原机器数值 gate 未通过这两个限制。
 
 ## 18. 实际执行 TODO 与门禁
 
@@ -930,7 +932,7 @@ estimate_confidence = low
 - [x] 下载并验收 EN/ZH Easy Turn 与 ZH Full-Duplex-Bench 官方资产。
 - [ ] 获取并固定 English Full-Duplex-Bench、Qwen2.5-7B-Instruct、IndexTTS-1.5 及端到端系统依赖。
 - [x] 实现逐样本可审计、可中断续跑的 Easy Turn runner和指标汇总；结果记录环境、代码、配置、模型与样本身份。
-- [ ] 在 checkpoint 对比汇总中补充 paired bootstrap 和 McNemar 统计检验。
+- [x] 实现 checkpoint 配对汇总的 10,000 次 paired bootstrap、exact McNemar 和中文四个固定真人/合成子组统计；正式数值待 checkpoint 推理完成后回填。
 - [x] 在少量 EN/ZH 样本上核对 160 ms streaming、ASR、state 输出和精简 Conda 环境运行链；真实 smoke 分别完成 ZH 2 条和 EN 2 条。论文表 3 的样本级读出协议仍待复现。
 - [x] 完成 ZH 600 条在线服务语义诊断，确认 Complete 269/300、Incomplete 191/300；该结果不计作官方基线。
 - [x] 定向重跑 18 条 `no_decision`：关闭部署 RMS 门限后 14 条为 Incomplete、4 条为 Complete，证明门限只能解释部分差异。
@@ -947,23 +949,24 @@ estimate_confidence = low
 - [x] 全量运行官方 checkpoint 的冻结候选 Easy Turn baseline；证据审计通过，数值门禁失败。
 - [ ] 复现官方 checkpoint 的 Full-Duplex-Bench baseline。
 
-### Gate 9：基线一致性
+### Gate 9：候选基线一致性与项目决定
 
 - [ ] Easy Turn 四个类别达到论文对应正确样本数，或差异不超过预定义 ±1 条且原因已完全解释。本轮失败；即使按较宽的 ±1.0 pp 机器筛查，仍有两类超限。
 - [x] 使用本机运行前冻结的唯一候选主协议；没有阈值搜索、规则择优、标签条件分支或样本排除，并单独披露其尚缺作者确认。
 - [ ] Full-Duplex-Bench 主要指标达到预定义复现容差，随机运行统计和环境差异完整。
 - [x] 固定 Easy Turn 候选 baseline predictions、配置、日志、软件/硬件版本和 checksum；产物位于 `dataset/soulx_duplug_eval/table3_audit/formal-candidate-v1-ac8fcf1`。
+- [x] 项目负责人在知悉原机器 gate 未通过及 last-terminal 未获作者确认的前提下，接受该运行作为本项目内部配对 step 0 并授权续训练；历史 gate 结果不修改。
 
 ### Phase 10：正式训练前冻结
 
-- [ ] 生成 source-conversation group-aware train/validation manifest 并做泄漏审计。
-- [ ] 只用 train/validation 完成 `1e-5` 与 `3.33e-5` 的 20-step LR 校准。
-- [ ] 冻结唯一正式训练配置、step 定义、checkpoint 网格和停止规则。
-- [ ] 确认 evaluation snapshot 与 resumable checkpoint 的磁盘预算和重载结果。
+- [x] 生成 source-conversation group-aware train/validation manifest 并做泄漏审计；475/25 源会话、2,066/102 rows、leakage=0。
+- [x] 只用 train/validation 完成 `1e-5` 与 `3.33e-5` 的 20-step LR 校准；两档均无 AMP overflow，未读取 Table 3。
+- [x] 冻结正式 peak LR=`1e-5`、step 定义、checkpoint 网格和停止规则。两档在 step 20 都触发单 head >5pp guard；`1e-5` 将保护线维持到 step 10，`3.33e-5` 在 step 5 已触发，因此按修正后的 validation-only v2 选择器采用低 LR。错误地从空 eligible set 选高 LR 的 v1 结果已标记为 rejected bug 并保留审计，不用于训练。
+- [x] 确认 evaluation snapshot 与 resumable checkpoint 的磁盘预算和重载结果；evaluation 约 54 MB，resume 约 162 MB，端到端 1-step smoke 和 reload 通过。
 
 ### Gate 10：正式续训练确认
 
-- [ ] 项目负责人检查 baseline 报告、LR 校准、有效 batch、FP16、checkpoint 和磁盘方案。
+- [x] 项目负责人已明确要求开始续训练；有效 batch/step 双口径、FP16、checkpoint 和磁盘方案按本计划执行，LR 由 validation-only 校准自动冻结。
 
 ### Phase 11：续训练与固定网格评估
 

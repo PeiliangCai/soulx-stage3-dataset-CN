@@ -218,6 +218,46 @@ def audit_result(
         load_audit.get("loaded_model_alias_tied"), True, "loaded model alias tying"
     )
 
+    continuation = payload.get("continuation_checkpoint")
+    expected_state_profile = "official-base-v1"
+    if continuation is not None:
+        if not isinstance(continuation, dict):
+            raise ValueError("invalid continuation checkpoint audit")
+        require_equal(continuation.get("status"), "accepted", "continuation status")
+        require_equal(
+            continuation.get("policy"),
+            "official-base-plus-exact-trainable-overlay-v1",
+            "continuation load policy",
+        )
+        require_equal(
+            continuation.get("profile"),
+            "soulx-stage3-compact-evaluation-v2",
+            "continuation checkpoint profile",
+        )
+        if not isinstance(continuation.get("local_step"), int) or continuation["local_step"] <= 0:
+            raise ValueError("continuation local step must be positive")
+        require_equal(
+            continuation.get("missing_trainable_keys"), [], "continuation missing keys"
+        )
+        require_equal(
+            continuation.get("unexpected_trainable_keys"), [], "continuation unexpected keys"
+        )
+        require_equal(
+            continuation.get("shape_mismatches"), {}, "continuation tensor shapes"
+        )
+        require_equal(
+            continuation.get("nonfinite_tensor_names"), [], "continuation finite tensors"
+        )
+        verify_file(
+            continuation["path"], continuation["sha256"], "continuation checkpoint"
+        )
+        expected_state_profile = "official-base-plus-exact-trainable-overlay-v1"
+    require_equal(
+        protocol.get("model_state_profile", "official-base-v1"),
+        expected_state_profile,
+        "model state profile",
+    )
+
     upstream = payload.get("upstream", {})
     require_equal(upstream.get("commit"), EXPECTED_UPSTREAM_COMMIT, "upstream commit")
     require_equal(upstream.get("dirty"), False, "upstream dirty flag")
@@ -472,6 +512,12 @@ def audit_result(
         "paper_accuracy_percent": 100 * paper_correct / expected_count,
         "delta_percentage_points": delta_percentage_points,
         "within_one_percentage_point": abs(delta_percentage_points) <= 1.0 + 1e-12,
+        "continuation_local_step": (
+            continuation.get("local_step") if continuation is not None else 0
+        ),
+        "continuation_checkpoint_sha256": (
+            continuation.get("sha256") if continuation is not None else None
+        ),
     }
     return payload, report
 
@@ -483,6 +529,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--zh-complete", type=Path, required=True)
     parser.add_argument("--zh-incomplete", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--evaluation-mode",
+        choices=("baseline", "continuation"),
+        default="baseline",
+    )
     return parser
 
 
@@ -528,6 +579,24 @@ def main(argv: Sequence[str] | None = None) -> int:
         1,
         "run ID count",
     )
+    continuation_values = [
+        item.get("continuation_checkpoint") for item in payloads.values()
+    ]
+    if args.evaluation_mode == "baseline":
+        require_equal(continuation_values, [None] * 4, "baseline continuation overlays")
+    else:
+        if not all(isinstance(item, dict) for item in continuation_values):
+            raise ValueError("continuation mode requires four continuation overlays")
+        require_equal(
+            len({item["sha256"] for item in continuation_values}),
+            1,
+            "continuation checkpoint identity count",
+        )
+        require_equal(
+            len({item["local_step"] for item in continuation_values}),
+            1,
+            "continuation local-step count",
+        )
     cache_paths = [item["asr_cache"]["path"] for item in payloads.values()]
     require_equal(len(set(cache_paths)), 4, "fresh per-class ASR cache count")
     for language in ("en", "zh"):
@@ -549,20 +618,34 @@ def main(argv: Sequence[str] | None = None) -> int:
             f"{language} model artifact identity",
         )
 
-    gate_passed = all(item["within_one_percentage_point"] for item in reports)
+    accuracy_gate_passed = all(item["within_one_percentage_point"] for item in reports)
     report = {
         "schema_version": SCHEMA_VERSION,
         "protocol": "frozen-candidate-v1",
-        "criterion": "all four class accuracies within 1.0 percentage point",
+        "evaluation_mode": args.evaluation_mode,
+        "criterion": (
+            "all four class accuracies within 1.0 percentage point"
+            if args.evaluation_mode == "baseline"
+            else "complete frozen-protocol evidence for one continuation checkpoint"
+        ),
         "evidence_audit_passed": True,
-        "accuracy_gate_passed": gate_passed,
-        "gate_passed": gate_passed,
-        "continued_training_authorized": gate_passed,
+        "accuracy_gate_passed": (
+            accuracy_gate_passed if args.evaluation_mode == "baseline" else None
+        ),
+        "gate_passed": (
+            accuracy_gate_passed if args.evaluation_mode == "baseline" else True
+        ),
+        "continued_training_authorized": (
+            accuracy_gate_passed if args.evaluation_mode == "baseline" else None
+        ),
+        "continuation_checkpoint": (
+            continuation_values[0] if args.evaluation_mode == "continuation" else None
+        ),
         "checks": reports,
     }
     atomic_json_write(args.output, report)
     print(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2))
-    return 0 if gate_passed else 2
+    return 0 if report["gate_passed"] else 2
 
 
 if __name__ == "__main__":

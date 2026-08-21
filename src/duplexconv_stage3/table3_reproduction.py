@@ -528,6 +528,88 @@ def audit_checkpoint_compatibility(model: Any, checkpoint_path: Path) -> dict[st
     return result
 
 
+def apply_continuation_checkpoint(model: Any, checkpoint_path: Path) -> dict[str, Any]:
+    """Overlay the exact compact trainable tensors on the audited official base."""
+
+    import torch
+
+    path = checkpoint_path.resolve(strict=True)
+    payload = torch.load(path, map_location="cpu", weights_only=True)
+    if not isinstance(payload, dict):
+        raise RuntimeError("continuation checkpoint root must be a dictionary")
+    if payload.get("checkpoint_profile") not in {
+        "soulx-stage3-compact-evaluation-v2",
+        "soulx-stage3-compact-trainable-resume-v2",
+    }:
+        raise RuntimeError("unsupported continuation checkpoint profile")
+    if payload.get("official_base_checkpoint_sha256") != EXPECTED_OFFICIAL_CHECKPOINT_SHA256:
+        raise RuntimeError("continuation checkpoint official-base identity mismatch")
+    if payload.get("runtime_base_commit") != EXPECTED_UPSTREAM_COMMIT:
+        raise RuntimeError("continuation checkpoint runtime identity mismatch")
+    local_step = payload.get("local_step")
+    if not isinstance(local_step, int) or local_step <= 0:
+        raise RuntimeError("continuation checkpoint local_step must be positive")
+    state = payload.get("trainable_state_dict")
+    if not isinstance(state, dict) or not state:
+        raise RuntimeError("continuation trainable_state_dict is missing")
+    named_parameters = dict(model.named_parameters())
+    expected = {
+        name for name, parameter in model.named_parameters() if parameter.requires_grad
+    }
+    actual = set(state)
+    missing = sorted(expected - actual)
+    unexpected = sorted(actual - expected)
+    shape_mismatches = {
+        name: {
+            "checkpoint": list(state[name].shape),
+            "model": list(named_parameters[name].shape),
+        }
+        for name in sorted(expected & actual)
+        if tuple(state[name].shape) != tuple(named_parameters[name].shape)
+    }
+    nonfinite = [
+        name
+        for name in sorted(expected & actual)
+        if not torch.isfinite(state[name]).all()
+    ]
+    if missing or unexpected or shape_mismatches or nonfinite:
+        raise RuntimeError(
+            "continuation checkpoint tensor audit failed: "
+            + json.dumps(
+                {
+                    "missing": missing,
+                    "unexpected": unexpected,
+                    "shape_mismatches": shape_mismatches,
+                    "nonfinite": nonfinite,
+                },
+                sort_keys=True,
+            )
+        )
+    with torch.no_grad():
+        for name in sorted(actual):
+            named_parameters[name].copy_(state[name].to(named_parameters[name].device))
+    result = {
+        "status": "accepted",
+        "policy": "official-base-plus-exact-trainable-overlay-v1",
+        "path": str(path),
+        "sha256": sha256_file(path),
+        "bytes": path.stat().st_size,
+        "profile": payload["checkpoint_profile"],
+        "local_step": local_step,
+        "estimated_total_optimizer_step": payload.get("estimated_total_optimizer_step"),
+        "origin_step_estimate": payload.get("origin_step_estimate"),
+        "peak_learning_rate": payload.get("peak_learning_rate"),
+        "split_identity_sha256": payload.get("split_identity_sha256"),
+        "trainable_tensor_count": len(actual),
+        "missing_trainable_keys": missing,
+        "unexpected_trainable_keys": unexpected,
+        "shape_mismatches": shape_mismatches,
+        "nonfinite_tensor_names": nonfinite,
+    }
+    del payload, state
+    return result
+
+
 def attach_llm_logit_audit(model: Any) -> None:
     """Capture state-token logits for every upstream LLM forward call."""
     import torch
@@ -663,6 +745,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--asr-cache", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--run-id", required=True)
+    parser.add_argument(
+        "--continuation-checkpoint",
+        type=Path,
+        help="Compact Stage 3 trainable overlay; omission evaluates the official base.",
+    )
     parser.add_argument(
         "--diagnostic-limit",
         type=int,
@@ -832,6 +919,11 @@ def main(argv: Sequence[str] | None = None) -> int:
             "official checkpoint did not emit the pinned late-bound alias fallback; "
             "see initialization log"
         )
+    continuation_checkpoint = None
+    if args.continuation_checkpoint is not None:
+        continuation_checkpoint = apply_continuation_checkpoint(
+            model, args.continuation_checkpoint
+        )
     effective_dtypes = model_dtype_manifest(model)
     attach_llm_logit_audit(model)
 
@@ -876,6 +968,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "config_precision_field": str(cfg.infer_config.precision),
         "autocast_enabled_by_runner": False,
         "effective_model_parameter_dtypes": effective_dtypes,
+        "model_state_profile": (
+            "official-base-plus-exact-trainable-overlay-v1"
+            if continuation_checkpoint is not None
+            else "official-base-v1"
+        ),
     }
     payload: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
@@ -892,6 +989,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "sha256": checkpoint_sha256,
             "load_audit": checkpoint_load_audit,
         },
+        "continuation_checkpoint": continuation_checkpoint,
         "upstream": official_identity,
         "project": project_identity,
         "config": {

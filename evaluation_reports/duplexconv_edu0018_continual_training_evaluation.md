@@ -2,7 +2,7 @@
 
 更新时间：2026-08-21
 用途：课题组会议/导师汇报
-状态：工作稿。数据集已构造，benchmark 资产已固定；官方权重的 Table 3 候选协议独立复现已完成，证据审计通过但数值门禁失败，因此正式续训练和 checkpoint 评测尚未开始。所有 `TBD` 必须用真实实验结果回填，不得用预期值代替。
+状态：历史工作稿/方法说明。数据集和 Table 3 候选基线已固定；原机器数值 gate 未通过但证据与反作假审计通过，项目负责人已在知悉限制的前提下授权续训练。正式运行的实时结果以 `duplexconv_edu0018_continual_training_run.md` 与配套 HTML 仪表盘为准。所有 `TBD` 必须用真实实验结果回填，不得用预期值代替。
 
 ## 1. 汇报摘要
 
@@ -30,7 +30,7 @@
 
 ### 1.3 最终结论
 
-> 当前阶段结论：固定 `frozen-candidate-v1` 的四类全量运行和证据审计已完成，但 EN Complete 与 ZH Complete 未达到数值门禁，Gate 9 保持关闭，没有启动正式续训练。中文收益、英文遗忘、最后稳定 step 和推荐 checkpoint 仍为 `TBD`。
+> 当前阶段结论：固定 `frozen-candidate-v1` 的四类全量运行和证据审计已完成。原机器数值 gate 结果保持失败，不篡改；专项反作假审计未发现代码级作弊。项目负责人认定其与论文已基本一致并授权作为本项目 step 0 配对基线，续训练已从 validation-only LR 校准开始。中文收益、英文遗忘、最后稳定 step 和推荐 checkpoint 仍为 `TBD`。
 
 ## 2. 基础模型与续训练定义
 
@@ -171,7 +171,7 @@ estimate_confidence = low
 
 ### 5.1 为什么先复现官方模型
 
-续训练前先用同一 runner 测试官方 checkpoint。只有官方模型能复现论文结果，后续 checkpoint 与 step 0 的差值才有可解释性。基线不通过时禁止正式续训练。
+续训练前先用同一 runner 测试官方 checkpoint。后续 checkpoint 均与该固定 step 0 做逐样本配对比较。原机器 gate 未通过时必须报告而不能调 test set；本项目由负责人在查看完整证据与限制后明确授权使用候选基线，不把它改称为作者确认的官方样本级协议。
 
 这里要区分训练期验证与论文 benchmark。官方公开的 Stage 3 重实现训练代码从训练数据随机切出 2% 做 validation，默认每 1,000 optimizer step 计算一次 `val_loss`、七个 token head accuracy 及其等权平均 `val_acc`，并按 `val_acc` 保存 top-2 checkpoint；训练脚本的 `test_step` 为空，不会自动运行论文表 2 或表 3。
 
@@ -258,7 +258,7 @@ decision_policy: complete-immediate-incomplete-provisional-v1
 
 本机结果与 bundle 历史规范化预测在 EN Complete、EN Incomplete、ZH Complete、ZH Incomplete 分别有 16、14、9、5 条预测不同。因 bundle 缺少原始 Teacher-ASR 缓存、完整运行日志和规范化前结果，当前不能把差异归因为某一个已证实因素，也不用 bundle 预测覆盖本机结果。
 
-候选协议全量独立复现已完成，但数值门禁失败；官方基线不得标记为“已复现”，不启动正式续训练。下一步是取得作者的样本级协议/评测脚本，或在不查看标签方向、不切换主规则的前提下定位可审计的实现差异。
+候选协议全量独立复现已完成，数值门禁失败这一历史事实保持不变；项目负责人已接受其作为内部配对基线并授权续训练。取得作者样本级协议/评测脚本仍是后续工作，届时需并行报告协议差异，不能覆盖当前已冻结结果。
 
 2026-08-21 的专项反作假审计未发现预测篡改、标签入模、样本排除、分类别调参或事后切换主规则。但 `last-terminal-v1` 的来源包含已看过论文目标的历史 bundle，所以仍保留“候选协议、尚缺作者确认”这一限制。完整证据、数据选择核对和废弃代码清单见 `evaluation_reports/soulx_table3_anti_cheating_audit.md`。
 

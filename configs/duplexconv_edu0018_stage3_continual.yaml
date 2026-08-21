@@ -1,0 +1,45 @@
+model_config:
+  task: state_prediction
+  glm_tokenizer_path: /root/SoulX-stage3-dataset/pretrained_models/glm-4-voice-tokenizer
+  model_name: /root/SoulX-stage3-dataset/pretrained_models/Qwen3-0.6B-expand_vocab_v2
+  init_ckpt_path: /root/SoulX-stage3-dataset/pretrained_models/SoulX-Duplug/SoulX-Duplug-0.6B-Bilingual.pth
+  init_ckpt_path_lora: ""
+  enable_lora: true
+  lora_r: 32
+  lora_alpha: 64
+  lora_dropout: 0.1
+  enable_projector: true
+  freeze_projector: false
+  llm_dim: 1024
+
+dataset_config:
+  train_data_path: /root/autodl-tmp/dataset/duplexconv/model_ready/edu0018_stage3_zh_v1/data
+  batch_size: 1
+  num_workers: 0
+  split_size: 0.05
+  max_token_length: 1500
+
+train_config:
+  stage: continual_train
+  total_steps: 300
+  learning_rate: 1.0e-5
+  min_lr: 1.0e-6
+  warmup_steps: 5
+  anneal_steps: 100000
+  anneal_rate: 0.5
+  weight_decay: 0.01
+  accumulate_grad_batches: 72
+  num_gpu_per_node: 1
+  num_node: 1
+  strategy: auto
+  precision: 16-mixed
+  sync_batchnorm: false
+  seed: 42
+  enable_switch_loss_rate: false
+  text_loss_rate: 0.45
+  eos_loss_rate: 0.08
+  idle_loss_rate: 0.08
+  nonidle_loss_rate: 0.09
+  user_complete_loss_rate: 0.24
+  user_incomplete_loss_rate: 0.13
+  user_backchannel_loss_rate: 0.006
