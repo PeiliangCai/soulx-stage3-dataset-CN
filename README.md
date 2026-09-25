@@ -42,7 +42,7 @@ Table 2 Full-Duplex-Bench **没有执行**。A 的结果在提出 B/C/D 假设�
 | 位置 | 内容 | 是否在 GitHub |
 |---|---|---|
 | 本仓库 | `src/`、`scripts/`、`tests/`、配置、计划、报告、状态与发布回执 | 是 |
-| 百度网盘 `/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2` | 45 个原始 shard、metadata、最终 `model_ready` 聚合、证据与回执 | 否 |
+| 百度网盘 `/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh` | 45 个原始 shard、metadata、最终 `model_ready` 聚合、证据与回执 | 否 |
 | 本地 `dataset/` | 数据盘目录的软链接 | 否 |
 | `pretrained_models/`、`checkpoints/` | 官方模型与实验 checkpoint | 否 |
 | `runtimes/`、`third_party/`、`.conda-envs/` | 派生运行时、官方仓库副本与 Conda 环境 | 否 |
