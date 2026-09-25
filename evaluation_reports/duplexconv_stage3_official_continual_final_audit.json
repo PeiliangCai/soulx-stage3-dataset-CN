@@ -1,0 +1,70 @@
+{
+  "checks": {
+    "all_continuation_evidence_gates_passed": true,
+    "baseline_accuracy_gate_passed": false,
+    "baseline_evidence_audit_passed": true,
+    "exact_optimizer_resume": false,
+    "four_classes_per_step": true,
+    "official_group_validation_step0_complete": true,
+    "official_group_validation_step0_no_training": true,
+    "official_training_complete": true,
+    "paper_targets_not_used_for_selection": true,
+    "table3_exact_steps": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "table3_sweep_complete": true,
+    "train_validation_source_leakage_count": 0
+  },
+  "generated_at_utc": "2026-08-22T10:14:22.161640+00:00",
+  "inputs": {
+    "group_validation_runner": {
+      "path": "/root/SoulX-stage3-dataset/scripts/run_official_group_validation.py",
+      "sha256": "e22fab0e80ed19c6eb4d1377c1292a4254f83f8ceb850fcca9af37fa519a6ed4"
+    },
+    "group_validation_step0": {
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/official_group_validation_step0_v1/result.json",
+      "sha256": "5cca4646650bef4d2acf35c144dbb6f1b7d213669bdf377806abe829f72422a2"
+    },
+    "model_ready_stats": {
+      "path": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0018_stage3_zh_v1/stats.json",
+      "sha256": "502ff369d14cf2d1d77122afdaa8b1e500bf3794455e8305fb5fd5d51d03b63b"
+    },
+    "optimizer_updates": {
+      "path": "/root/SoulX-stage3-dataset/checkpoints/duplexconv_edu0018_official_continual_v1/optimizer_updates.jsonl",
+      "sha256": "1464020840686e44408bc76c098c434d64e92c9cbaa486a34d7fcaaafdb4c793"
+    },
+    "orchestration_manifest": {
+      "path": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/official_lightning_v1_b17bcf/orchestration_manifest.json",
+      "sha256": "54130270361aa9858f7fb073132e5e63c46bf425435e9643783753d8bd125081"
+    },
+    "report_renderer": {
+      "path": "/root/SoulX-stage3-dataset/scripts/render_official_continual_report.py",
+      "sha256": "c2326f3505605700ff44f294e75d1abd7ce4518bdf3ccd45ad8ca048a0aa0145"
+    },
+    "split_manifest": {
+      "path": "/root/autodl-tmp/dataset/duplexconv/splits/edu0018_stage3_zh_v1_seed42_group95_5/split_manifest.json",
+      "sha256": "b4874ccf3e263ec4bf56257f5850e676b66528647f06407caf9a3ff0819d6210"
+    },
+    "state_summary": {
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/state_labels_v1/summary.json",
+      "sha256": "9723f05afd4b4b13ee3f9681c4d1acbc90130a8f009489bc6128a4c85d688167"
+    },
+    "sweep_index": {
+      "path": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/official_lightning_v1_b17bcf/sweep_index.json",
+      "sha256": "9c192fd0e7fda41ae1499fb41bab11d53cd849d07f9fb78649a2d48d626bcd5c"
+    },
+    "training_manifest": {
+      "path": "/root/SoulX-stage3-dataset/checkpoints/duplexconv_edu0018_official_continual_v1/run_manifest.json",
+      "sha256": "927f369cd122c5a5e7eece11f23bd54f4a39025793810747bf998378d3cacbe7"
+    },
+    "validation_metrics": {
+      "path": "/root/SoulX-stage3-dataset/checkpoints/duplexconv_edu0018_official_continual_v1/validation_metrics.jsonl",
+      "sha256": "d613a0bbfcbb51c974ceb9267d6fba897cb670442d08586948dd31e21a117f6d"
+    }
+  },
+  "schema_version": 1,
+  "status": "passed"
+}

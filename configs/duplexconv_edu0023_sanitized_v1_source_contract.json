@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0023_sanitized_v1_stage3_zh_v1",
+  "shard_number": 23,
+  "archive_name": "Edu_0023_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0023.tar",
+  "parent_official_archive_bytes": 7968808960,
+  "parent_official_archive_sha256": "e0201c0b4212fbe0673d291620196808f85deaf1cff5e7aaa1d6301b558e7a8f",
+  "sanitization_profile": "exclude-frozen-benchmark-leakage-source-v1",
+  "excluded_source_ids": [
+    "Edu--014047"
+  ],
+  "exclusion_reason": "Frozen benchmark leakage gate v2.2 near-duplicate hit; entire source conversation quarantined by owner-approved conservative resolution.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--013551",
+    "last_source_id": "Edu--014155",
+    "source_ids_sha256": "ea5f6c703d10819a8cc89ee333d8c1ab13b9d57acb009eb786a042545df4ffbb",
+    "source_ntrack": {
+      "2": 488,
+      "3": 11
+    },
+    "target_view_count": 1009,
+    "event_count": 9081,
+    "state_distribution": {
+      "complete": 4698,
+      "incomplete": 1587,
+      "backchannel": 964,
+      "wait": 13,
+      "missing": 1819
+    }
+  }
+}

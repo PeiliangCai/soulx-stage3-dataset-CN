@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-rebuildable-work-tar-rolling-cleanup-completion-v1",
+  "completed_at_utc": "2026-08-28T12:57:24Z",
+  "status": "complete",
+  "predelete_audit": "/root/SoulX-stage3-dataset/project_state/storage_cleanup_edu0011_20260828/rolling_cleanup_predelete.json",
+  "predelete_audit_sha256": "5e017c5c4c114a11177779249e56d7c94bd952b6dc03f4fafedacd04cf4d9da9",
+  "deleted_target_count": 2,
+  "deleted_target_apparent_bytes": 10349516800,
+  "free_bytes_before": 39917600768,
+  "free_bytes_after": 50267119616,
+  "free_bytes_increase": 10349518848,
+  "free_space_note": "The filesystem-reported increase differs from the sum of apparent tar sizes by 2048 bytes because filesystem metadata and allocated blocks are reported independently; both exact target paths are absent after deletion.",
+  "deleted_paths": [
+    "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0011_sanitized_v1/candidate_model_ready_views.tar",
+    "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0011_v1/Edu_0011_sanitized_499sources_v1.tar"
+  ],
+  "preserved": {
+    "official_raw_archive": true,
+    "model_ready_parquet": true,
+    "target_audio": true,
+    "target_audio_file_count": 1008,
+    "openrouter_state_label_request_and_result_file_count": 16,
+    "paraformer_cache_file_count": 1005,
+    "glm_audio_token_cache_file_count": 1005,
+    "source_scan_file_count": 7,
+    "model_ready_file_count": 7,
+    "requests_results_and_api_manifests": true,
+    "gate_selections_manifests_checksums_and_reports": true,
+    "training_and_evaluation_outputs": true
+  },
+  "recoverability": "Deleted files cannot be restored in place, but are deterministically rebuildable from preserved inputs and the exact identities recorded in the predelete audit."
+}

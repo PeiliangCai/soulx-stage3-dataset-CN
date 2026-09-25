@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "task_id": "duplexconv_edu0001_0045_official_continual_v1",
+  "approved_at_utc": "2026-08-29T07:56:31Z",
+  "updated_at_utc": "2026-08-30T01:20:52Z",
+  "status": "running",
+  "current_stage": "table3_parallel_recovery_running_step10_and_step5",
+  "approved_scope": [
+    "Create and audit a seed-42 source-conversation 98/2 split from the immutable Edu_0001-Edu_0045 v2 aggregate.",
+    "Run the patched official Lightning Stage 3 flow for 30 local optimizer steps from the released SoulX weight file.",
+    "Save compact evaluation overlays at local steps 1,2,3,5,10,20,30 and one final resumable Lightning checkpoint.",
+    "Run frozen internal validation and the unchanged Table 3 metric protocol serially after training.",
+    "Generate new Markdown, HTML and audit JSON meeting-report artifacts without overwriting prior Edu_0018 evidence."
+  ],
+  "forbidden_actions": [
+    "Do not run the old custom optimizer loop or runtimes/table3-eval-b17bcf/scripts/run_continual_training.py.",
+    "Do not modify third_party/SoulX-Duplug-upstream or the patched official training runtime.",
+    "Do not change training data, labels, split, learning rate, checkpoint grid, Table 3 samples, decoding rule, thresholds or metrics after observing Table 3 results.",
+    "Do not use Table 3 to select a checkpoint or decide the current 30-step training horizon.",
+    "Do not call paid APIs or delete existing local training/evaluation evidence."
+  ],
+  "training_runtime": {
+    "root": "/root/SoulX-stage3-dataset/runtimes/SoulX-Duplug-928b065-official-continual-v1",
+    "upstream_commit": "928b06508ed2de1344208d06fb1f6fb2ebfb1df5",
+    "entrypoint": "finetune.py",
+    "flow": "official Lightning Trainer.fit/training_step/configure_optimizers",
+    "old_custom_training_flow_used": false
+  },
+  "base_checkpoint": {
+    "path": "/root/SoulX-stage3-dataset/pretrained_models/SoulX-Duplug/SoulX-Duplug-0.6B-Bilingual.pth",
+    "sha256": "b0703dea0b1dbb1cd51e6e7b6514c60907ea4d4b6752cecc3f71cb6445650dbe",
+    "contains_optimizer_scheduler_scaler_global_step": false,
+    "origin_step_estimate": 1800,
+    "origin_step_estimate_confidence": "low"
+  },
+  "dataset": {
+    "aggregate": "/root/autodl-tmp/dataset/duplexconv/aggregates/edu0001_0045_stage3_zh_v2",
+    "aggregate_manifest_sha256": "f6838ad77b4ea533366f7bbf079814f0db16488424e940159a5e3f11ccbe8e72",
+    "row_count": 101395,
+    "source_conversation_count": 22032,
+    "training_effective_hours": 993.444888889
+  },
+  "split": {
+    "output": "/root/autodl-tmp/dataset/duplexconv/splits/edu0001_0045_stage3_zh_v2_seed42_group98_2",
+    "profile": "source-conversation-group-aware-random-v1",
+    "seed": 42,
+    "validation_fraction": 0.02,
+    "expected_identity_sha256": "a2599191a146f0cc37c7cf068cfe2d8cbbbb4906ef3b9a6a04912e3af92dc6fb",
+    "expected_train_rows": 99334,
+    "expected_validation_rows": 2061,
+    "expected_source_leakage_count": 0,
+    "status": "passed",
+    "actual_identity_sha256": "a2599191a146f0cc37c7cf068cfe2d8cbbbb4906ef3b9a6a04912e3af92dc6fb",
+    "train_source_count": 21591,
+    "validation_source_count": 441,
+    "train_row_count": 99334,
+    "validation_row_count": 2061,
+    "source_leakage_count": 0,
+    "train_hours": 972.9949333333334,
+    "validation_hours": 20.449955555555555,
+    "manifest_sha256": "c343348bc97a48ed811c590a37c74d5d634275690f5b76ce9db6240233ec8d95"
+  },
+  "training": {
+    "config": "/root/SoulX-stage3-dataset/configs/duplexconv_edu0001_0045_stage3_official_continual_v1.yaml",
+    "output": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1",
+    "system_link": "/root/SoulX-stage3-dataset/checkpoints/duplexconv_edu0001_0045_official_continual_v1",
+    "local_microbatch": 1,
+    "accumulate_grad_batches": 576,
+    "effective_batch": 576,
+    "total_steps": 30,
+    "checkpoint_steps": [1, 2, 3, 5, 10, 20, 30],
+    "validation_every_optimizer_steps": 10,
+    "estimated_sample_exposure": 17280,
+    "estimated_epoch_fraction": 0.173957557,
+    "status": "complete",
+    "tmux_session": null,
+    "log": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/training.log",
+    "datasets_cache": "/root/autodl-tmp/cache/huggingface_continual_edu0001_0045",
+    "actual_runtime_audit": {
+      "status": "passed",
+      "training_flow": "official-pytorch-lightning-trainer-fit-v1",
+      "manual_optimization": false,
+      "optimizer": "torch.optim.adamw.AdamW",
+      "scheduler": "utils.sparkvox.utils.scheduler.WarmupAnnealSteps",
+      "scheduler_last_epoch_at_fit_start": 1800,
+      "lr_at_fit_start": 0.00003332407793031351,
+      "world_size": 1,
+      "trainable_parameter_count": 13505536,
+      "total_parameter_count": 953154816,
+      "trainable_tensor_count": 118
+    }
+  },
+  "resources": {
+    "training_gpu": "single NVIDIA vGPU-32GB",
+    "training_and_table3_mutual_exclusion": true,
+    "baidu_upload_parallel_allowed": true,
+    "estimated_new_storage_gib": "5_to_7",
+    "paid_api_cost_usd": 0.0
+  },
+  "preflight": {
+    "status": "passed",
+    "unit_test_count": 10,
+    "upstream_clean": true,
+    "upstream_commit": "928b06508ed2de1344208d06fb1f6fb2ebfb1df5",
+    "base_checkpoint_sha256_verified": true
+  },
+  "step0_validation": {
+    "status": "passed",
+    "output": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/group_validation_step0.json",
+    "log": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/group_validation_step0.log",
+    "datasets_cache": "/root/autodl-tmp/cache/huggingface_continual_edu0001_0045",
+    "attempts": [
+      {
+        "attempt": 1,
+        "status": "failed_before_validation",
+        "reason": "Hugging Face datasets default cache exhausted the system disk while expanding the frozen Parquet split",
+        "training_updates_performed": 0,
+        "result_created": false,
+        "log": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/group_validation_step0.attempt1.log"
+      },
+      {
+        "attempt": 2,
+        "status": "complete",
+        "change": "Route HF_HOME, HF_DATASETS_CACHE and XDG_CACHE_HOME to the data disk; experiment inputs and metrics unchanged"
+      }
+    ],
+    "result_sha256": "457d2284ea1f6b8fa910c07bda5853e8914e53ead96247c2da265be77ca5b8a2",
+    "validation_row_count": 2061,
+    "metric_count": 23,
+    "val_acc": 0.5301703214645386,
+    "all_metrics_finite": true,
+    "optimizer_created": false,
+    "backward_calls_performed": 0,
+    "training_updates_performed": 0
+  },
+  "training_attempts": [
+    {
+      "attempt": 1,
+      "status": "failed_after_step10_validation_before_native_checkpoint_commit",
+      "started_at_utc": "2026-08-29T08:15:10.920483+00:00",
+      "failed_at_utc": "2026-08-29T08:41:59.183140+00:00",
+      "completed_optimizer_steps": 10,
+      "completed_compact_checkpoints": [1, 2, 3, 5, 10],
+      "step10_compact_checkpoint_sha256": "9ece2412f9ce1fe71a96989d9916b0051250485333ae288b5dbd36a25a1faf50",
+      "step10_val_acc": 0.5489738583564758,
+      "failure": "Lightning fsspec transaction used tempfile.mkstemp() under the system /tmp while committing the native last.ckpt; the system disk had about 1.4 GiB free and raised ENOSPC.",
+      "training_numerics_failed": false,
+      "native_resume_checkpoint_created": false,
+      "exact_resume_possible": false,
+      "archive": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/attempts/attempt1_tmpdir_system_enospc_step10",
+      "evaluation_archive": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1_attempt1_training_enospc"
+    },
+    {
+      "attempt": 2,
+      "status": "complete_from_released_base_with_identical_frozen_experiment_inputs",
+      "started_at_utc": "2026-08-29T09:29:09.251480+00:00",
+      "reason_for_restart_from_step0": "Attempt 1 did not produce optimizer/scheduler/global-step state, so an exact step-10 resume was impossible.",
+      "configuration_changed": false,
+      "training_data_changed": false,
+      "model_or_learning_rate_changed": false,
+      "process_environment_change_only": {
+        "TMPDIR": "/root/autodl-tmp/tmp/soulx_edu0001_0045_official_v1_attempt2",
+        "TEMP": "/root/autodl-tmp/tmp/soulx_edu0001_0045_official_v1_attempt2",
+        "TMP": "/root/autodl-tmp/tmp/soulx_edu0001_0045_official_v1_attempt2"
+      },
+      "fsspec_atomic_write_probe": "passed",
+      "related_test_count": 16,
+      "completed_at_utc": "2026-08-29T10:49:38.086429+00:00",
+      "completed_optimizer_steps": 30,
+      "completed_compact_checkpoints": [1, 2, 3, 5, 10, 20, 30],
+      "total_samples": 17280,
+      "native_checkpoint_committed": true
+    }
+  ],
+  "posttrain_evaluation": {
+    "status": "running",
+    "current_stage": "parallel_mandatory_step10_zh_incomplete_and_step5",
+    "tmux_session": "soulx_table3_parallel_edu0001_0045_v1",
+    "orchestration_manifest": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/coarse_to_fine_orchestration_manifest.json",
+    "supervisor_log": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/table3_coarse_to_fine.log",
+    "table3_output": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf",
+    "resource_lock": "training is complete; configurable checkpoint-level GPU pool uses devices 0 and 1 now, with at most one checkpoint per GPU and all four classes serial within a checkpoint",
+    "parallel_scheduler": {
+      "profile": "checkpoint-step-gpu-pool-v1",
+      "devices_argument": "0,1",
+      "resolved_devices": ["0", "1"],
+      "one_checkpoint_per_device": true,
+      "classes_within_checkpoint": "serial",
+      "global_manifest_writer": "main-thread-only",
+      "configuration_examples": ["--devices 0", "--devices 0,1", "--devices auto"],
+      "implementation_sha256": "0e3e29e92bde268d0962bc5e72c4a2c1f72d2057d9cc5e212f5594a265c861ef",
+      "targeted_test_count": 9
+    },
+    "evaluation_recovery": {
+      "failed_at_utc": "2026-08-29T16:37:24.016535+00:00",
+      "cause": "Inherited local proxy 127.0.0.1:17890 was unavailable during ModelScope auxiliary VAD/punctuation initialization for step10 ZH Incomplete.",
+      "evidence_preserved_in_orchestration_failure_history": true,
+      "network_change_only": "Clear inherited HTTP/HTTPS/ALL proxy variables and use the reachable direct ModelScope route; model configuration and frozen evaluation protocol are unchanged.",
+      "resumed_at_utc": "2026-08-30T01:18:53.956927+00:00",
+      "initial_assignments": [
+        {"device": "1", "local_step": 10},
+        {"device": "0", "local_step": 5}
+      ]
+    },
+    "expected_steps": [1, 2, 3, 5, 10, 20, 30],
+    "internal_validation_status": "complete",
+    "internal_validation_selected_local_step": 1,
+    "table3_used_for_checkpoint_selection": false,
+    "table3_protocol": {
+      "profile": "table3-endpoint-first-coarse-to-fine-v1",
+      "approved_before_step1_aggregate_result": true,
+      "mandatory_evaluation_order": [1, 30, 10, 5, 20],
+      "conditional_refinement_order": [2, 3],
+      "refinement_trigger": "evaluate steps 2 and 3 iff step 5 obvious_decline_trigger is true",
+      "changes_to_samples_rules_thresholds_metrics": false,
+      "table3_used_for_checkpoint_selection": false
+    },
+    "step1_supervision": {
+      "status": "complete_and_audited",
+      "class_totals": {
+        "en_complete": 318,
+        "en_incomplete": 299,
+        "zh_complete": 300,
+        "zh_incomplete": 300
+      },
+      "checkpoint_sha256": "7838a6b5c91b5e35bf9b4ff65d43f87831a2554b8b343f5ab15ec649911eb1fa",
+      "evidence_gate_sha256": "37390044098fc87ea95d1a4dc9dfe86a19b87be2c378c55d55d2db0625d9c796",
+      "evidence_audit_passed": true,
+      "gate_passed": true,
+      "transition_receipt": "/root/SoulX-stage3-dataset/project_state/table3_coarse_to_fine_transition_20260829.json"
+    },
+    "report_status_after_evaluation": "pending_separate_md_html_audit_render"
+  },
+  "report_supervisor": {
+    "status": "running",
+    "current_stage": "waiting_for_coarse_to_fine_evaluation",
+    "tmux_session": "soulx_report_parallel_edu0001_0045_v1",
+    "manifest": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/report_supervisor_coarse_to_fine_manifest.json",
+    "markdown": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_official_continual_final.md",
+    "html": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_official_continual_final.html",
+    "audit": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_official_continual_final_audit.json"
+  },
+  "tmux_session": "soulx_table3_parallel_edu0001_0045_v1",
+  "tmux_sessions": [
+    "soulx_table3_parallel_edu0001_0045_v1",
+    "soulx_report_parallel_edu0001_0045_v1"
+  ],
+  "next_action": "Let the fail-closed two-GPU Table 3 scheduler finish mandatory steps 10, 5 and 20 after reusing identity-valid steps 1 and 30, conditionally evaluate 2/3 iff step 5 triggers, and let the separate report supervisor render MD/HTML/audit outputs after completion."
+}

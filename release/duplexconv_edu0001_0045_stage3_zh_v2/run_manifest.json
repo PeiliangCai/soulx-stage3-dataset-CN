@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "task_id": "duplexconv_baidu_release_edu0001_0045_v2",
+  "approved_at_utc": "2026-08-29T06:50:00Z",
+  "updated_at_utc": "2026-08-29T07:20:23Z",
+  "status": "upload_running",
+  "current_stage": "incremental_upload_then_independent_verification",
+  "remote_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2",
+  "superseded_remote_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1",
+  "approved_scope": [
+    "Move the existing verified v1 raw tree server-side into v2 without creating a remote copy.",
+    "Upload missing Edu_0001-Edu_0017 raw archives, the immutable v2 aggregate, evidence and receipts.",
+    "Independently verify every directly stored remote file by exact byte size and represent legitimate zero-byte files deterministically.",
+    "Only after v2 verification, retire the superseded v1 model_ready, evidence and receipts trees to the Baidu recycle bin while leaving a redirect tombstone."
+  ],
+  "forbidden_actions": [
+    "Do not delete or overwrite local raw, aggregate, cache, work, report or historical v1 evidence.",
+    "Do not create a second remote copy of the 211827029597-byte v1 raw tree.",
+    "Do not retire any v1 remote content before complete v2 independent verification.",
+    "Do not upload .env, credentials, processed intermediates, caches, Conda environments or model weights.",
+    "Do not create a training split, train, evaluate checkpoints, run Table 3 or call paid APIs."
+  ],
+  "local_payload": {
+    "raw_file_count": 46,
+    "raw_payload_bytes": 345867800157,
+    "aggregate_file_count": 185,
+    "aggregate_payload_bytes": 231291894,
+    "aggregate_report_file_count": 2,
+    "aggregate_report_payload_bytes": 7767,
+    "legitimate_zero_byte_aggregate_file_count": 21
+  },
+  "remote_migration": {
+    "source_raw": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/raw",
+    "destination_raw": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw",
+    "record_count": 29,
+    "payload_bytes": 211827029597,
+    "copy_created": false,
+    "status": "passed_server_side_move_29_of_29_exact_bytes_verified",
+    "completed_at_utc": "2026-08-29T07:19:36.780263+00:00",
+    "receipt": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/raw_migration_receipt.json",
+    "source_raw_absent": true,
+    "destination_raw_present": true
+  },
+  "incremental_upload_estimate": {
+    "new_raw_bytes": 134040770560,
+    "new_aggregate_and_evidence_bytes_upper_bound": 232000000,
+    "estimated_wall_hours": "3_to_5",
+    "gpu_required": false,
+    "paid_api_cost_usd": 0.0
+  },
+  "preflight": {
+    "status": "passed",
+    "core_manifest": {
+      "record_count": 239,
+      "payload_bytes": 346099193428,
+      "zero_byte_record_count": 21,
+      "remote_path_collision_count": 0,
+      "credential_like_path_count": 0,
+      "sha256": "42382210089f784408cad8a50caf73bf96b153bef489e3bf553496ff3d6041af"
+    },
+    "compatibility_manifest": {
+      "record_count": 3,
+      "payload_bytes": 32898,
+      "sha256": "91ab36df04397b989d17cdd7791012ad30ae881d2008e04d3ae243760d2de519"
+    },
+    "combined_upload": {
+      "record_count": 242,
+      "payload_bytes": 346099226326,
+      "represented_zero_byte_record_count": 21,
+      "dry_run_status": "passed"
+    },
+    "empty_file_restore_regression": {
+      "first_run_created": 21,
+      "second_run_already_present": 21,
+      "status": "passed"
+    },
+    "post_compat_aggregate_checksum": {
+      "checked_record_count": 184,
+      "status": "passed",
+      "log_sha256": "cb52549cc55fe3db6d4dc5923a74c253b4f293b2dc1322db4b124ee91298fe57"
+    },
+    "raw_migration_dry_run": {
+      "status": "passed_ready_to_move",
+      "record_count": 29,
+      "payload_bytes": 211827029597,
+      "remote_copy_created": false,
+      "log_sha256": "544e4d5771a39972d71358fd2db5bc006d7ac72bef97b706bfd62a57d7860986"
+    }
+  },
+  "tmux_session": "soulx_baidu_release_edu0001_0045_v2",
+  "upload": {
+    "status": "running",
+    "started_at_utc": "2026-08-29T07:20:04Z",
+    "progress": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/upload_progress.json",
+    "completion": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/upload_completion.json",
+    "log": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/upload.log",
+    "expected_logical_record_count": 242,
+    "expected_direct_remote_file_count": 221,
+    "expected_represented_zero_byte_record_count": 21,
+    "workers_per_file": 4,
+    "retry": 10,
+    "resume_policy": "append-only progress; same-size remote files are verified and skipped; no overwrite"
+  },
+  "postupload_verification": {
+    "status": "queued_in_same_tmux_after_successful_upload",
+    "output": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/remote_verification.json",
+    "log": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/remote_verification.log"
+  },
+  "guarded_v1_retirement": {
+    "status": "implemented_and_tested_waiting_for_v2_verification",
+    "script": "/root/SoulX-stage3-dataset/scripts/retire_baidu_release_after_verification.py",
+    "script_sha256": "a50a5205a2543c0e4ea5bb6a31ed434cc626d86e2075c5d7c23d14cc690135bb",
+    "directed_test_count": 10,
+    "directed_test_status": "passed",
+    "retire_remote_paths": [
+      "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/model_ready",
+      "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/evidence",
+      "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/receipts"
+    ],
+    "delete_destination": "Baidu recycle bin",
+    "required_precondition": "remote_verification.json status=passed and exact frozen v2 contract",
+    "automatic_execution": false
+  },
+  "training_authorized": false,
+  "next_action": "Monitor resumable upload and automatic independent verification; do not retire v1 until the verification report is reviewed and passed."
+}

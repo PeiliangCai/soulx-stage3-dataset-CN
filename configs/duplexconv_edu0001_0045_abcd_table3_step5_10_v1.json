@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "task_id": "duplexconv_edu0001_0045_abcd_table3_step5_10_v1",
+  "protocol": "frozen-table3-abcd-step5-10-parallel-v1",
+  "expected_evaluation_commit": "b17bcf903b9bd896238a4ee9fec495fd75df1401",
+  "expected_official_commit": "928b06508ed2de1344208d06fb1f6fb2ebfb1df5",
+  "expected_steps": [5, 10],
+  "baseline": {
+    "mode": "fresh_same_runtime",
+    "expected": {
+      "en/complete": {"correct": 251, "total": 318},
+      "en/incomplete": {"correct": 268, "total": 299},
+      "zh/complete": {"correct": 263, "total": 300},
+      "zh/incomplete": {"correct": 241, "total": 300}
+    }
+  },
+  "groups": {
+    "B": {
+      "description": "original training view plus equal Complete/Incomplete loss rates",
+      "checkpoints": {
+        "5": {
+          "path": "/root/SoulX-stage3-dataset/checkpoints/edu0001_0045_official_continual_weight_equal_v1/checkpoints/evaluation/step000005.pt",
+          "sha256": "e3fb5726c8e3d1302fbc82f9357dc8cd6fdcf0a102e68a9541463a8a3ccb518a"
+        },
+        "10": {
+          "path": "/root/SoulX-stage3-dataset/checkpoints/edu0001_0045_official_continual_weight_equal_v1/checkpoints/evaluation/step000010.pt",
+          "sha256": "0e7e283cb5c33ee2a3ddb4f161c889b1ebb27325eb1c429085703e61d045f58e"
+        }
+      }
+    },
+    "C": {
+      "description": "Complete/Incomplete balanced training view plus original loss rates",
+      "checkpoints": {
+        "5": {
+          "path": "/root/SoulX-stage3-dataset/checkpoints/edu0001_0045_official_continual_sample_balanced_v1/checkpoints/evaluation/step000005.pt",
+          "sha256": "a59748b81e699d1af7ff81626f415ae664208f06767d7e1dd589d2545b8a5ccb"
+        },
+        "10": {
+          "path": "/root/SoulX-stage3-dataset/checkpoints/edu0001_0045_official_continual_sample_balanced_v1/checkpoints/evaluation/step000010.pt",
+          "sha256": "1d7aba85255f9ac83d3fc8978c053b441f1df92d1c4c5f70fc07ad1d7ae8be43"
+        }
+      }
+    },
+    "D": {
+      "description": "Complete/Incomplete balanced training view plus equal loss rates",
+      "checkpoints": {
+        "5": {
+          "path": "/root/SoulX-stage3-dataset/checkpoints/edu0001_0045_official_continual_joint_balanced_v1/checkpoints/evaluation/step000005.pt",
+          "sha256": "96ebde46a2a72e875979ed40c16918dd959ca551fd143fbab1aa525ff812eb59"
+        },
+        "10": {
+          "path": "/root/SoulX-stage3-dataset/checkpoints/edu0001_0045_official_continual_joint_balanced_v1/checkpoints/evaluation/step000010.pt",
+          "sha256": "ead99b09797bba3d8df3a82fd7a987e7dd3ce3db8cccb8979d58217870dcd733"
+        }
+      }
+    }
+  },
+  "execution_waves": [
+    ["baseline", "B5", "C5"],
+    ["D5", "B10", "C10"],
+    ["D10"]
+  ],
+  "table3_used_for_training_or_checkpoint_selection": false,
+  "table2_enabled": false,
+  "paid_api_enabled": false
+}

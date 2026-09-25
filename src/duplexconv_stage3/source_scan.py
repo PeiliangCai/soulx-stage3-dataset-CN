@@ -21,7 +21,7 @@ import wave
 CHUNK_MS = 160
 SOURCE_VIEW_PROFILE = "target-vs-rest-v1"
 DATASET_VERSION = "duplexconv_edu0018_stage3_zh_v1"
-SUPPORTED_TRACK_COUNTS = (2, 3)
+SUPPORTED_TRACK_COUNTS = (2, 3, 4)
 STATE_MAP = {
     "<|complete|>": "complete",
     "<|incomplete|>": "incomplete",
@@ -360,20 +360,33 @@ def sha256_file(path: Path, block_size: int = 8 * 1024 * 1024) -> str:
     return digest.hexdigest()
 
 
-def _validate_expected(summary: dict[str, Any]) -> None:
+def _validate_expected(summary: dict[str, Any], expected: dict[str, Any]) -> None:
     checks = {
-        "source_count": summary["sources"]["total"] == EXPECTED["source_count"],
+        "source_count": summary["sources"]["total"] == expected["source_count"],
         "source_ntrack": summary["sources"]["by_ntrack"]
-        == EXPECTED["source_ntrack"],
+        == expected["source_ntrack"],
         "target_view_count": summary["views"]["upper_bound"]
-        == EXPECTED["target_view_count"],
-        "event_count": summary["events"]["total"] == EXPECTED["event_count"],
+        == expected["target_view_count"],
+        "event_count": summary["events"]["total"] == expected["event_count"],
         "state_distribution": summary["events"]["state_distribution"]
-        == EXPECTED["state_distribution"],
+        == expected["state_distribution"],
         "view_closure": summary["views"]["upper_bound"]
         == summary["views"]["structurally_usable"]
         + summary["views"]["source_quarantined"],
     }
+    if "first_source_id" in expected:
+        checks["first_source_id"] = (
+            summary["sources"]["first_source_id"] == expected["first_source_id"]
+        )
+    if "last_source_id" in expected:
+        checks["last_source_id"] = (
+            summary["sources"]["last_source_id"] == expected["last_source_id"]
+        )
+    if "source_ids_sha256" in expected:
+        checks["source_ids_sha256"] = (
+            summary["sources"]["source_ids_sha256"]
+            == expected["source_ids_sha256"]
+        )
     summary["expected_checks"] = checks
     summary["gate_3_source_contract_passed"] = all(checks.values())
     if not summary["gate_3_source_contract_passed"]:
@@ -387,6 +400,9 @@ def scan_archives(
     output_dir: Path,
     *,
     compute_input_hashes: bool = True,
+    dataset_version: str = DATASET_VERSION,
+    supported_track_counts: Sequence[int] = SUPPORTED_TRACK_COUNTS,
+    expected: dict[str, Any] = EXPECTED,
 ) -> dict[str, Any]:
     audio_archive = audio_archive.resolve(strict=True)
     metadata_archive = metadata_archive.resolve(strict=True)
@@ -464,7 +480,7 @@ def scan_archives(
                 ntrack = metadata.get("nTrack")
                 if not isinstance(ntrack, int):
                     errors.append("metadata_ntrack_not_integer")
-                elif ntrack not in SUPPORTED_TRACK_COUNTS:
+                elif ntrack not in supported_track_counts:
                     errors.append(f"unsupported_ntrack:{ntrack}")
                 if ntrack != wav_channels:
                     errors.append(
@@ -579,7 +595,7 @@ def scan_archives(
                             "source_ntrack": ntrack,
                             "conversation_domain": (
                                 "multi_party_supplemental"
-                                if ntrack == 3
+                                if ntrack > 2
                                 else "two_party"
                             ),
                             "source_view_profile": SOURCE_VIEW_PROFILE,
@@ -604,8 +620,9 @@ def scan_archives(
         )
         summary: dict[str, Any] = {
             "schema_version": 1,
-            "dataset_version": DATASET_VERSION,
+            "dataset_version": dataset_version,
             "source_view_profile": SOURCE_VIEW_PROFILE,
+            "supported_track_counts": list(supported_track_counts),
             "chunk_ms": CHUNK_MS,
             "inputs": {
                 "audio_archive": str(audio_archive),
@@ -615,6 +632,20 @@ def scan_archives(
             },
             "sources": {
                 "total": len(source_inventory),
+                "first_source_id": min(
+                    (item["source_id"] for item in source_inventory), default=None
+                ),
+                "last_source_id": max(
+                    (item["source_id"] for item in source_inventory), default=None
+                ),
+                "source_ids_sha256": hashlib.sha256(
+                    (
+                        "\n".join(
+                            sorted(item["source_id"] for item in source_inventory)
+                        )
+                        + "\n"
+                    ).encode("utf-8")
+                ).hexdigest(),
                 "structurally_usable": sum(
                     item["structurally_usable"] for item in source_inventory
                 ),
@@ -660,7 +691,7 @@ def scan_archives(
             summary["inputs"]["metadata_archive_sha256"] = sha256_file(
                 metadata_archive
             )
-        _validate_expected(summary)
+        _validate_expected(summary, expected)
 
         _write_jsonl(temporary / "source_inventory.jsonl", source_inventory)
         _write_jsonl(temporary / "events.jsonl", event_records)
@@ -691,6 +722,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--metadata-archive", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument(
+        "--contract-json",
+        type=Path,
+        help=(
+            "Frozen shard contract containing dataset_version, "
+            "supported_track_counts, and expected counts. Defaults to the "
+            "legacy Edu_0018 contract for backward compatibility."
+        ),
+    )
+    parser.add_argument(
         "--skip-input-hashes",
         action="store_true",
         help="Skip expensive archive hashing (not allowed for the formal scan).",
@@ -700,11 +740,26 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.contract_json is None:
+        dataset_version = DATASET_VERSION
+        supported_track_counts = SUPPORTED_TRACK_COUNTS
+        expected = EXPECTED
+    else:
+        contract = json.loads(args.contract_json.read_text(encoding="utf-8"))
+        required = {"dataset_version", "supported_track_counts", "expected"}
+        if not isinstance(contract, dict) or not required.issubset(contract):
+            raise ValueError(f"invalid source contract: {args.contract_json}")
+        dataset_version = contract["dataset_version"]
+        supported_track_counts = tuple(contract["supported_track_counts"])
+        expected = contract["expected"]
     summary = scan_archives(
         args.audio_archive,
         args.metadata_archive,
         args.output_dir,
         compute_input_hashes=not args.skip_input_hashes,
+        dataset_version=dataset_version,
+        supported_track_counts=supported_track_counts,
+        expected=expected,
     )
     print(json.dumps(summary, ensure_ascii=False, sort_keys=True, indent=2))
     return 0

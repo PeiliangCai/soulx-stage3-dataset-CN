@@ -2,8 +2,10 @@ import unittest
 
 from duplexconv_stage3.model_ready import (
     contiguous_usable_spans,
+    filter_excluded_sources,
     greedy_windows,
     make_chunk_group,
+    validate_model_ready_view_partition,
 )
 
 
@@ -13,6 +15,19 @@ class CharacterTokenizer:
 
 
 class ModelReadyTests(unittest.TestCase):
+    def test_source_exclusion_removes_every_view_of_the_conversation(self):
+        records = [
+            {"source_id": "keep", "view_id": "keep/target-ch00"},
+            {"source_id": "drop", "view_id": "drop/target-ch00"},
+            {"source_id": "drop", "view_id": "drop/target-ch01"},
+        ]
+        kept, removed = filter_excluded_sources(records, ["drop"])
+        self.assertEqual([item["view_id"] for item in kept], ["keep/target-ch00"])
+        self.assertEqual(
+            [item["view_id"] for item in removed],
+            ["drop/target-ch00", "drop/target-ch01"],
+        )
+
     def test_usable_spans_split_at_quarantine(self):
         self.assertEqual(
             contiguous_usable_spans(["user_idle", None, "user_nonidle", "user_complete"]),
@@ -38,6 +53,28 @@ class ModelReadyTests(unittest.TestCase):
         )
         self.assertEqual([(item[0], item[1]) for item in windows], [(10, 11), (11, 12), (12, 13)])
         self.assertEqual(oversized, [])
+
+    def test_source_view_quarantine_provenance_must_be_identical(self):
+        record = {
+            "view_id": "bad",
+            "original_chunk_count": 3,
+            "event_count": 1,
+            "event_ids": ["event"],
+        }
+        result = validate_model_ready_view_partition(
+            timelines=[{"view_id": "ok"}],
+            glm_records=[{"view_id": "ok"}],
+            timeline_source_view_quarantine=[record],
+            glm_source_view_quarantine=[dict(record)],
+        )
+        self.assertEqual(result, [record])
+        with self.assertRaises(ValueError):
+            validate_model_ready_view_partition(
+                timelines=[{"view_id": "ok"}],
+                glm_records=[{"view_id": "ok"}],
+                timeline_source_view_quarantine=[record],
+                glm_source_view_quarantine=[{**record, "event_count": 0}],
+            )
 
 
 if __name__ == "__main__":

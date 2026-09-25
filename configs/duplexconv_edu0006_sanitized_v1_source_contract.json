@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0006_sanitized_v1_stage3_zh_v1",
+  "shard_number": 6,
+  "archive_name": "Edu_0006_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0006.tar",
+  "parent_official_archive_bytes": 8034068480,
+  "parent_official_archive_sha256": "f4640451a4bbce126e5c0ef80be4b72b56e1a6fce58feab3cb795747a89a4b18",
+  "input_archive_bytes": 7994173440,
+  "input_archive_sha256": "45c08f3673285a6db297d0d72af34636b8004ea54ff1b4b5dad7b914c0f23a3d",
+  "sanitization_profile": "exclude-source-structural-timestamp-quarantine-v1",
+  "excluded_source_ids": [
+    "Edu--003492"
+  ],
+  "exclusion_reason": "Official metadata contains a terminal speaker segment wholly after the exact WAV endpoint for Edu--003492/ch00/event0012: segment 6 is 207.980-208.080 seconds while the WAV ends at 207.780 seconds. The complete source conversation is conservatively excluded without changing the fixed 160 ms deterministic tail-repair tolerance, source scanner, or any leakage threshold.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--003087",
+    "last_source_id": "Edu--003700",
+    "source_ids_sha256": "f33eac6744a5258261cc381e93bd68febf5895173bba50c8337d41720837aa5d",
+    "source_ntrack": {
+      "2": 489,
+      "3": 10
+    },
+    "target_view_count": 1008,
+    "target_view_hours": 23.12830184027778,
+    "event_count": 9109,
+    "state_distribution": {
+      "complete": 4761,
+      "incomplete": 1668,
+      "backchannel": 880,
+      "wait": 22,
+      "missing": 1778
+    }
+  }
+}

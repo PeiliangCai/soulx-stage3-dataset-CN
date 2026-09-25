@@ -14,8 +14,8 @@ from urllib import error, request
 
 from .state_labeling import (
     ENDPOINT,
-    FULL_RUN_CONFIRMATION,
     canonical_json,
+    full_run_confirmation_token,
     load_api_key,
     read_jsonl,
     validate_structured_labels,
@@ -30,6 +30,43 @@ SUPPORTED_NETWORK_ROUTE_POLICIES = (
     DIRECT_NETWORK_ROUTE_POLICY,
     LEGACY_NETWORK_ROUTE_POLICY,
 )
+KEY_STATUS_ENDPOINT = "https://openrouter.ai/api/v1/key"
+DAILY_BUDGET_CAP_USD = 10.0
+
+
+def validate_daily_budget_status(
+    status: dict[str, Any], cap_usd: float = DAILY_BUDGET_CAP_USD
+) -> dict[str, Any]:
+    safe = {
+        key: status.get(key)
+        for key in (
+            "usage_daily",
+            "limit",
+            "limit_remaining",
+            "limit_reset",
+            "is_free_tier",
+            "disabled",
+            "expires_at",
+        )
+    }
+    limit = safe["limit"]
+    usage = safe["usage_daily"]
+    remaining = safe["limit_remaining"]
+    if safe["limit_reset"] != "daily":
+        raise PermissionError("OpenRouter key limit_reset is not daily")
+    if isinstance(limit, bool) or not isinstance(limit, (int, float)):
+        raise PermissionError("OpenRouter key has no numeric server-side limit")
+    if float(limit) > cap_usd:
+        raise PermissionError(
+            f"OpenRouter key limit {limit} exceeds the approved {cap_usd} USD cap"
+        )
+    if isinstance(usage, bool) or not isinstance(usage, (int, float)):
+        raise PermissionError("OpenRouter key usage_daily is unavailable")
+    if isinstance(remaining, bool) or not isinstance(remaining, (int, float)):
+        raise PermissionError("OpenRouter key limit_remaining is unavailable")
+    if float(usage) >= float(limit) or float(remaining) <= 0:
+        raise PermissionError("OpenRouter daily budget is exhausted")
+    return safe
 
 
 class OpenRouterClient:
@@ -112,6 +149,23 @@ class OpenRouterClient:
                     raise RuntimeError(f"OpenRouter network failure: {exc}") from None
             time.sleep(min(8.0, 2.0**attempt))
         raise AssertionError("unreachable")
+
+    def key_status(self) -> dict[str, Any]:
+        status_request = request.Request(
+            KEY_STATUS_ENDPOINT,
+            method="GET",
+            headers={"Authorization": f"Bearer {self._api_key}"},
+        )
+        try:
+            with self._opener.open(
+                status_request, timeout=self.timeout_seconds
+            ) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except (error.URLError, TimeoutError, http.client.HTTPException, OSError) as exc:
+            raise RuntimeError(f"OpenRouter key budget preflight failed: {exc}") from None
+        if not isinstance(payload, dict) or not isinstance(payload.get("data"), dict):
+            raise RuntimeError("OpenRouter key status response has the wrong schema")
+        return payload["data"]
 
     @staticmethod
     def _content(response: dict[str, Any]) -> str:
@@ -216,13 +270,23 @@ def run_requests(
     if limit is not None:
         records = records[:limit]
     if any(record["kind"] == "full" for record in records):
-        if full_run_confirmation != FULL_RUN_CONFIRMATION:
+        event_count = sum(len(record["target_event_ids"]) for record in records)
+        if full_run_confirmation != full_run_confirmation_token(event_count):
             raise PermissionError(
                 "full request execution requires the exact Gate 4A confirmation token"
             )
     if workers < 1 or workers > 8:
         raise ValueError("workers must be between 1 and 8")
     api_key = load_api_key(env_file)
+    budget_preflight = None
+    if records:
+        budget_client = OpenRouterClient(
+            api_key,
+            network_route_policy=network_route_policy,
+        )
+        budget_preflight = validate_daily_budget_status(
+            budget_client.key_status(), DAILY_BUDGET_CAP_USD
+        )
     cache_dir.mkdir(parents=True, exist_ok=True)
     if result_file.exists():
         raise FileExistsError(f"refusing to overwrite result file: {result_file}")
@@ -286,6 +350,8 @@ def run_requests(
         ),
         "result_file": str(result_file),
         "requested_network_route_policy": network_route_policy,
+        "daily_budget_cap_usd": DAILY_BUDGET_CAP_USD,
+        "budget_preflight": budget_preflight,
         "result_network_route_policy_counts": dict(
             sorted(Counter(item["network_route_policy"] for item in finalized_results).items())
         ),

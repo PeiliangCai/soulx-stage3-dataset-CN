@@ -1,0 +1,409 @@
+diff --git a/config/config.py b/config/config.py
+index 3dbd0cd..546d04c 100644
+--- a/config/config.py
++++ b/config/config.py
+@@ -82,6 +82,10 @@ class DataConfig:
+     max_token_length: int = 1500
+     avg_token_length: int = 150
+     train_data_path: str = ""
++    # Optional frozen validation artifact.  When empty, retain the upstream
++    # random row-level train/validation split exactly as published.
++    validation_data_path: str = ""
++    split_manifest_path: str = ""
+ 
+     # dynamic batch size
+     enable_dynamic_batch: bool = False
+@@ -161,6 +165,20 @@ class TrainConfig:
+     wandb_run_name: str = ""
+     wandb_save_dir: str = ""
+ 
++    # Weight-only continuation metadata.  Zero preserves the upstream
++    # scheduler start; a positive value offsets the published scheduler
++    # formula without pretending that optimizer state was recovered.
++    origin_step_estimate: int = 0
++
++    # Optional audit/checkpoint layer around the upstream Lightning Trainer.
++    # These fields do not replace training_step, configure_optimizers,
++    # backward, gradient accumulation, or optimizer stepping.
++    continual_run_id: str = ""
++    continual_audit_dir: str = ""
++    continual_checkpoint_steps: List[int] = field(default_factory=list)
++    native_checkpoint_save_top_k: int = 2
++    native_checkpoint_save_last: bool = True
++
+     def __post_init__(self):
+         self.betas = [0.9, 0.999]
+ 
+diff --git a/finetune.py b/finetune.py
+index d5cb6ee..766a61f 100644
+--- a/finetune.py
++++ b/finetune.py
+@@ -21,6 +21,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
+ from utils.ema.ema import EMA, EMAModelCheckpoint
+ from utils.dynamic_train import DynamicTrainCallback
+ from utils.epoch_shuffle import SetEpochCallback
++from utils.continual_audit import OfficialContinualAuditCallback
+ 
+ 
+ def debug(config):
+@@ -141,6 +142,9 @@ def train(config):
+     lr_monitor = LearningRateMonitor(logging_interval="step")
+     callbacks = [lr_monitor]
+ 
++    if config.train_config.continual_audit_dir:
++        callbacks.append(OfficialContinualAuditCallback(config))
++
+     # shuffle_callback = SetEpochCallback(config.train_config)
+     # callbacks.append(shuffle_callback)
+ 
+@@ -175,12 +179,12 @@ def train(config):
+         callbacks.append(ema_callback)
+     else:
+         checkpoint_callback = ModelCheckpoint(
+-            save_top_k=2,
++            save_top_k=config.train_config.native_checkpoint_save_top_k,
+             monitor="val_acc",
+             mode="max",
+             dirpath=config.train_config.default_root_dir,
+             filename="{epoch:02d}_{step:06d}_model-{val_acc:.5f}",
+-            save_last=True,
++            save_last=config.train_config.native_checkpoint_save_last,
+             # save_on_train_epoch_end=True,
+         )
+         callbacks.append(checkpoint_callback)
+diff --git a/models/_train_heads.py b/models/_train_heads.py
+index d40b52d..6bba332 100644
+--- a/models/_train_heads.py
++++ b/models/_train_heads.py
+@@ -45,9 +45,20 @@ class TokenHeadsMixin:
+         return numerator.float() / denominator.float()
+ 
+     def _shifted_ce(self, logits, labels):
++        shifted_logits = logits[:, :-1, :].reshape(-1, self.lm_vocab_size)
++        shifted_labels = labels[:, 1:].reshape(-1)
++        if not torch.any(shifted_labels != -100):
++            # PyTorch cross_entropy returns NaN when every label is ignored.
++            # Return a graph-connected finite zero so this empty objective can
++            # remain in the official weighted head sum without affecting grads.
++            anchor = shifted_logits.reshape(-1)[0].float()
++            finite_anchor = torch.where(
++                torch.isfinite(anchor), anchor, torch.zeros_like(anchor)
++            )
++            return finite_anchor * 0.0
+         return F.cross_entropy(
+-            logits[:, :-1, :].reshape(-1, self.lm_vocab_size),
+-            labels[:, 1:].reshape(-1),
++            shifted_logits,
++            shifted_labels,
+             ignore_index=-100,
+         )
+ 
+diff --git a/models/state_prediction_data.py b/models/state_prediction_data.py
+index 26c4739..30b3ef1 100644
+--- a/models/state_prediction_data.py
++++ b/models/state_prediction_data.py
+@@ -1,6 +1,9 @@
+ import pytorch_lightning as pl
+ import torch, torchaudio
+ import numpy as np
++import hashlib
++import json
++from pathlib import Path
+ from torch.utils.data import DataLoader, DistributedSampler
+ from datasets import load_dataset, load_from_disk
+ from transformers import AutoModelForCausalLM, AutoTokenizer
+@@ -73,16 +76,30 @@ class State_Prediction_Dataset(torch.utils.data.Dataset):
+             self.model_config.assistant_interrupt_token_id
+         )
+ 
+-        ds = load_dataset(
+-            self.dataset_config.train_data_path
+-        )  # load_from huggingface datasets
+-        train_val_split = ds["train"].train_test_split(
+-            test_size=self.dataset_config.split_size, seed=self.config.train_config.seed
+-        )
+-        if split == "train":
+-            self.data_list = train_val_split["train"]
++        if self.dataset_config.validation_data_path:
++            # Frozen source-conversation split: retain the official Dataset,
++            # tokenizer, masks, __getitem__ and collator, changing only which
++            # already-frozen Parquet artifact supplies each split.
++            selected_path = (
++                self.dataset_config.train_data_path
++                if split == "train"
++                else self.dataset_config.validation_data_path
++            )
++            self.data_list = load_dataset(
++                "parquet", data_files=selected_path, split="train"
++            )
+         else:
+-            self.data_list = train_val_split["test"]
++            ds = load_dataset(
++                self.dataset_config.train_data_path
++            )  # load_from huggingface datasets
++            train_val_split = ds["train"].train_test_split(
++                test_size=self.dataset_config.split_size,
++                seed=self.config.train_config.seed,
++            )
++            if split == "train":
++                self.data_list = train_val_split["train"]
++            else:
++                self.data_list = train_val_split["test"]
+ 
+     def __len__(self):
+         return len(self.data_list)
+@@ -213,12 +230,79 @@ class State_Prediction_DataModule(pl.LightningDataModule):
+         self.config = config
+         self.dataset_config = config.dataset_config
+         self.epoch = 0
++        self.split_audit = None
++
++    @staticmethod
++    def _sha256_file(path):
++        digest = hashlib.sha256()
++        with Path(path).open("rb") as handle:
++            for block in iter(lambda: handle.read(8 * 1024 * 1024), b""):
++                digest.update(block)
++        return digest.hexdigest()
++
++    @staticmethod
++    def _canonical_sha256(value):
++        payload = json.dumps(
++            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
++        ).encode("utf-8")
++        return hashlib.sha256(payload).hexdigest()
++
++    def _audit_frozen_split(self):
++        manifest_path = Path(self.dataset_config.split_manifest_path).resolve(
++            strict=True
++        )
++        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
++        configured = {
++            "train": Path(self.dataset_config.train_data_path).resolve(strict=True),
++            "validation": Path(
++                self.dataset_config.validation_data_path
++            ).resolve(strict=True),
++        }
++        for name, path in configured.items():
++            artifact = manifest["artifacts"][name]
++            if path != Path(artifact["path"]).resolve(strict=True):
++                raise RuntimeError(f"frozen {name} path differs from split manifest")
++            if self._sha256_file(path) != artifact["sha256"]:
++                raise RuntimeError(f"frozen {name} artifact hash drift")
++
++        train_indexes = list(self.asr_train.data_list["index"])
++        validation_indexes = list(self.asr_val.data_list["index"])
++        if len(train_indexes) != manifest["train"]["row_count"]:
++            raise RuntimeError("frozen train row count mismatch")
++        if len(validation_indexes) != manifest["validation"]["row_count"]:
++            raise RuntimeError("frozen validation row count mismatch")
++        if set(train_indexes) & set(validation_indexes):
++            raise RuntimeError("frozen split row leakage")
++        for name, indexes in (
++            ("train", train_indexes),
++            ("validation", validation_indexes),
++        ):
++            identity = self._canonical_sha256(sorted(indexes))
++            if identity != manifest[name]["row_index_identity_sha256"]:
++                raise RuntimeError(f"frozen {name} row identity mismatch")
++        if manifest["source_leakage_count"] != 0:
++            raise RuntimeError("split manifest reports source-conversation leakage")
++        self.split_audit = {
++            "manifest_path": str(manifest_path),
++            "manifest_sha256": self._sha256_file(manifest_path),
++            "split_identity_sha256": manifest["split_identity_sha256"],
++            "train_row_count": len(train_indexes),
++            "validation_row_count": len(validation_indexes),
++            "source_leakage_count": manifest["source_leakage_count"],
++        }
++        print(f"[frozen_split_audit] {json.dumps(self.split_audit, sort_keys=True)}")
+ 
+     def setup(self, stage=None):
+         # Assign train/val datasets for use in dataloaders
+         if stage == "fit" or stage is None:
+             self.asr_train = State_Prediction_Dataset(self.config, "train")
+             self.asr_val = State_Prediction_Dataset(self.config, "val")
++            if self.dataset_config.validation_data_path:
++                if not self.dataset_config.split_manifest_path:
++                    raise ValueError(
++                        "split_manifest_path is required with frozen validation data"
++                    )
++                self._audit_frozen_split()
+ 
+         # dummy test set
+         if stage == "test" or stage is None:
+diff --git a/models/state_prediction_model.py b/models/state_prediction_model.py
+index a9abfdf..e523866 100644
+--- a/models/state_prediction_model.py
++++ b/models/state_prediction_model.py
+@@ -118,24 +118,6 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+             param.requires_grad = True
+         self.llm.train()
+ 
+-        if self.model_config.init_ckpt_path:
+-            print(f"loading state dict from {self.model_config.init_ckpt_path}...")
+-            checkpoint = torch.load(
+-                self.model_config.init_ckpt_path,
+-                map_location=torch.device("cpu"),
+-                weights_only=False,
+-            )
+-            state_dict = (
+-                checkpoint["state_dict"] if "state_dict" in checkpoint else checkpoint
+-            )
+-            try:
+-                self.load_state_dict(state_dict)
+-            except Exception as e:
+-                print(f"load_state_dict failed: {e}. Retry with strict=False")
+-                self.load_state_dict(state_dict, strict=False)
+-
+-            del checkpoint
+-
+         if self.model_config.embed_only:
+             if self.global_rank == 0:
+                 print(f"only train partial embedding weights...")
+@@ -154,35 +136,33 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+             )
+             self.llm = get_peft_model(self.llm, peft_config)
+ 
+-            if self.model_config.init_ckpt_path_lora:
+-                print(
+-                    f"loading state dict from {self.model_config.init_ckpt_path_lora}..."
+-                )
++        if hasattr(self.llm.model, "embed_tokens"):
++            self.embed_tokens_func = self.llm.model.embed_tokens
++        elif hasattr(self.llm.model.model, "embed_tokens"):
++            self.embed_tokens_func = self.llm.model.model.embed_tokens
++        else:
++            self.embed_tokens_func = self.llm.model.model.model.embed_tokens
++
++        # The released Stage 3 checkpoint contains a PEFT-wrapped LLM and the
++        # registered embedding alias.  Construct that exact module graph first
++        # and reject any partial load instead of silently retrying strict=False.
++        for checkpoint_path in (
++            self.model_config.init_ckpt_path,
++            self.model_config.init_ckpt_path_lora,
++        ):
++            if checkpoint_path:
++                print(f"loading state dict from {checkpoint_path}...")
+                 checkpoint = torch.load(
+-                    self.model_config.init_ckpt_path_lora,
++                    checkpoint_path,
+                     map_location=torch.device("cpu"),
+                     weights_only=False,
+                 )
+                 state_dict = (
+-                    checkpoint["state_dict"]
+-                    if "state_dict" in checkpoint
+-                    else checkpoint
++                    checkpoint["state_dict"] if "state_dict" in checkpoint else checkpoint
+                 )
+-                try:
+-                    self.load_state_dict(state_dict)
+-                except Exception as e:
+-                    print(f"load_state_dict failed: {e}. Retry with strict=False")
+-                    self.load_state_dict(state_dict, strict=False)
+-
++                self.load_state_dict(state_dict, strict=True)
+                 del checkpoint
+ 
+-        if hasattr(self.llm.model, "embed_tokens"):
+-            self.embed_tokens_func = self.llm.model.embed_tokens
+-        elif hasattr(self.llm.model.model, "embed_tokens"):
+-            self.embed_tokens_func = self.llm.model.model.embed_tokens
+-        else:
+-            self.embed_tokens_func = self.llm.model.model.model.embed_tokens
+-
+     def forward(self, batch):
+         sequences, audio_masks, labels = batch
+ 
+@@ -232,12 +212,21 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+                 logger=True,
+                 rank_zero_only=True,
+             )
++            self.log(
++                f"train_{head.name}_valid_targets",
++                torch.count_nonzero(batch[head.label_key][:, 1:] != -100).float(),
++                prog_bar=False,
++                logger=True,
++                rank_zero_only=True,
++            )
+ 
+         return loss
+ 
+     def on_validation_epoch_start(self):
+         self.val_loss = []
+         self.val_accs = {head.name: [] for head in self.LOSS_HEADS}
++        self.val_losses = {head.name: [] for head in self.LOSS_HEADS}
++        self.val_valid_targets = {head.name: [] for head in self.LOSS_HEADS}
+ 
+     def validation_step(self, batch, batch_idx):
+         input_ids = batch["input_ids"]
+@@ -247,11 +236,15 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+         x_ori = model_outputs.logits
+         preds = torch.argmax(x_ori, -1)
+ 
+-        loss, _, accs = self._compute_heads(x_ori, preds, batch, self.LOSS_HEADS)
++        loss, losses, accs = self._compute_heads(x_ori, preds, batch, self.LOSS_HEADS)
+ 
+         self.val_loss.append(loss)
+         for head in self.LOSS_HEADS:
+             self.val_accs[head.name].append(accs[head.name])
++            self.val_losses[head.name].append(losses[head.name])
++            self.val_valid_targets[head.name].append(
++                torch.count_nonzero(batch[head.label_key][:, 1:] != -100).float()
++            )
+ 
+     def on_validation_epoch_end(self):
+         avg_loss = torch.nanmean(torch.stack(self.val_loss))
+@@ -269,6 +262,13 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+         self.log(f"val_acc", avg_acc, prog_bar=True, logger=True, sync_dist=True)
+ 
+         for head in self.LOSS_HEADS:
++            self.log(
++                f"val_{head.name}_loss",
++                torch.nanmean(torch.stack(self.val_losses[head.name])),
++                prog_bar=False,
++                logger=True,
++                sync_dist=True,
++            )
+             self.log(
+                 f"val_acc_{head.name}",
+                 avg_accs[head.name],
+@@ -276,6 +276,13 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+                 logger=True,
+                 sync_dist=True,
+             )
++            self.log(
++                f"val_{head.name}_valid_targets",
++                torch.sum(torch.stack(self.val_valid_targets[head.name])),
++                prog_bar=False,
++                logger=True,
++                sync_dist=True,
++            )
+ 
+     def test_step(self, batch, batch_idx):
+         pass
+@@ -289,6 +296,15 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+             eps=self.train_config.eps,
+         )
+ 
++        scheduler_last_epoch = -1
++        if self.train_config.origin_step_estimate > 0:
++            # LambdaLR requires initial_lr when resuming its position without
++            # an optimizer checkpoint.  AdamW moments still start fresh and
++            # that limitation is recorded separately in the run manifest.
++            for group in optimizer.param_groups:
++                group.setdefault("initial_lr", self.train_config.learning_rate)
++            scheduler_last_epoch = self.train_config.origin_step_estimate - 1
++
+         scheduler_dict = {
+             "scheduler": WarmupAnnealSteps(
+                 optimizer,
+@@ -296,6 +312,7 @@ class State_Prediction_Model(TokenHeadsMixin, pl.LightningModule):
+                 anneal_steps=[self.train_config.anneal_steps],
+                 anneal_rate=self.train_config.anneal_rate,
+                 final_lr=self.train_config.min_lr,
++                last_epoch=scheduler_last_epoch,
+             ),
+             "interval": "step",
+             "frequency": 1,

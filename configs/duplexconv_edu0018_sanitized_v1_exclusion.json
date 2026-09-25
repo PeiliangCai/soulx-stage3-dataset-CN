@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "profile": "whole-source-model-ready-exclusion-v1",
+  "decision": "Conservatively exclude the complete Edu--010902 source conversation after the unchanged frozen Edu_0018 Gate D detected one unique near-duplicate source member.",
+  "parent_model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0018_stage3_zh_v1",
+  "excluded_source_ids": [
+    "Edu--010902"
+  ],
+  "excluded_view_ids": [
+    "Edu--010902/target-ch00",
+    "Edu--010902/target-ch01"
+  ],
+  "expected_exclusion_audit": {
+    "profile": "whole-source-model-ready-exclusion-v1",
+    "excluded_source_ids": [
+      "Edu--010902"
+    ],
+    "excluded_source_conversation_count": 1,
+    "excluded_source_view_count": 2,
+    "excluded_effective_chunk_count": 262,
+    "excluded_event_count": 6,
+    "excluded_source_view_quarantine_count": 0,
+    "excluded_source_view_quarantined_chunk_count": 0
+  },
+  "expected_sanitized": {
+    "source_conversation_count": 499,
+    "source_view_count": 1003,
+    "row_count": 2166,
+    "exported_chunk_count": 473768,
+    "quarantined_chunk_count": 2736,
+    "total_effective_chunk_count": 476504
+  },
+  "frozen_evidence": [
+    {
+      "path": "/root/autodl-tmp/dataset/duplexconv/processed/timelines_v1/checksums.sha256",
+      "sha256": "c94c65bec29f4082d547ce978c638340c667fa4f29977300d8288b836826f0c6"
+    },
+    {
+      "path": "/root/autodl-tmp/dataset/duplexconv/processed/glm_audio_tokens_v2/checksums.sha256",
+      "sha256": "5d45f1e3967c2a821fbc9bfb09a8136a4a4e48a1539ec0a881aefbff062e943d"
+    },
+    {
+      "path": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0018_stage3_zh_v1/checksums.sha256",
+      "sha256": "fee11dbda41c3b64de985f77054fdf9f1d2f8c60f3ae89ab41e81f834dff1f43"
+    },
+    {
+      "path": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0018/gate_d_closure_v1.json",
+      "sha256": "337ddbd68fd3ce30c1d956c2cce96e3bd62e898a3aa621ef26d1aee9b05ef344"
+    }
+  ]
+}

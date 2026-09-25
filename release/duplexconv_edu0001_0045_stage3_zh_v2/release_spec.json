@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "release_id": "duplexconv_edu0001_0045_stage3_zh_v2",
+  "created_at_utc": "2026-08-29T06:59:09Z",
+  "remote_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2",
+  "payloads": [
+    {
+      "name": "raw",
+      "local_path": "/root/autodl-tmp/dataset/duplexconv/raw",
+      "remote_parent": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2",
+      "expected_file_count": 46,
+      "expected_payload_bytes": 345867800157
+    },
+    {
+      "name": "model_ready",
+      "local_path": "/root/autodl-tmp/dataset/duplexconv/aggregates/edu0001_0045_stage3_zh_v2",
+      "remote_parent": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready",
+      "expected_file_count": 185,
+      "expected_payload_bytes": 231291894
+    },
+    {
+      "name": "aggregate_reports",
+      "local_path": "/root/autodl-tmp/dataset/duplexconv/reports/aggregate_edu0001_0045_v2",
+      "remote_parent": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence",
+      "expected_file_count": 2,
+      "expected_payload_bytes": 7767
+    }
+  ],
+  "evidence_files": [
+    "/root/SoulX-stage3-dataset/configs/duplexconv_edu0001_0045_aggregate_v2.json",
+    "/root/SoulX-stage3-dataset/configs/benchmark_audio_leakage_frozen_v2_2.json",
+    "/root/SoulX-stage3-dataset/project_state/duplexconv_aggregate_edu0001_0045_v2_run_manifest.json",
+    "/root/SoulX-stage3-dataset/project_state/duplexconv_expansion_edu0001_0017_v2_run_manifest.json"
+  ],
+  "excluded_local_roots": [
+    "/root/autodl-tmp/dataset/duplexconv/processed",
+    "/root/autodl-tmp/dataset/duplexconv/cache",
+    "/root/autodl-tmp/dataset/duplexconv/work",
+    "/root/autodl-tmp/conda_envs"
+  ],
+  "client": {
+    "name": "BaiduPCS-Go",
+    "version": "v4.0.1",
+    "installed_path": "/root/tools/BaiduPCS-Go-v4.0.1/BaiduPCS-Go-v4.0.1-linux-amd64/BaiduPCS-Go",
+    "installed_binary_sha256": "56cb54573c59c98c8cf6deb1b154e4ccb9adec78a8ef9cd41f177fb7a541b715"
+  },
+  "security": {
+    "reuse_existing_login_config_without_printing_secrets": true,
+    "forbid_credential_material_in_logs_or_release": true,
+    "baidu_route": "direct_with_proxy_variables_unset"
+  },
+  "migration_policy": "Move the already verified v1 raw tree server-side into v2, upload only missing Edu_0001-Edu_0017, then independently verify every direct remote file.",
+  "retirement_policy": "Only after v2 independent verification, delete the superseded v1 model_ready/evidence/receipts trees to Baidu recycle bin and leave a redirect tombstone at the v1 root.",
+  "training_authorized": false,
+  "api_calls_authorized": false
+}

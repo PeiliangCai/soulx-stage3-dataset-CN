@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "task_id": "duplexconv_edu0001_0045_abcd_table3_step5_10_v1",
+  "updated_at_utc": "2026-09-13T09:03:44Z",
+  "status": "complete_and_audited",
+  "approved_scope": "Run development Table 3 for B/C/D checkpoints 5 and 10 using the frozen four-class protocol. Use three GPUs in parallel, regenerate one same-runtime step-0 baseline, do not run Table 2 or other checkpoints.",
+  "tmux_session": null,
+  "historical_final_tmux_session": "soulx_abcd_table3_d10_single_v1",
+  "stop_monitor_tmux_session": null,
+  "stop_monitor_receipt": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_abcd_step5_10_v1/stop_at_one_active_receipt_resume2.json",
+  "live_manifest": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_abcd_step5_10_v1/orchestration_manifest.json",
+  "supervisor_log": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_abcd_step5_10_v1.supervisor.log",
+  "output_root": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_abcd_step5_10_v1",
+  "config": {
+    "path": "/root/SoulX-stage3-dataset/configs/duplexconv_edu0001_0045_abcd_table3_step5_10_v1.json",
+    "sha256": "522ddcd9a1daa6343354651e44ca2a08549912eec29a0c14b49a840e56327f64"
+  },
+  "controller": {
+    "path": "/root/SoulX-stage3-dataset/scripts/run_abcd_table3_step5_10.py",
+    "sha256": "230c3103b5b124bb0fdfd84a9719afb835537a41bd2f7503d4fdf8d3618bdbf6",
+    "legacy_sha256": "a046fa967d340a2b4edb954d4f5c842e5685c1f19670ac01d9b08bfa33133523",
+    "targeted_and_scheduler_tests_passed": 11
+  },
+  "runtime": {
+    "python": "/root/autodl-tmp/conda_envs/soulx-table3-audit/bin/python",
+    "evaluation_root": "/root/SoulX-stage3-dataset/runtimes/table3-eval-b17bcf",
+    "evaluation_commit": "b17bcf903b9bd896238a4ee9fec495fd75df1401",
+    "official_root": "/root/SoulX-stage3-dataset/third_party/SoulX-Duplug-upstream",
+    "official_commit": "928b06508ed2de1344208d06fb1f6fb2ebfb1df5",
+    "devices": ["0", "1", "2"],
+    "gpu_model": "NVIDIA GeForce RTX 4080 SUPER",
+    "network_policy": "local artifacts with HF/Transformers offline and inherited proxy variables cleared",
+    "paid_api_cost_usd": 0.0
+  },
+  "execution_waves": [
+    ["baseline@GPU0", "B5@GPU1", "C5@GPU2"],
+    ["D5@GPU0", "B10@GPU1", "C10@GPU2"],
+    ["D10@GPU0"]
+  ],
+  "baseline_gate": {
+    "policy": "The fresh baseline must exactly match the frozen A correct/total counts before later waves are scheduled.",
+    "expected": {
+      "en/complete": "251/318",
+      "en/incomplete": "268/299",
+      "zh/complete": "263/300",
+      "zh/incomplete": "241/300"
+    },
+    "provisional_policy": "B5/C5 run concurrently with the baseline. On an exact-count mismatch, record the cause, delete only this run's provisional B5/C5 result directories, and stop."
+  },
+  "dataset_order_repair": {
+    "first_attempt_status": "failed_before_model_initialization_or_sample_evaluation",
+    "cause": "English WAV bytes and names matched, but directory-entry order had changed; the frozen official-os-walk identity therefore differed.",
+    "raw_zip": "/root/autodl-tmp/dataset/soulx_duplug_eval/raw/soulx_duplug_eval_f6e50e8/Easy-Turn-Testset-en.zip",
+    "zip_integrity": "passed",
+    "replacement_policy": "Re-extracted in ZIP order after exact sorted file-hash equality check; retained the previous directory as a recoverable backup.",
+    "current_root": "/root/autodl-tmp/dataset/soulx_duplug_eval/extracted/Easy-Turn-Testset-en",
+    "backup_root": "/root/autodl-tmp/dataset/soulx_duplug_eval/extracted/Easy-Turn-Testset-en-order-drift-backup-20260913",
+    "complete_identity_sha256": "4a8a2823a93fec9e55c85706a95b878022868f74f58053d3d7892a9966ab4f5e",
+    "incomplete_identity_sha256": "e61a135189990e774aff857f470deb9688966c57e4d769f93d9ad376a9010339",
+    "failed_attempt_archive": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_abcd_step5_10_v1.failed_dataset_order_20260913T022706Z",
+    "failed_attempt_log": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_abcd_step5_10_v1.failed_dataset_order_20260913T022706Z.supervisor.log"
+  },
+  "interruption_recovery_20260913": {
+    "first_wave_status": "complete",
+    "fresh_baseline_exact_match": true,
+    "fresh_baseline_observed": {
+      "en/complete": "251/318",
+      "en/incomplete": "268/299",
+      "zh/complete": "263/300",
+      "zh/incomplete": "241/300"
+    },
+    "interrupted_stage": "parallel_D5_B10_C10",
+    "interrupted_partial_records": {
+      "D5 en/complete": "164/318",
+      "B10 en/complete": "163/318",
+      "C10 en/complete": "179/318"
+    },
+    "resume_bug": "Legacy controller compared JSON-reloaded string checkpoint keys with in-memory integer keys and falsely reported identity mismatch.",
+    "resume_fix": "JSON-normalize identities; allow only the known legacy controller hash migration; reject any unrelated drift.",
+    "identity_migration_recorded_in_live_manifest": true,
+    "partial_policy": "Each running en/complete result, ASR cache, process log and traces was moved into its own interrupted-retry archive before a clean class restart.",
+    "resumed_at_utc": "2026-09-13T04:46:39Z"
+  },
+  "current_stage_at_launch": "parallel_D5_B10_C10",
+  "owner_stop_policy_20260913": {
+    "instruction": "Stop the evaluation when only one GPU/checkpoint remains active.",
+    "monitor_status": "stopped_reconciled",
+    "trigger": "exactly one active_assignments entry in three consecutive manifest reads",
+    "poll_interval_seconds": 5,
+    "current_active_tasks_at_monitor_start": ["D5", "B10", "C10"],
+    "current_class_at_monitor_start": "zh/complete",
+    "completed_before_monitor_start": "B5/C5 all classes; D5/B10/C10 en complete and en incomplete",
+    "stop_behavior": "Terminate the main tmux, preserve all complete outputs, and leave any running class for the existing archive-on-resume path."
+  },
+  "second_server_interruption_20260913": {
+    "cause": "server_or_container_disconnect while all three checkpoint assignments were still active; the stop-at-one policy did not trigger",
+    "last_monitor_observation_at_utc": "2026-09-13T06:02:28Z",
+    "completed_before_interruption": "D5/B10/C10 en complete, en incomplete and zh complete",
+    "partial_at_interruption": {
+      "D5 zh/incomplete": "started before first persisted record",
+      "B10 zh/incomplete": "59/300",
+      "C10 zh/incomplete": "72/300"
+    },
+    "resumed_at_utc": "2026-09-13T06:04:55Z",
+    "resume_policy": "Reuse every complete class after identity validation; archive each partial zh/incomplete artifact and restart only that class.",
+    "new_stop_monitor": "soulx_abcd_stop_at_one_v2"
+  },
+  "single_active_stop_result": {
+    "triggered_at_utc": "2026-09-13T06:32:57Z",
+    "trigger_stage": "D10",
+    "trigger_active_task": "D10@GPU0",
+    "completed_candidates": ["B5", "B10", "C5", "C10", "D5"],
+    "d10_persisted_records": 0,
+    "remaining_processes": 0,
+    "gpu_memory_used_mib": [0, 0, 0],
+    "live_manifest_note": "The controller-owned manifest intentionally remains status=running at stage D10 because the external owner-requested stop terminated it.",
+    "receipt_status_note": "The monitor initially stopped at status=stopping after matching the shared tmux server; read-only process/GPU reconciliation proved the evaluation was stopped, and the receipt was closed as stopped_reconciled.",
+    "monitor_fix": "Only Python controller/evaluation processes are now considered workload processes; tmux server processes are excluded."
+  },
+  "owner_single_gpu_resume_20260913": {
+    "instruction": "Continue execution after reducing the container to one GPU.",
+    "available_devices": ["0"],
+    "gpu_model": "NVIDIA GeForce RTX 4080 SUPER",
+    "resumed_at_utc": "2026-09-13T06:55:44Z",
+    "tmux_session": "soulx_abcd_table3_d10_single_v1",
+    "controller_devices_argument": "0",
+    "stop_at_one_monitor_reenabled": false,
+    "reuse_policy": "Identity-validate and reuse B5/B10/C5/C10/D5; evaluate only D10.",
+    "d10_previous_empty_artifacts": "Archived by the existing interrupted-retry path before restart.",
+    "first_persisted_progress": "en/complete 6/318 at 2026-09-13T06:59:14Z"
+  },
+  "completed_candidate_four_class_macro_percent": {
+    "baseline": 84.1407,
+    "A5": 79.0015,
+    "A10": 67.1350,
+    "B5": 81.1885,
+    "B10": 71.6909,
+    "C5": 80.0982,
+    "C10": 70.5014,
+    "D5": 81.7357,
+    "D10": 75.6825
+  },
+  "completion": {
+    "table3_completed_at_utc": "2026-09-13T08:40:48.441275+00:00",
+    "manifest_status": "complete",
+    "manifest_stage": "table3_step5_10_complete",
+    "completed_class_count": 28,
+    "candidate_grid": ["B5", "B10", "C5", "C10", "D5", "D10"],
+    "all_continuation_evidence_gates_passed": true,
+    "best_new_candidate": "D5",
+    "best_new_candidate_four_class_macro_percent": 81.7356650049431,
+    "best_new_candidate_delta_vs_baseline_pp": -2.405066153425466,
+    "interpretation": "Joint balancing is best among B/C/D at both evaluated steps and mitigates A's Incomplete collapse, but no new candidate exceeds the official step-0 four-class macro baseline.",
+    "table2_run": false,
+    "paid_api_cost_for_training_and_evaluation_usd": 0.0
+  },
+  "final_artifacts": {
+    "markdown": {
+      "path": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_abcd_experiment_summary.md",
+      "sha256": "14dea87943cd4f8fb6e26d5239e754a03479a930e4f6263b08ae563d3dd59d83"
+    },
+    "html": {
+      "path": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_abcd_experiment_summary.html",
+      "sha256": "481ada0457251b7ee5fc656948ce992e83a94a0e65e15cfb1e8c9b63059e7718"
+    },
+    "audit": {
+      "path": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_abcd_experiment_summary_audit.json",
+      "sha256": "9a3f99f4074b40b138ea1cc74f4ef3ee6f1d22d6c3cbdaa63d742cddc9b9dec6",
+      "status": "passed"
+    },
+    "renderer": {
+      "path": "/root/SoulX-stage3-dataset/scripts/render_abcd_table3_report.py",
+      "sha256": "52c72f8cd29f26df9ac47f74ee7fae0b4d3aecdfea316a40ccf1a5161ddb9777"
+    }
+  },
+  "forbidden_actions": [
+    "Do not change Table 3 samples, sample order, labels, ASR, decoding, terminal rule, thresholds, denominators or metrics.",
+    "Do not use Table 3 to alter training data, loss rates or checkpoint weights.",
+    "Do not run Table 2 or checkpoints other than 5 and 10.",
+    "Do not download models or call paid APIs."
+  ],
+  "next_action": "Preserve the completed Table 3 evidence and final report read-only. Table 2 remains deferred and must not be started without a separately confirmed protocol."
+}

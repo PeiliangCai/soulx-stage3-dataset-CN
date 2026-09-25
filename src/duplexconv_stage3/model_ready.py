@@ -106,6 +106,80 @@ def _event_ids_for_window(assignments: Sequence[dict[str, Any]], start: int, sto
     return sorted(event_ids)
 
 
+def validate_model_ready_view_partition(
+    *,
+    timelines: Sequence[dict[str, Any]],
+    glm_records: Sequence[dict[str, Any]],
+    timeline_source_view_quarantine: Sequence[dict[str, Any]],
+    glm_source_view_quarantine: Sequence[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    timeline_ids = [item["view_id"] for item in timelines]
+    glm_ids = [item["view_id"] for item in glm_records]
+    timeline_quarantine_ids = [
+        item["view_id"] for item in timeline_source_view_quarantine
+    ]
+    glm_quarantine_ids = [item["view_id"] for item in glm_source_view_quarantine]
+    for label, values in (
+        ("timelines", timeline_ids),
+        ("GLM records", glm_ids),
+        ("timeline source-view quarantine", timeline_quarantine_ids),
+        ("GLM source-view quarantine", glm_quarantine_ids),
+    ):
+        if len(set(values)) != len(values):
+            raise ValueError(f"{label} contain duplicate view IDs")
+    if set(timeline_ids) != set(glm_ids):
+        raise ValueError("timeline and GLM view ID sets differ")
+    if set(timeline_quarantine_ids) != set(glm_quarantine_ids):
+        raise ValueError("timeline and GLM source-view quarantine ID sets differ")
+    timeline_quarantine_by_id = {
+        item["view_id"]: item for item in timeline_source_view_quarantine
+    }
+    glm_quarantine_by_id = {
+        item["view_id"]: item for item in glm_source_view_quarantine
+    }
+    for view_id in timeline_quarantine_by_id:
+        if timeline_quarantine_by_id[view_id] != glm_quarantine_by_id[view_id]:
+            raise ValueError(
+                f"source-view quarantine provenance changed before GLM export: {view_id}"
+            )
+        item = timeline_quarantine_by_id[view_id]
+        if not isinstance(item.get("original_chunk_count"), int) or item[
+            "original_chunk_count"
+        ] < 1:
+            raise ValueError(f"invalid source-view quarantine chunk count: {view_id}")
+        if not isinstance(item.get("event_count"), int) or item["event_count"] < 0:
+            raise ValueError(f"invalid source-view quarantine event count: {view_id}")
+        if item["event_count"] != len(item.get("event_ids", [])):
+            raise ValueError(f"source-view quarantine event closure failed: {view_id}")
+    overlap = set(timeline_ids) & set(timeline_quarantine_ids)
+    if overlap:
+        raise ValueError(
+            f"usable/source-view quarantine IDs overlap: {sorted(overlap)}"
+        )
+    return [timeline_quarantine_by_id[key] for key in sorted(timeline_quarantine_by_id)]
+
+
+def source_id_for_record(record: dict[str, Any]) -> str:
+    source_id = record.get("source_id")
+    if isinstance(source_id, str) and source_id:
+        return source_id
+    view_id = record.get("view_id")
+    if not isinstance(view_id, str) or "/" not in view_id:
+        raise ValueError("record has neither source_id nor a valid view_id")
+    return view_id.split("/", 1)[0]
+
+
+def filter_excluded_sources(
+    records: Sequence[dict[str, Any]], excluded_source_ids: Sequence[str]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    excluded = set(excluded_source_ids)
+    kept = []
+    removed = []
+    for record in records:
+        (removed if source_id_for_record(record) in excluded else kept).append(record)
+    return kept, removed
+
+
 def export_model_ready(
     *,
     timeline_dir: Path,
@@ -114,6 +188,9 @@ def export_model_ready(
     output_dir: Path,
     upstream_commit: str,
     max_token_length: int = MAX_TOKEN_LENGTH,
+    dataset_version: str = DATASET_VERSION,
+    index_prefix: str = "duplexconv_edu0018",
+    excluded_source_ids: Sequence[str] = (),
 ) -> dict[str, Any]:
     timeline_dir = timeline_dir.resolve(strict=True)
     glm_dir = glm_dir.resolve(strict=True)
@@ -151,12 +228,83 @@ def export_model_ready(
                 raise ValueError(f"tokenizer contract mismatch for {token}: {actual}")
 
         timelines = list(read_jsonl(timeline_dir / "timelines.jsonl"))
-        glm_by_view = {item["view_id"]: item for item in read_jsonl(glm_dir / "audio_tokens.jsonl")}
+        glm_records = list(read_jsonl(glm_dir / "audio_tokens.jsonl"))
         glm_quarantine = list(read_jsonl(glm_dir / "glm_quarantine.jsonl"))
         if glm_quarantine:
             raise ValueError("GLM quarantine is non-empty; resolve it before export")
-        if {item["view_id"] for item in timelines} != set(glm_by_view):
-            raise ValueError("timeline and GLM view ID sets differ")
+        timeline_source_view_quarantine_path = (
+            timeline_dir / "source_view_quarantine.jsonl"
+        )
+        glm_source_view_quarantine_path = glm_dir / "source_view_quarantine.jsonl"
+        timeline_source_view_quarantine = (
+            list(read_jsonl(timeline_source_view_quarantine_path))
+            if timeline_source_view_quarantine_path.exists()
+            else []
+        )
+        glm_source_view_quarantine = (
+            list(read_jsonl(glm_source_view_quarantine_path))
+            if glm_source_view_quarantine_path.exists()
+            else []
+        )
+        original_source_view_quarantine = validate_model_ready_view_partition(
+            timelines=timelines,
+            glm_records=glm_records,
+            timeline_source_view_quarantine=timeline_source_view_quarantine,
+            glm_source_view_quarantine=glm_source_view_quarantine,
+        )
+        excluded_source_ids = tuple(sorted(set(excluded_source_ids)))
+        if any(not isinstance(item, str) or not item for item in excluded_source_ids):
+            raise ValueError("excluded source IDs must be non-empty strings")
+        available_source_ids = {
+            source_id_for_record(item)
+            for item in [*timelines, *original_source_view_quarantine]
+        }
+        missing_exclusions = set(excluded_source_ids) - available_source_ids
+        if missing_exclusions:
+            raise ValueError(
+                f"excluded source IDs are absent from input: {sorted(missing_exclusions)}"
+            )
+        timelines, excluded_timelines = filter_excluded_sources(
+            timelines, excluded_source_ids
+        )
+        glm_records, excluded_glm_records = filter_excluded_sources(
+            glm_records, excluded_source_ids
+        )
+        source_view_quarantine, excluded_source_view_quarantine = (
+            filter_excluded_sources(
+                original_source_view_quarantine, excluded_source_ids
+            )
+        )
+        if {item["view_id"] for item in excluded_timelines} != {
+            item["view_id"] for item in excluded_glm_records
+        }:
+            raise ValueError("excluded timeline and GLM view sets differ")
+        source_view_quarantine = validate_model_ready_view_partition(
+            timelines=timelines,
+            glm_records=glm_records,
+            timeline_source_view_quarantine=source_view_quarantine,
+            glm_source_view_quarantine=source_view_quarantine,
+        )
+        glm_by_view = {item["view_id"]: item for item in glm_records}
+        exclusion_audit = {
+            "profile": "whole-source-model-ready-exclusion-v1",
+            "excluded_source_ids": list(excluded_source_ids),
+            "excluded_source_conversation_count": len(excluded_source_ids),
+            "excluded_source_view_count": len(excluded_timelines),
+            "excluded_effective_chunk_count": sum(
+                item["effective_chunk_count"] for item in excluded_timelines
+            ),
+            "excluded_event_count": sum(
+                len(item["event_assignments"]) for item in excluded_timelines
+            ),
+            "excluded_source_view_quarantine_count": len(
+                excluded_source_view_quarantine
+            ),
+            "excluded_source_view_quarantined_chunk_count": sum(
+                item["original_chunk_count"]
+                for item in excluded_source_view_quarantine
+            ),
+        }
 
         rows = []
         metadata_rows = []
@@ -202,7 +350,7 @@ def export_model_ready(
                     )
                 for start, stop, sequence, tokenized_length in windows:
                     index = (
-                        f"duplexconv_edu0018__{timeline['source_id']}__"
+                        f"{index_prefix}__{timeline['source_id']}__"
                         f"ch{timeline['target_channel']:02d}__c{start:06d}-{stop:06d}"
                     )
                     if any((view_id, chunk) in exported_chunks for chunk in range(start, stop)):
@@ -265,10 +413,16 @@ def export_model_ready(
         with (temporary / "quarantine" / "chunks.jsonl").open("w", encoding="utf-8") as handle:
             for item in quarantine_rows:
                 handle.write(canonical_json(item) + "\n")
+        with (temporary / "quarantine" / "views.jsonl").open(
+            "w", encoding="utf-8"
+        ) as handle:
+            for item in source_view_quarantine:
+                handle.write(canonical_json(item) + "\n")
 
         contract = {
             "schema_version": 1,
-            "dataset_version": DATASET_VERSION,
+            "dataset_version": dataset_version,
+            "index_prefix": index_prefix,
             "sequence_profile": SEQUENCE_PROFILE,
             "columns": ["index", "sequence"],
             "prefix": PREFIX,
@@ -279,6 +433,8 @@ def export_model_ready(
             "upstream_commit": upstream_commit,
             "timeline_profile": timelines[0]["timeline_profile"] if timelines else None,
             "glm_audio_profile": next(iter(glm_by_view.values()))["glm_audio_profile"] if glm_by_view else None,
+            "source_view_quarantine_profile": "propagated-source-view-quarantine-v1",
+            "source_exclusion": exclusion_audit,
         }
         (temporary / "contract.json").write_text(
             json.dumps(contract, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
@@ -290,14 +446,41 @@ def export_model_ready(
             for state in timeline["chunk_states"]
             if state is not None
         )
+        source_view_quarantined_chunk_count = sum(
+            item["original_chunk_count"] for item in source_view_quarantine
+        )
+        source_view_quarantined_event_count = sum(
+            item["event_count"] for item in source_view_quarantine
+        )
+        input_total_chunk_count = total_chunks + source_view_quarantined_chunk_count
+        if (
+            len(exported_chunks)
+            + len(quarantined_chunk_ids)
+            + source_view_quarantined_chunk_count
+            != input_total_chunk_count
+        ):
+            raise ValueError("global exported/quarantined chunk closure failed")
         stats = {
             "schema_version": 1,
-            "dataset_version": DATASET_VERSION,
+            "dataset_version": dataset_version,
             "row_count": len(rows),
+            "input_source_view_count": len(timelines) + len(source_view_quarantine),
             "source_view_count": len(timelines),
+            "source_view_quarantined_count": len(source_view_quarantine),
+            "source_view_partition_closed": True,
             "total_effective_chunk_count": total_chunks,
+            "input_total_chunk_count": input_total_chunk_count,
             "exported_chunk_count": len(exported_chunks),
             "quarantined_chunk_count": len(quarantined_chunk_ids),
+            "source_view_quarantined_chunk_count": source_view_quarantined_chunk_count,
+            "total_quarantined_chunk_count": (
+                len(quarantined_chunk_ids) + source_view_quarantined_chunk_count
+            ),
+            "source_view_quarantined_event_count": source_view_quarantined_event_count,
+            "source_view_quarantined_duration_seconds": sum(
+                float(item.get("duration_seconds", 0.0))
+                for item in source_view_quarantine
+            ),
             "max_observed_tokenized_length": max(
                 (item["tokenized_length"] for item in metadata_rows), default=0
             ),
@@ -305,6 +488,7 @@ def export_model_ready(
                 sorted(Counter(str(item["source_ntrack"]) for item in metadata_rows).items())
             ),
             "chunk_state_counts_before_window_quarantine": dict(sorted(state_counts.items())),
+            "source_exclusion": exclusion_audit,
         }
         (temporary / "stats.json").write_text(
             json.dumps(stats, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
@@ -331,6 +515,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--upstream-commit", required=True)
     parser.add_argument("--max-token-length", type=int, default=MAX_TOKEN_LENGTH)
+    parser.add_argument("--dataset-version", default=DATASET_VERSION)
+    parser.add_argument("--index-prefix", default="duplexconv_edu0018")
+    parser.add_argument(
+        "--excluded-source-id",
+        action="append",
+        default=[],
+        help="Exclude one complete source conversation; may be repeated.",
+    )
     return parser
 
 
@@ -343,6 +535,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         output_dir=args.output_dir,
         upstream_commit=args.upstream_commit,
         max_token_length=args.max_token_length,
+        dataset_version=args.dataset_version,
+        index_prefix=args.index_prefix,
+        excluded_source_ids=args.excluded_source_id,
     )
     print(json.dumps(stats, ensure_ascii=False, sort_keys=True, indent=2))
     return 0

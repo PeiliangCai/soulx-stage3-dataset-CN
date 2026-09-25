@@ -1,0 +1,9 @@
+{
+  "archive_sha256": "a67361aa1ee5014a88f106c829bbc249007d34de3d152f463f8ce9de23aed097",
+  "schema_version": 1,
+  "status": "passed",
+  "supplemental_manifest_sha256": "91ab36df04397b989d17cdd7791012ad30ae881d2008e04d3ae243760d2de519",
+  "supplemental_payload_bytes": 32898,
+  "supplemental_record_count": 3,
+  "zero_byte_record_count": 21
+}

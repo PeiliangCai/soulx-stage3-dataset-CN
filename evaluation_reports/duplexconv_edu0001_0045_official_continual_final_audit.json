@@ -1,0 +1,97 @@
+{
+  "checks": {
+    "aggregate_gate_d_closed": true,
+    "all_table3_continuation_gates_passed": true,
+    "baseline_accuracy_gate_passed": false,
+    "baseline_evidence_audit_passed": true,
+    "exact_internal_validation_complete": true,
+    "exact_optimizer_resume": false,
+    "official_lightning_training_complete": true,
+    "old_custom_training_flow_used": false,
+    "origin_step_estimate_confidence": "low",
+    "pretrain_step0_no_training": true,
+    "source_conversation_leakage_count": 0,
+    "table3_baseline_reused_read_only": true,
+    "table3_coarse_to_fine": true,
+    "table3_evaluated_steps": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20,
+      30
+    ],
+    "table3_used_for_selection": false
+  },
+  "generated_at_utc": "2026-08-30T05:06:31.836519+00:00",
+  "inputs": {
+    "aggregate_manifest": {
+      "bytes": 2689,
+      "path": "/root/autodl-tmp/dataset/duplexconv/aggregates/edu0001_0045_stage3_zh_v2/aggregate_manifest.json",
+      "sha256": "f6838ad77b4ea533366f7bbf079814f0db16488424e940159a5e3f11ccbe8e72"
+    },
+    "execution_manifest": {
+      "bytes": 13270,
+      "path": "/root/SoulX-stage3-dataset/project_state/duplexconv_edu0001_0045_official_continual_v1_run_manifest.json",
+      "sha256": "31cfde9bb71f1107fa7e0e9fffc583b42775bef3ffc0aa47ba88574ba1c88088"
+    },
+    "internal_validation": {
+      "bytes": 35575,
+      "path": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/group_validation/index.json",
+      "sha256": "c6d22ed39574a98e8e07a7f77b38aba88bc155341cd9452b996902150967aa8a"
+    },
+    "posttrain_orchestration": {
+      "bytes": 13849,
+      "path": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/coarse_to_fine_orchestration_manifest.json",
+      "sha256": "54487a998c01c0d9218d0d31f94180f07523131117e874b925a975dbe872b60c"
+    },
+    "pretrain_step0": {
+      "bytes": 2767,
+      "path": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/group_validation_step0.json",
+      "sha256": "457d2284ea1f6b8fa910c07bda5853e8914e53ead96247c2da265be77ca5b8a2"
+    },
+    "renderer": {
+      "bytes": 42128,
+      "path": "/root/SoulX-stage3-dataset/scripts/render_official_continual_report.py",
+      "sha256": "3b6e4460ff0195223e1ce3bdc5d5b6debc3c6fac1d60505a2b3150ea3f94f43d"
+    },
+    "split_manifest": {
+      "bytes": 442184,
+      "path": "/root/autodl-tmp/dataset/duplexconv/splits/edu0001_0045_stage3_zh_v2_seed42_group98_2/split_manifest.json",
+      "sha256": "c343348bc97a48ed811c590a37c74d5d634275690f5b76ce9db6240233ec8d95"
+    },
+    "state_provenance": {
+      "bytes": 13075,
+      "path": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/dataset_state_provenance_summary.json",
+      "sha256": "312d75b02cd092db90f3c4dee2568f03291b38a28f992015bd68d5278c8567cb"
+    },
+    "table3_index": {
+      "bytes": 36370,
+      "path": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/sweep_index.json",
+      "sha256": "bff6ceb935117004928e2e3a716d38e6ace6f5ac8401adfabdd0b7266d4f9228"
+    },
+    "table3_orchestration": {
+      "bytes": 13849,
+      "path": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/coarse_to_fine_orchestration_manifest.json",
+      "sha256": "54487a998c01c0d9218d0d31f94180f07523131117e874b925a975dbe872b60c"
+    },
+    "training_manifest": {
+      "bytes": 27664,
+      "path": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/run_manifest.json",
+      "sha256": "08fdda2ad300506ea872f19681ba94900c6a0a7182d5241d5a8d35db9d5f58f5"
+    }
+  },
+  "outputs": {
+    "html": {
+      "path": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_official_continual_final.html",
+      "sha256": "d30c139358fa5891c67ba1e39fd05d4389ec7484e5ab26477499e6e713c0692b"
+    },
+    "markdown": {
+      "path": "/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0001_0045_official_continual_final.md",
+      "sha256": "e8232006ba1d2c8c8dcb4eb14287d79d2153a7ee5c167532168c22c2e8804675"
+    }
+  },
+  "schema_version": 1,
+  "status": "passed"
+}

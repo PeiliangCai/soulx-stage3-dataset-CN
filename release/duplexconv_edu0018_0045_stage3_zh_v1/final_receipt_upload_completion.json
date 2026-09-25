@@ -1,0 +1,14 @@
+{
+  "completed_at_utc": "2026-08-27T12:11:39.846953+00:00",
+  "manifest": "/root/SoulX-stage3-dataset/release/duplexconv_edu0018_0045_stage3_zh_v1/final_receipt_manifest.jsonl",
+  "manifest_sha256": "8bd15e5c5c92f1eb40f16f1f5ee8c81c7d61b720fc74956ab8368c6b920b9921",
+  "payload_bytes": 703088,
+  "progress": "/root/SoulX-stage3-dataset/release/duplexconv_edu0018_0045_stage3_zh_v1/final_receipt_upload_progress.jsonl",
+  "progress_sha256": "82b26f3fdc2099c3eae46b3df7aa38e2e7f45a78930bcd0b2f6c8e3794c6999c",
+  "record_count": 12,
+  "remote_delete_count": 0,
+  "remote_exact_byte_verification_count": 12,
+  "remote_overwrite_count": 0,
+  "schema_version": 1,
+  "status": "passed"
+}

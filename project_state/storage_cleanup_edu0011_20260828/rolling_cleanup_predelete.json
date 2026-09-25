@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-rebuildable-work-tar-rolling-cleanup-v1",
+  "created_at_utc": "2026-08-28T12:56:18Z",
+  "status": "predelete_audit_passed",
+  "owner_approval": "Approved exact-one-source Edu_0011 structural recovery includes exact rolling cleanup after final frozen Gate D; delete only independently audited, deterministically rebuildable work tars.",
+  "target_count": 2,
+  "target_bytes": 10349516800,
+  "free_bytes_before": 39917600768,
+  "targets": [
+    {
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0011_sanitized_v1/candidate_model_ready_views.tar",
+      "bytes": 2589624320,
+      "sha256": "dbf1b0b43d42092a2b088d121d5e52b1cb079f1f12c9b23cdfcd9b3395a7bd06",
+      "independent_sha256_recheck": "passed",
+      "rebuild_from": "preserved model-ready selection and target audio",
+      "gate_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0011/gate_d_closure_sanitized_v1.json",
+      "gate_closure_sha256": "2e1502420259e15a2eab925ef17880186020c2dd8e64edcb6b3441e68d983498",
+      "gate_passed": true
+    },
+    {
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0011_v1/Edu_0011_sanitized_499sources_v1.tar",
+      "bytes": 7759892480,
+      "sha256": "310c7ad73a3342514f5df72016a8b85a5282224cf8aa74a363762d9e5fdc8a01",
+      "independent_sha256_recheck": "passed",
+      "rebuild_from": "preserved official Edu_0011.tar plus exact excluded source Edu--006595 and sanitization audit",
+      "official_raw_archive": "/root/autodl-tmp/dataset/duplexconv/raw/audio/Edu_0011.tar",
+      "official_raw_archive_bytes": 7800422400,
+      "official_raw_archive_sha256": "88122657ad1175f4b7fca16efb117203b3bdd7a927f70625c55a543fe40a0b51",
+      "sanitization_audit": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0011/sanitization_audit_v1.json",
+      "sanitization_audit_sha256": "67f07a739c7a75afb5e68398cc2f695a36cc14f134c92d39dc71d31c65ce7ac0",
+      "sanitization_audit_passed": true
+    }
+  ],
+  "safety_checks": {
+    "related_process_count": 0,
+    "related_symlink_count": 0,
+    "training_checkpoint_or_split_reference_count": 0,
+    "expected_nonruntime_references_only": true,
+    "raw_archive_preserved": true,
+    "model_ready_parquet_preserved": true,
+    "target_audio_preserved": true,
+    "state_paraformer_glm_caches_preserved": true,
+    "manifests_checksums_reports_and_selections_preserved": true,
+    "sanitized_excluded_source_absent_from_downstream_outputs": true,
+    "training_dependency": "none; official training reads model-ready or aggregate Parquet, not these work tars"
+  },
+  "provenance": {
+    "pipeline_manifest": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0011/full_pipeline_manifest_sanitized_v1.json",
+    "pipeline_manifest_sha256": "1c227f97adbf1fc7f61f5740e234946bbdd73a2f8d007d0b14ad49b0a5dfbcad",
+    "source_contract": "/root/SoulX-stage3-dataset/configs/duplexconv_edu0011_sanitized_v1_source_contract.json",
+    "source_contract_sha256": "e8e6ee4330d8b8bb25f2014788d6bd9060f4e279114eb6354d5576ff5d2f25d6",
+    "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0011_sanitized_stage3_zh_v1",
+    "model_ready_row_count": 2308,
+    "model_ready_view_count": 1005,
+    "model_ready_exported_chunk_count": 502379,
+    "official_loader_train_split_length": 2192
+  },
+  "recovery_note": "Deletion is not recoverable in place. Both targets are deterministically rebuildable from the explicitly preserved raw/model-ready/target-audio inputs and frozen manifests; their exact identities remain in this audit."
+}

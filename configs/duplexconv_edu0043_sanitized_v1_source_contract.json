@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0043_sanitized_v1_stage3_zh_v1",
+  "shard_number": 43,
+  "archive_name": "Edu_0043_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0043.tar",
+  "parent_official_archive_bytes": 7444357120,
+  "parent_official_archive_sha256": "1806e902a3c068d211644202910ce5b9e34525d0a48830fb8aa94552b11868fc",
+  "sanitization_profile": "exclude-source-frozen-benchmark-near-duplicate-quarantine-v1",
+  "excluded_source_ids": [
+    "Edu--026481"
+  ],
+  "exclusion_reason": "The unchanged frozen benchmark leakage gate v2.2 produced a near-duplicate gate hit for channel 1 of Edu--026481.wav against candor_turn_taking/62/input.wav. The complete source conversation is conservatively excluded without changing or overriding any frozen threshold.",
+  "supported_track_counts": [
+    2,
+    3
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--025947",
+    "last_source_id": "Edu--026565",
+    "source_ids_sha256": "290d845d4a3bca0c62d857ad3a1711697438da469e11f48bffaba0941e4c954a",
+    "source_ntrack": {
+      "2": 494,
+      "3": 5
+    },
+    "target_view_count": 1003,
+    "target_view_hours": 21.50447068287036,
+    "event_count": 8493,
+    "state_distribution": {
+      "complete": 4371,
+      "incomplete": 1632,
+      "backchannel": 843,
+      "wait": 14,
+      "missing": 1633
+    }
+  }
+}

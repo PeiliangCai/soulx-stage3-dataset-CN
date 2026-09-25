@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
 import hashlib
 import json
 import math
@@ -346,10 +346,9 @@ def run_paraformer(
             "cache_hit_count": cache_hit_count,
             "cache_miss_count": cache_miss_count,
             "cache_dir": str(cache_dir) if cache_dir is not None else None,
-            "view_count_by_ntrack": {
-                str(ntrack): sum(item["source_ntrack"] == ntrack for item in results)
-                for ntrack in (2, 3)
-            },
+            "view_count_by_ntrack": dict(
+                sorted(Counter(str(item["source_ntrack"]) for item in results).items())
+            ),
             "total_token_count": sum(len(item["tokens"]) for item in results),
             "outside_activity_token_count": sum(
                 len(item["asr_token_outside_target_activity"]) for item in results

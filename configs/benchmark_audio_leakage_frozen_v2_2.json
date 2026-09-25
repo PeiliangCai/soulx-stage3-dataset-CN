@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-benchmark-audio-leakage-v2.2",
+  "calibration_profile": "duplexconv-benchmark-audio-leakage-calibration-v2.2",
+  "frozen_at_utc": "2026-08-22T13:40:52Z",
+  "benchmark_records_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_denylist_v2/benchmark_identity_manifest.jsonl",
+  "benchmark_records_sha256": "c3587ac3a8e363e1e9f7bb5584b198904a4bfa5bad7a3b08513b72b3c533d134",
+  "calibration_result_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_gate_v2_2/calibration_result.json",
+  "calibration_result_sha256": "32e7065eb6104072c7b0d64529634cf4013df397be7546161cc86cb0f668c153",
+  "calibration_run_manifest_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_gate_v2_2/calibration_run_manifest.json",
+  "calibration_run_manifest_sha256": "11b24bb73762a76618b5093e115513afba4473f6e9fbb970a318c971f603ec79",
+  "implementation_path": "/root/SoulX-stage3-dataset/src/duplexconv_stage3/audio_leakage_v2_2.py",
+  "implementation_sha256": "d40c56915efb31be9b8a26e0090523aed74a78a46934035a8c706de065216de6",
+  "v2_dependency_path": "/root/SoulX-stage3-dataset/src/duplexconv_stage3/audio_leakage_v2.py",
+  "v2_dependency_sha256": "9147180206a1c71eeb53492a230384d7b8fefeda86e0289df800f46359513e0d",
+  "v1_dependency_path": "/root/SoulX-stage3-dataset/src/duplexconv_stage3/audio_leakage.py",
+  "v1_dependency_sha256": "e5b36c76a6e5fdaf801c609df809855c53874af17c1475d2ba49d9d8b140c536",
+  "base_v2_config_path": "/root/SoulX-stage3-dataset/configs/benchmark_audio_leakage_frozen_v2.json",
+  "base_v2_config_sha256": "a557f7b4055073b6976340b23e223cba5b23f2c899739aed0e9c325da05cb3db",
+  "candidate_training_shard_used_for_numeric_calibration": false,
+  "near_duplicate_similarity_threshold": 0.655,
+  "minimum_aligned_frames": 64,
+  "minimum_lsh_votes": 16,
+  "content_parameters": {
+    "canonical_sample_rate": 16000,
+    "activity_frame_ms": 20,
+    "activity_rms_after_peak_normalization": 0.01,
+    "activity_expansion_frames": 0,
+    "content_windows": [
+      {
+        "seconds": 1.0,
+        "hop_seconds": 0.25
+      },
+      {
+        "seconds": 4.0,
+        "hop_seconds": 1.0
+      }
+    ],
+    "chromaprint_algorithm": 1,
+    "lsh_bits": 12,
+    "lsh_shifts": [
+      0,
+      5,
+      10,
+      15,
+      20
+    ],
+    "lsh_max_postings": 512
+  },
+  "decision": {
+    "exact_pcm_identity_match": "quarantine",
+    "peak_normalized_pcm_identity_match": "quarantine",
+    "compact_content_identity_match": "quarantine",
+    "compact_content_window_identity_match": "quarantine",
+    "near_duplicate_requires_all": [
+      "similarity_at_or_above_0.655",
+      "aligned_frames_at_or_above_64",
+      "lsh_votes_at_or_above_16"
+    ]
+  },
+  "split_audit": {
+    "seed": 20260822,
+    "calibration_fraction": 0.7,
+    "calibration_sample_key_count": 77,
+    "validation_sample_key_count": 33,
+    "overlap_count": 0,
+    "calibration_sample_keys_sha256": "71ebffdd760415edce428547e15de29086477fb9a832af609015880e1c999e97",
+    "validation_sample_keys_sha256": "58eaf5cde000f46d3d064f4a8fde566528b524f97576165ad47cd6aa39ab4def"
+  },
+  "calibration_summary": {
+    "calibration_positive_count": 168,
+    "validation_positive_count": 76,
+    "calibration_positive_failure_count": 0,
+    "validation_positive_failure_count": 0,
+    "positive_minimum_similarity": 0.7316595441595442,
+    "positive_minimum_lsh_votes": 95,
+    "calibration_negative_count": 1057,
+    "validation_negative_count": 149,
+    "calibration_negative_gate_hit_count": 0,
+    "validation_negative_gate_hit_count": 0,
+    "calibration_negative_maximum_lsh_votes": 9,
+    "validation_negative_maximum_lsh_votes": 6,
+    "minimum_lsh_votes_derivation": "strictly next power of two above calibration-negative maximum",
+    "short_padded_origin_detection_recall": 1.0,
+    "short_padded_cross_sample_collision_count": 0,
+    "short_padded_nonorigin_near_candidate_count": 0,
+    "silence_emits_no_evidence": true,
+    "calibration_passed": true
+  }
+}

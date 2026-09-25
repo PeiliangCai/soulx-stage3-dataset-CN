@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0026_sanitized_v1_stage3_zh_v1",
+  "shard_number": 26,
+  "archive_name": "Edu_0026_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0026.tar",
+  "parent_official_archive_bytes": 8177203200,
+  "parent_official_archive_sha256": "460a874c92469e8ba4d8f251edd4a53da613790f673eaa32811a2d1b9ad1914b",
+  "sanitization_profile": "exclude-source-structural-timestamp-quarantine-v1",
+  "excluded_source_ids": [
+    "Edu--015901"
+  ],
+  "exclusion_reason": "Official speaker segment ends 176 ms beyond the exact WAV duration, exceeding the unchanged 160 ms deterministic tail-repair tolerance; entire source conversation excluded by owner-approved conservative resolution.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--015388",
+    "last_source_id": "Edu--015998",
+    "source_ids_sha256": "ed0c9a090a5042d9d370db0b96a02bc2f44b89d584614e6ae562ed4944d045e1",
+    "source_ntrack": {
+      "2": 496,
+      "3": 3
+    },
+    "target_view_count": 1001,
+    "event_count": 9409,
+    "state_distribution": {
+      "complete": 4939,
+      "incomplete": 1711,
+      "backchannel": 925,
+      "wait": 24,
+      "missing": 1810
+    }
+  }
+}

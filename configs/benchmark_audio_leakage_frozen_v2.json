@@ -1,0 +1,76 @@
+{
+  "schema_version": 2,
+  "profile": "duplexconv-benchmark-audio-leakage-v2",
+  "calibration_profile": "duplexconv-benchmark-audio-leakage-calibration-v2.1",
+  "frozen_at_utc": "2026-08-22T13:12:02Z",
+  "benchmark_records_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_denylist_v2/benchmark_identity_manifest.jsonl",
+  "benchmark_records_sha256": "c3587ac3a8e363e1e9f7bb5584b198904a4bfa5bad7a3b08513b72b3c533d134",
+  "raw_calibration_result_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_denylist_v2/calibration_result.json",
+  "raw_calibration_result_sha256": "c6301f7da06370ff513a7076f6e76f6baf38d48bcbad072a82542fa289713309",
+  "calibration_result_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_denylist_v2/calibration_result_final_v2_1.json",
+  "calibration_result_sha256": "d2706409da86f0ff4c8c071a1ad3660fd2aebb4f2ac25e669073950e22dde007",
+  "calibration_protocol_path": "/root/SoulX-stage3-dataset/scripts/finalize_audio_leakage_calibration_v2_1.py",
+  "calibration_protocol_sha256": "58cee8d1aaec6a9c792c0db0561f32779a6ac78559804fac916b3c8a5065f939",
+  "implementation_path": "/root/SoulX-stage3-dataset/src/duplexconv_stage3/audio_leakage_v2.py",
+  "implementation_sha256": "9147180206a1c71eeb53492a230384d7b8fefeda86e0289df800f46359513e0d",
+  "v1_dependency_path": "/root/SoulX-stage3-dataset/src/duplexconv_stage3/audio_leakage.py",
+  "v1_dependency_sha256": "e5b36c76a6e5fdaf801c609df809855c53874af17c1475d2ba49d9d8b140c536",
+  "candidate_training_shard_used_for_numeric_calibration": false,
+  "near_duplicate_similarity_threshold": 0.655,
+  "minimum_aligned_frames": 64,
+  "content_parameters": {
+    "canonical_sample_rate": 16000,
+    "activity_frame_ms": 20,
+    "activity_rms_after_peak_normalization": 0.01,
+    "activity_expansion_frames": 0,
+    "content_windows": [
+      {
+        "seconds": 1.0,
+        "hop_seconds": 0.25
+      },
+      {
+        "seconds": 4.0,
+        "hop_seconds": 1.0
+      }
+    ],
+    "chromaprint_algorithm": 1,
+    "lsh_bits": 12,
+    "lsh_shifts": [
+      0,
+      5,
+      10,
+      15,
+      20
+    ],
+    "lsh_max_postings": 512
+  },
+  "decision": {
+    "exact_pcm_identity_match": "quarantine",
+    "peak_normalized_pcm_identity_match": "quarantine",
+    "compact_content_identity_match": "quarantine",
+    "compact_content_window_identity_match": "quarantine",
+    "near_duplicate_at_or_above_threshold": "quarantine"
+  },
+  "calibration_summary": {
+    "raw_v2_calibration_passed": false,
+    "raw_failure_reasons": [
+      "same benchmark sample clean_input/input association was counted as a cross-sample collision",
+      "inherited v1 threshold floor 0.80 exceeded the v2 resampling-control p01"
+    ],
+    "same_source_control_count": 192,
+    "same_source_retrieval_recall": 1.0,
+    "same_source_minimum_similarity": 0.7316595441595442,
+    "same_source_p01_similarity": 0.7678843458633305,
+    "different_source_control_count": 1125,
+    "different_source_maximum_similarity": 0.6328125,
+    "threshold_derivation": "ceil((max_negative + 0.02) / 0.005) * 0.005",
+    "positive_p01_minus_threshold_margin": 0.11288434586333052,
+    "short_padded_control_count": 48,
+    "short_padded_origin_detection_recall": 1.0,
+    "same_sample_associated_component_overlap_count": 21,
+    "cross_sample_collision_count": 0,
+    "short_nonorigin_near_candidate_count": 0,
+    "silence_emits_no_evidence": true,
+    "final_calibration_passed": true
+  }
+}

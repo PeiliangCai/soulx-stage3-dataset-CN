@@ -19,6 +19,10 @@ from duplexconv_stage3.continual_training import (
     sha256_file,
     utc_now,
 )
+from duplexconv_stage3.validate_model_ready import (
+    discover_metadata_files,
+    discover_parquet_files,
+)
 
 
 def main() -> int:
@@ -30,8 +34,8 @@ def main() -> int:
     args = parser.parse_args()
 
     root = args.model_ready_root.resolve(strict=True)
-    input_parquet = root / "data/train-00000-of-00001.parquet"
-    metadata_path = root / "metadata/windows.jsonl"
+    input_parquets = discover_parquet_files(root)
+    metadata_paths = discover_metadata_files(root)
     output = args.output_dir.absolute()
     if output.exists():
         raise FileExistsError(f"split output already exists: {output}")
@@ -39,10 +43,18 @@ def main() -> int:
     import pyarrow as pa
     import pyarrow.parquet as pq
 
-    table = pq.read_table(input_parquet, columns=["index", "sequence"])
+    table = pa.concat_tables(
+        [pq.read_table(path, columns=["index", "sequence"]) for path in input_parquets]
+    )
     indexes = table.column("index").to_pylist()
     sequences = table.column("sequence").to_pylist()
-    metadata = load_window_metadata(metadata_path)
+    metadata = {}
+    for metadata_path in metadata_paths:
+        current = load_window_metadata(metadata_path)
+        overlap = set(metadata) & set(current)
+        if overlap:
+            raise ValueError(f"duplicate metadata indexes across shards: {sorted(overlap)[:10]}")
+        metadata.update(current)
     train_rows, validation_rows, manifest = build_split_rows(
         indexes,
         sequences,
@@ -72,14 +84,14 @@ def main() -> int:
             "created_at_utc": utc_now(),
             "model_ready_root": str(root),
             "source_artifacts": {
-                "parquet": {
-                    "path": str(input_parquet),
-                    "sha256": sha256_file(input_parquet),
-                },
-                "window_metadata": {
-                    "path": str(metadata_path),
-                    "sha256": sha256_file(metadata_path),
-                },
+                "parquet_files": [
+                    {"path": str(path), "sha256": sha256_file(path)}
+                    for path in input_parquets
+                ],
+                "window_metadata_files": [
+                    {"path": str(path), "sha256": sha256_file(path)}
+                    for path in metadata_paths
+                ],
             },
             "artifacts": {
                 "train": {

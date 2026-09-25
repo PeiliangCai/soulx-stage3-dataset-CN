@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "release_id": "duplexconv_edu0018_0045_stage3_zh_v1",
+  "created_at_utc": "2026-08-27T04:18:37Z",
+  "remote_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1",
+  "payloads": [
+    {
+      "name": "raw",
+      "local_path": "/root/autodl-tmp/dataset/duplexconv/raw",
+      "remote_parent": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1",
+      "expected_file_count": 29,
+      "expected_payload_bytes": 211827029597
+    },
+    {
+      "name": "model_ready",
+      "local_path": "/root/autodl-tmp/dataset/duplexconv/aggregates/edu0018_0045_stage3_zh_v1",
+      "remote_parent": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/model_ready",
+      "expected_file_count": 117,
+      "expected_payload_bytes": 141410058
+    },
+    {
+      "name": "aggregate_reports",
+      "local_path": "/root/autodl-tmp/dataset/duplexconv/reports/aggregate_edu0018_0045_v1",
+      "remote_parent": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/evidence",
+      "expected_file_count": 5,
+      "expected_payload_bytes": 15559
+    }
+  ],
+  "evidence_files": [
+    "/root/SoulX-stage3-dataset/configs/duplexconv_edu0018_0045_aggregate_v1.json",
+    "/root/SoulX-stage3-dataset/configs/duplexconv_edu0018_sanitized_v1_exclusion.json",
+    "/root/SoulX-stage3-dataset/configs/benchmark_audio_leakage_frozen_v2_2.json",
+    "/root/SoulX-stage3-dataset/project_plan/duplexconv_edu0018_stage3_plan.md"
+  ],
+  "excluded_local_roots": [
+    "/root/autodl-tmp/dataset/duplexconv/processed",
+    "/root/autodl-tmp/dataset/duplexconv/cache",
+    "/root/autodl-tmp/dataset/duplexconv/work",
+    "/root/autodl-tmp/conda_envs"
+  ],
+  "client": {
+    "name": "BaiduPCS-Go",
+    "version": "v4.0.1",
+    "linux_amd64_zip_sha256": "ffbf6d15eef8f7df06ad59d46e7347c71d725dec24d1f558357bd27d16aa65b3",
+    "installed_path": "/root/tools/BaiduPCS-Go-v4.0.1/BaiduPCS-Go-v4.0.1-linux-amd64/BaiduPCS-Go",
+    "installed_binary_sha256": "56cb54573c59c98c8cf6deb1b154e4ccb9adec78a8ef9cd41f177fb7a541b715",
+    "source": "https://github.com/qjfoidnh/BaiduPCS-Go/releases/tag/v4.0.1"
+  },
+  "security": {
+    "reuse_existing_login_config_without_printing_secrets": true,
+    "forbid_credential_material_in_logs_or_release": true,
+    "baidu_route": "direct_with_proxy_variables_unset"
+  },
+  "upload_policy": "rsync_same-size-skip; never delete remote or local files",
+  "training_authorized": false,
+  "api_calls_authorized": false
+}

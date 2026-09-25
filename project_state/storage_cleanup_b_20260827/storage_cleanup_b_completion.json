@@ -1,0 +1,16 @@
+{
+  "completed_at_utc": "2026-08-27T12:29:29.047010+00:00",
+  "deleted_deprecated_root": "/root/autodl-tmp/soulx-duplug-stage3-cn-replacement",
+  "deleted_target_count_including_deprecated_root": 16,
+  "deleted_work_tar_bytes": 80093716480,
+  "deleted_work_tar_count": 15,
+  "disk_after": {
+    "free_bytes": 228196986880,
+    "free_bytes_increase": 188281516032,
+    "total_bytes": 536870912000,
+    "used_bytes": 308673925120
+  },
+  "recovery": "Deprecated datasets require redownload. Work tars are deterministically rebuildable from preserved official raw tars, exclusion configs, model-ready selection metadata, and frozen Gate-D inputs.",
+  "schema_version": 1,
+  "status": "passed"
+}

@@ -1,0 +1,1386 @@
+{
+  "category_record_counts": {
+    "aggregate_reports": 2,
+    "empty_file_compat": 3,
+    "evidence_file": 4,
+    "model_ready": 185,
+    "raw": 46,
+    "release_metadata": 2
+  },
+  "completion": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/upload_completion.json",
+  "completion_sha256": "050f0d330db8265e8f3565505641fb9093d877842b933ab92d9195cb257287a0",
+  "core_manifest_record_count": 239,
+  "direct_remote_file_count": 221,
+  "direct_remote_verified_bytes": 346099226326,
+  "direct_remote_verified_file_count": 221,
+  "local_manifest_identity_recheck": "passed_size_and_mtime_for_all_242_records",
+  "login_preflight": "passed_existing_protected_config_no_credentials_logged",
+  "manifest": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/file_manifest.jsonl",
+  "manifest_sha256": "42382210089f784408cad8a50caf73bf96b153bef489e3bf553496ff3d6041af",
+  "payload_bytes": 346099226326,
+  "progress": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/upload_progress.json",
+  "progress_sha256": "a7ba53b8fecdacd9acd4d49bebd44c86350f333fcd28df703eb9af058cbee5dc",
+  "remote_delete_count": 0,
+  "remote_file_results": [
+    {
+      "actual_bytes": 1092,
+      "expected_bytes": 1092,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence/aggregate_edu0001_0045_v2/aggregate_audit.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 6675,
+      "expected_bytes": 6675,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence/aggregate_edu0001_0045_v2/model_ready_validation.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 4042,
+      "expected_bytes": 4042,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence/benchmark_audio_leakage_frozen_v2_2.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 5472,
+      "expected_bytes": 5472,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence/duplexconv_aggregate_edu0001_0045_v2_run_manifest.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 18358,
+      "expected_bytes": 18358,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence/duplexconv_edu0001_0045_aggregate_v2.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 61281,
+      "expected_bytes": 61281,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/evidence/duplexconv_expansion_edu0001_0017_v2_run_manifest.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2689,
+      "expected_bytes": 2689,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/aggregate_manifest.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 19639,
+      "expected_bytes": 19639,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/checksums.sha256",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1139,
+      "expected_bytes": 1139,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/contract.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3146186,
+      "expected_bytes": 3146186,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0001-96fa57dc20fd.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3131237,
+      "expected_bytes": 3131237,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0002-f4f9ca77f8da.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3342697,
+      "expected_bytes": 3342697,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0003-8a80b6b6b3fe.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3065168,
+      "expected_bytes": 3065168,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0004-f06b5a61bbdc.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3268116,
+      "expected_bytes": 3268116,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0005-f2d67c9ffba6.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3197712,
+      "expected_bytes": 3197712,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0006-699fa32cdeae.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3194299,
+      "expected_bytes": 3194299,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0007-fdc13300b67b.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3419650,
+      "expected_bytes": 3419650,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0008-bf4c6d177e4f.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2953102,
+      "expected_bytes": 2953102,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0009-af3642157c07.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2987181,
+      "expected_bytes": 2987181,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0010-2cc6f020e970.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3126302,
+      "expected_bytes": 3126302,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0011-90a498049a4c.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3179371,
+      "expected_bytes": 3179371,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0012-a4d79706a932.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3200877,
+      "expected_bytes": 3200877,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0013-b87d55f7247b.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3064927,
+      "expected_bytes": 3064927,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0014-92263dd7ed55.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3221390,
+      "expected_bytes": 3221390,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0015-fb12680cac85.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3079017,
+      "expected_bytes": 3079017,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0016-4e8a26ba21de.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3290270,
+      "expected_bytes": 3290270,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0017-f65294d4a49b.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2948413,
+      "expected_bytes": 2948413,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0018-37479b595900.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3028014,
+      "expected_bytes": 3028014,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0019-ddde0c866409.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3106435,
+      "expected_bytes": 3106435,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0020-5469411ab453.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3037306,
+      "expected_bytes": 3037306,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0021-6106ace96787.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3242341,
+      "expected_bytes": 3242341,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0022-efc970f8542b.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3186730,
+      "expected_bytes": 3186730,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0023-0adb416081fb.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3000895,
+      "expected_bytes": 3000895,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0024-aff227968480.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3049314,
+      "expected_bytes": 3049314,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0025-80ad2fef7559.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3287272,
+      "expected_bytes": 3287272,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0026-72ce4f29702b.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3336873,
+      "expected_bytes": 3336873,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0027-97ae62315029.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3180920,
+      "expected_bytes": 3180920,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0028-07e0173b7fae.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3256122,
+      "expected_bytes": 3256122,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0029-c3c3c5995423.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3209210,
+      "expected_bytes": 3209210,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0030-bc5837e29434.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3173700,
+      "expected_bytes": 3173700,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0031-f58440b7b4ea.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3081846,
+      "expected_bytes": 3081846,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0032-c70f9950f663.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3054499,
+      "expected_bytes": 3054499,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0033-218762feba64.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3358106,
+      "expected_bytes": 3358106,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0034-1b71bc2857b3.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3000015,
+      "expected_bytes": 3000015,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0035-49081a99748d.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3111328,
+      "expected_bytes": 3111328,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0036-a899ca1050ee.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3130649,
+      "expected_bytes": 3130649,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0037-c32498fb5922.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3319470,
+      "expected_bytes": 3319470,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0038-ecaddcd39eb6.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3208271,
+      "expected_bytes": 3208271,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0039-35abe097fd9b.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3034437,
+      "expected_bytes": 3034437,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0040-0e00d312704e.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3306199,
+      "expected_bytes": 3306199,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0041-909c66e941a4.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2949139,
+      "expected_bytes": 2949139,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0042-f3f1271bc7a3.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3006088,
+      "expected_bytes": 3006088,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0043-b6c277181d9a.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 3143953,
+      "expected_bytes": 3143953,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0044-3ef7fe1b77af.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 270713,
+      "expected_bytes": 270713,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/data/train-edu_0045-6f5f88bf5b24.parquet",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1796733,
+      "expected_bytes": 1796733,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0001.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1809371,
+      "expected_bytes": 1809371,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0002.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1915039,
+      "expected_bytes": 1915039,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0003.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1753047,
+      "expected_bytes": 1753047,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0004.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1848833,
+      "expected_bytes": 1848833,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0005.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1844588,
+      "expected_bytes": 1844588,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0006.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1805062,
+      "expected_bytes": 1805062,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0007.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1932872,
+      "expected_bytes": 1932872,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0008.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1717964,
+      "expected_bytes": 1717964,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0009.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1735773,
+      "expected_bytes": 1735773,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0010.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1812348,
+      "expected_bytes": 1812348,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0011.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1809667,
+      "expected_bytes": 1809667,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0012.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1813701,
+      "expected_bytes": 1813701,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0013.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1783119,
+      "expected_bytes": 1783119,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0014.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1845452,
+      "expected_bytes": 1845452,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0015.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1764355,
+      "expected_bytes": 1764355,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0016.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1858219,
+      "expected_bytes": 1858219,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0017.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1705188,
+      "expected_bytes": 1705188,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0018.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1722100,
+      "expected_bytes": 1722100,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0019.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1769697,
+      "expected_bytes": 1769697,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0020.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1746009,
+      "expected_bytes": 1746009,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0021.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1783169,
+      "expected_bytes": 1783169,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0022.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1827404,
+      "expected_bytes": 1827404,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0023.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1678323,
+      "expected_bytes": 1678323,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0024.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1704190,
+      "expected_bytes": 1704190,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0025.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1860370,
+      "expected_bytes": 1860370,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0026.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1859814,
+      "expected_bytes": 1859814,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0027.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1813829,
+      "expected_bytes": 1813829,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0028.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1818370,
+      "expected_bytes": 1818370,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0029.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1840935,
+      "expected_bytes": 1840935,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0030.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1781479,
+      "expected_bytes": 1781479,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0031.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1728796,
+      "expected_bytes": 1728796,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0032.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1758947,
+      "expected_bytes": 1758947,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0033.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1876516,
+      "expected_bytes": 1876516,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0034.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1726701,
+      "expected_bytes": 1726701,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0035.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1775860,
+      "expected_bytes": 1775860,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0036.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1761903,
+      "expected_bytes": 1761903,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0037.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1832185,
+      "expected_bytes": 1832185,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0038.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1863714,
+      "expected_bytes": 1863714,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0039.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1731723,
+      "expected_bytes": 1731723,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0040.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1859398,
+      "expected_bytes": 1859398,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0041.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1721940,
+      "expected_bytes": 1721940,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0042.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1756875,
+      "expected_bytes": 1756875,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0043.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1774790,
+      "expected_bytes": 1774790,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0044.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 150961,
+      "expected_bytes": 150961,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/metadata/by_shard/Edu_0045.windows.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 251493,
+      "expected_bytes": 251493,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0001.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 302625,
+      "expected_bytes": 302625,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0002.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 357359,
+      "expected_bytes": 357359,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0003.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1220,
+      "expected_bytes": 1220,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0003.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 265333,
+      "expected_bytes": 265333,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0004.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 323457,
+      "expected_bytes": 323457,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0005.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 446,
+      "expected_bytes": 446,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0005.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 302955,
+      "expected_bytes": 302955,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0006.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 446,
+      "expected_bytes": 446,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0006.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 277636,
+      "expected_bytes": 277636,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0007.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 474,
+      "expected_bytes": 474,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0007.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 325101,
+      "expected_bytes": 325101,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0008.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 256287,
+      "expected_bytes": 256287,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0009.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1395,
+      "expected_bytes": 1395,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0009.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 290912,
+      "expected_bytes": 290912,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0010.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2486,
+      "expected_bytes": 2486,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0010.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 297747,
+      "expected_bytes": 297747,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0011.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 335420,
+      "expected_bytes": 335420,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0012.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 706,
+      "expected_bytes": 706,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0012.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 287723,
+      "expected_bytes": 287723,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0013.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 315294,
+      "expected_bytes": 315294,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0014.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 279516,
+      "expected_bytes": 279516,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0015.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 532,
+      "expected_bytes": 532,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0015.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 313423,
+      "expected_bytes": 313423,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0016.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 344168,
+      "expected_bytes": 344168,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0017.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 253249,
+      "expected_bytes": 253249,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0018.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 274320,
+      "expected_bytes": 274320,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0019.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1543,
+      "expected_bytes": 1543,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0019.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 303751,
+      "expected_bytes": 303751,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0020.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2617,
+      "expected_bytes": 2617,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0020.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 306076,
+      "expected_bytes": 306076,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0021.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1039,
+      "expected_bytes": 1039,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0021.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 269856,
+      "expected_bytes": 269856,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0022.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 310921,
+      "expected_bytes": 310921,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0023.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 283841,
+      "expected_bytes": 283841,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0024.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 567,
+      "expected_bytes": 567,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0024.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 272563,
+      "expected_bytes": 272563,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0025.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1356,
+      "expected_bytes": 1356,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0025.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 299242,
+      "expected_bytes": 299242,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0026.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 445,
+      "expected_bytes": 445,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0026.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 348763,
+      "expected_bytes": 348763,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0027.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 291112,
+      "expected_bytes": 291112,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0028.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 451,
+      "expected_bytes": 451,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0028.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 335955,
+      "expected_bytes": 335955,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0029.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 319814,
+      "expected_bytes": 319814,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0030.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 293589,
+      "expected_bytes": 293589,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0031.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 619,
+      "expected_bytes": 619,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0031.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 270780,
+      "expected_bytes": 270780,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0032.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1577,
+      "expected_bytes": 1577,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0032.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 299493,
+      "expected_bytes": 299493,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0033.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 349972,
+      "expected_bytes": 349972,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0034.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 310839,
+      "expected_bytes": 310839,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0035.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 279544,
+      "expected_bytes": 279544,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0036.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1514,
+      "expected_bytes": 1514,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0036.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 281724,
+      "expected_bytes": 281724,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0037.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1155,
+      "expected_bytes": 1155,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0037.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 301182,
+      "expected_bytes": 301182,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0038.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 532,
+      "expected_bytes": 532,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0038.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 301276,
+      "expected_bytes": 301276,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0039.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 590,
+      "expected_bytes": 590,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0039.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 290984,
+      "expected_bytes": 290984,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0040.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 446,
+      "expected_bytes": 446,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0040.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 333096,
+      "expected_bytes": 333096,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0041.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 502,
+      "expected_bytes": 502,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0041.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 292166,
+      "expected_bytes": 292166,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0042.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2075,
+      "expected_bytes": 2075,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0042.views.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 302317,
+      "expected_bytes": 302317,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0043.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 282273,
+      "expected_bytes": 282273,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0044.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 24714,
+      "expected_bytes": 24714,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0045.chunks.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 69792,
+      "expected_bytes": 69792,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/shard_registry.jsonl",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 952,
+      "expected_bytes": 952,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/stats.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7799214080,
+      "expected_bytes": 7799214080,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0001.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7814389760,
+      "expected_bytes": 7814389760,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0002.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8294952960,
+      "expected_bytes": 8294952960,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0003.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7584215040,
+      "expected_bytes": 7584215040,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0004.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8070563840,
+      "expected_bytes": 8070563840,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0005.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8034068480,
+      "expected_bytes": 8034068480,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0006.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7885015040,
+      "expected_bytes": 7885015040,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0007.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8555407360,
+      "expected_bytes": 8555407360,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0008.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7393013760,
+      "expected_bytes": 7393013760,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0009.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7440578560,
+      "expected_bytes": 7440578560,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0010.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7800422400,
+      "expected_bytes": 7800422400,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0011.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7911475200,
+      "expected_bytes": 7911475200,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0012.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8007874560,
+      "expected_bytes": 8007874560,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0013.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7617873920,
+      "expected_bytes": 7617873920,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0014.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8022609920,
+      "expected_bytes": 8022609920,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0015.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7608002560,
+      "expected_bytes": 7608002560,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0016.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8201093120,
+      "expected_bytes": 8201093120,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0017.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7317340160,
+      "expected_bytes": 7317340160,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0018.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7612467200,
+      "expected_bytes": 7612467200,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0019.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7966894080,
+      "expected_bytes": 7966894080,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0020.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7560140800,
+      "expected_bytes": 7560140800,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0021.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8036096000,
+      "expected_bytes": 8036096000,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0022.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7968808960,
+      "expected_bytes": 7968808960,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0023.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7472896000,
+      "expected_bytes": 7472896000,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0024.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7541288960,
+      "expected_bytes": 7541288960,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0025.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8177203200,
+      "expected_bytes": 8177203200,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0026.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8255406080,
+      "expected_bytes": 8255406080,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0027.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7947059200,
+      "expected_bytes": 7947059200,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0028.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8074332160,
+      "expected_bytes": 8074332160,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0029.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7972321280,
+      "expected_bytes": 7972321280,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0030.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7819653120,
+      "expected_bytes": 7819653120,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0031.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7693424640,
+      "expected_bytes": 7693424640,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0032.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7609466880,
+      "expected_bytes": 7609466880,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0033.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8369879040,
+      "expected_bytes": 8369879040,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0034.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7440353280,
+      "expected_bytes": 7440353280,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0035.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7846338560,
+      "expected_bytes": 7846338560,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0036.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7735255040,
+      "expected_bytes": 7735255040,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0037.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8289576960,
+      "expected_bytes": 8289576960,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0038.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8089958400,
+      "expected_bytes": 8089958400,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0039.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7522283520,
+      "expected_bytes": 7522283520,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0040.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 8120791040,
+      "expected_bytes": 8120791040,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0041.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7413319680,
+      "expected_bytes": 7413319680,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0042.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7444357120,
+      "expected_bytes": 7444357120,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0043.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7812597760,
+      "expected_bytes": 7812597760,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0044.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 660613120,
+      "expected_bytes": 660613120,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/audio/Edu_0045.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 56907357,
+      "expected_bytes": 56907357,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw/metadata/jsons.tar.gz",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 1789,
+      "expected_bytes": 1789,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/receipts/README.md",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 7988,
+      "expected_bytes": 7988,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/receipts/empty_files_compat/EMPTY_FILES.json",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 20480,
+      "expected_bytes": 20480,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/receipts/empty_files_compat/empty_files.tar",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 4430,
+      "expected_bytes": 4430,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/receipts/empty_files_compat/restore_baidu_empty_release_files.py",
+      "status": "exact_byte_size_verified"
+    },
+    {
+      "actual_bytes": 2668,
+      "expected_bytes": 2668,
+      "remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/receipts/release_spec.json",
+      "status": "exact_byte_size_verified"
+    }
+  ],
+  "remote_overwrite_count": 0,
+  "represented_zero_byte_paths": [
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0001.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0002.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0004.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0008.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0011.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0013.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0014.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0016.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0017.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0018.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0022.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0023.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0027.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0029.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0030.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0033.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0034.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0035.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0043.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0044.views.jsonl",
+    "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0045.views.jsonl"
+  ],
+  "represented_zero_byte_record_count": 21,
+  "schema_version": 1,
+  "status": "passed",
+  "supplemental_manifest": "/root/SoulX-stage3-dataset/release/duplexconv_edu0001_0045_stage3_zh_v2/empty_file_compat_manifest.jsonl",
+  "supplemental_manifest_sha256": "91ab36df04397b989d17cdd7791012ad30ae881d2008e04d3ae243760d2de519",
+  "supplemental_record_count": 3,
+  "verification_scope": "independent_post_upload_BaiduPCS-Go_meta_exact_byte_size_for_every_direct_remote_file",
+  "verified_at_utc": "2026-08-29T09:58:44.440686+00:00",
+  "zero_byte_representation_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/receipts/empty_files_compat/empty_files.tar",
+  "zero_byte_representation_sha256": "a67361aa1ee5014a88f106c829bbc249007d34de3d152f463f8ce9de23aed097"
+}

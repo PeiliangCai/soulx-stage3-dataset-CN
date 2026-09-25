@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from collections import defaultdict
+from collections import Counter, defaultdict
 import hashlib
 import json
 import math
@@ -200,10 +200,9 @@ def extract_target_audio(
             "source_archive_sha256": archive_sha256,
             "scan_dir": str(scan_dir),
             "view_count": len(manifest),
-            "view_count_by_ntrack": {
-                str(ntrack): sum(item["source_ntrack"] == ntrack for item in manifest)
-                for ntrack in (2, 3)
-            },
+            "view_count_by_ntrack": dict(
+                sorted(Counter(str(item["source_ntrack"]) for item in manifest).items())
+            ),
             "resample_profile": RESAMPLE_PROFILE,
             "audio_profile": AUDIO_PROFILE,
             "total_resampled_frames": sum(

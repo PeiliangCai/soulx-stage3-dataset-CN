@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-rebuildable-work-tar-rolling-cleanup-completion-v1",
+  "completed_at_utc": "2026-08-28T04:28:00Z",
+  "status": "complete",
+  "predelete_audit": "/root/SoulX-stage3-dataset/project_state/storage_cleanup_edu0003_0006_20260828/rolling_cleanup_predelete.json",
+  "predelete_audit_sha256": "7292a2f98af8944f937cca3c04c9282ec596479127db6bd31c8a6d07efc77546",
+  "deleted_target_count": 5,
+  "deleted_target_apparent_bytes": 18651586560,
+  "free_bytes_before": 45577936896,
+  "free_bytes_after": 56764354560,
+  "free_bytes_increase": 11186417664,
+  "free_space_note": "The filesystem-reported increase is smaller than the sum of apparent file sizes because apparent tar sizes and allocated filesystem blocks are not identical; every exact target path is absent after deletion.",
+  "deleted_paths": [
+    "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0003_v1/candidate_model_ready_views.tar",
+    "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0004_v1/candidate_model_ready_views.tar",
+    "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0005_v1/candidate_model_ready_views.tar",
+    "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0006_sanitized_v1/candidate_model_ready_views.tar",
+    "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0006_v1/Edu_0006_sanitized_499sources_v1.tar"
+  ],
+  "preserved": {
+    "official_raw_archives": true,
+    "model_ready_parquet": true,
+    "target_audio": true,
+    "state_paraformer_glm_caches": true,
+    "requests_results_and_api_manifests": true,
+    "gate_selections_manifests_checksums_and_reports": true,
+    "training_and_evaluation_outputs": true
+  },
+  "recoverability": "Deleted files cannot be restored in place, but are deterministically rebuildable from preserved inputs and the exact identities recorded in the predelete audit."
+}

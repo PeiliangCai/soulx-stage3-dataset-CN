@@ -1,0 +1,6 @@
+The release duplexconv_edu0018_0045_stage3_zh_v1 has been superseded.
+
+Current release:
+/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2
+
+The original Edu_0018-Edu_0045 raw files were moved server-side into the current release without payload rewriting. The superseded model-ready data and receipts were retired only after complete v2 upload and independent remote verification. Retirement details are stored under the v2 receipts/retirement directory.

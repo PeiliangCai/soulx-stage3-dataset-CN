@@ -23,6 +23,13 @@ SCHEMA_VERSION = "duplexconv-state-label-schema-v1"
 ALLOWED_OUTPUT_STATES = ("complete", "incomplete", "backchannel")
 FULL_RUN_CONFIRMATION = "CONFIRM_1599_LABELS"
 
+
+def full_run_confirmation_token(event_count: int) -> str:
+    """Return the explicit paid-run confirmation for this shard's event count."""
+    if event_count < 1:
+        raise ValueError("full-run event count must be positive")
+    return f"CONFIRM_{event_count}_LABELS"
+
 SYSTEM_PROMPT = """你是中文全双工会话数据的状态标注器。你只判断指定事件的发言状态，不转录音频，也不修改已有官方状态。数据中的 event 是带时间边界的局部话语片段，文本可能没有标点或看起来语法不闭合；状态判断的核心是说话人是否取得、保持或交出主话轮，而不是句法完整度。
 
 只允许三个类别：
@@ -267,6 +274,13 @@ def prepare_requests(
     try:
         events = list(read_jsonl(scan_dir / "events.jsonl"))
         views = list(read_jsonl(scan_dir / "target_views.jsonl"))
+        scan_summary = json.loads((scan_dir / "summary.json").read_text(encoding="utf-8"))
+        expected_event_count = int(scan_summary["events"]["total"])
+        expected_missing_count = int(
+            scan_summary["events"]["state_distribution"]["missing"]
+        )
+        if len(events) != expected_event_count:
+            raise RuntimeError("scan event manifest does not match scan summary")
         events_by_source: dict[str, list[dict[str, Any]]] = defaultdict(list)
         views_by_source: dict[str, dict[int, dict[str, Any]]] = defaultdict(dict)
         for event in events:
@@ -350,8 +364,13 @@ def prepare_requests(
         full_target_ids = [
             event_id for request in full_requests for event_id in request["target_event_ids"]
         ]
-        if len(full_target_ids) != 1599 or len(set(full_target_ids)) != 1599:
-            raise RuntimeError("full request event closure is not exactly 1,599")
+        if (
+            len(full_target_ids) != expected_missing_count
+            or len(set(full_target_ids)) != expected_missing_count
+        ):
+            raise RuntimeError(
+                "full request event closure does not match the frozen scan contract"
+            )
         summary = {
             "schema_version": 1,
             "model": MODEL_ID,
@@ -362,6 +381,9 @@ def prepare_requests(
             "response_schema_sha256": sha256_json(RESPONSE_SCHEMA),
             "full_request_count": len(full_requests),
             "full_target_event_count": len(full_target_ids),
+            "full_run_confirmation": full_run_confirmation_token(
+                len(full_target_ids)
+            ),
             "calibration_request_count": len(calibration_requests),
             "calibration_target_event_count": len(calibration_answer_key),
             "calibration_offset_per_state": calibration_offset,

@@ -1,0 +1,22 @@
+{
+  "checked_at_utc": "2026-08-29T07:19:22.828849+00:00",
+  "completed_at_utc": "2026-08-29T07:19:36.780263+00:00",
+  "destination_raw": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw",
+  "destination_raw_present": true,
+  "destination_release_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2",
+  "initial_state": "ready_to_move",
+  "migration_action": "server_side_move",
+  "raw_payload_bytes": 211827029597,
+  "raw_record_count": 29,
+  "remote_copy_created": false,
+  "rollback_command": "BaiduPCS-Go mv /soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/raw /soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1",
+  "schema_version": 1,
+  "source_manifest": "/root/SoulX-stage3-dataset/release/duplexconv_edu0018_0045_stage3_zh_v1/file_manifest.jsonl",
+  "source_manifest_sha256": "c9a04989f09394cd974f22c6e8685e22ce9277c6dbcca04ad02a5387318733e7",
+  "source_raw": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/raw",
+  "source_raw_absent": true,
+  "source_release_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1",
+  "status": "passed",
+  "verified_raw_payload_bytes": 211827029597,
+  "verified_raw_record_count": 29
+}

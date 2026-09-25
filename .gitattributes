@@ -1,0 +1,4 @@
+# Markdown uses two trailing spaces for explicit line breaks.
+*.md whitespace=-trailing-space,-blank-at-eof
+# This bundle intentionally preserves the exact whitespace of a frozen runtime diff.
+*.patch whitespace=-trailing-space,-blank-at-eof

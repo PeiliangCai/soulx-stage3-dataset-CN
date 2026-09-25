@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0014_sanitized_v1_stage3_zh_v1",
+  "shard_number": 14,
+  "archive_name": "Edu_0014_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0014.tar",
+  "parent_official_archive_bytes": 7617873920,
+  "parent_official_archive_sha256": "65ad1be9f1c20016a4e64f0de8f3e6c001efbfa27d75caf3488c4b745db53e5b",
+  "input_archive_bytes": 7614412800,
+  "input_archive_sha256": "ffdb80a2b2e81f8a0823fd06dc587479d4c4d5d3410a841e57a8ee3e9a489c17",
+  "sanitization_profile": "exclude-source-frozen-benchmark-leakage-v1",
+  "excluded_source_ids": [
+    "Edu--008250"
+  ],
+  "exclusion_reason": "The unchanged frozen v2.2 gate produced one near-fingerprint hit against candor_turn_taking/62, while exact/content/window matches were zero and independent waveform correlation did not confirm reuse. The owner approved conservative exclusion of the complete source conversation while preserving the authoritative original gate failure.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--007974",
+    "last_source_id": "Edu--008594",
+    "source_ids_sha256": "d6e486a1e28844f91f2ef6fecbcb010747f3d081ed216f0ed17152417fc41e28",
+    "source_ntrack": {
+      "2": 496,
+      "3": 3
+    },
+    "target_view_count": 1001,
+    "target_view_hours": 22.02947527199074,
+    "event_count": 8702,
+    "state_distribution": {
+      "complete": 4503,
+      "incomplete": 1544,
+      "backchannel": 897,
+      "wait": 15,
+      "missing": 1743
+    }
+  }
+}

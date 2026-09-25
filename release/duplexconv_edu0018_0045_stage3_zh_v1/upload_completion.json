@@ -1,0 +1,22 @@
+{
+  "completed_at_utc": "2026-08-27T08:29:32.351039+00:00",
+  "core_manifest_record_count": 157,
+  "direct_remote_file_count": 148,
+  "manifest": "/root/SoulX-stage3-dataset/release/duplexconv_edu0018_0045_stage3_zh_v1/file_manifest.jsonl",
+  "manifest_sha256": "c9a04989f09394cd974f22c6e8685e22ce9277c6dbcca04ad02a5387318733e7",
+  "payload_bytes": 211968676948,
+  "progress": "/root/SoulX-stage3-dataset/release/duplexconv_edu0018_0045_stage3_zh_v1/upload_progress.jsonl",
+  "progress_sha256": "34faa0e483acc6247072405d91f63b6c4c5bb36469d21f1a1a316cdb33ddc7a4",
+  "record_count": 160,
+  "remote_delete_count": 0,
+  "remote_overwrite_count": 0,
+  "remote_verification": "per-file exact byte size via BaiduPCS-Go meta for all non-empty records; deterministic tar plus manifest for 12 zero-byte records",
+  "represented_zero_byte_record_count": 12,
+  "schema_version": 1,
+  "status": "all_nonempty_records_uploaded_or_preexisting_same_size_verified_and_zero_byte_records_represented_by_compatibility_bundle",
+  "supplemental_manifest": "/root/SoulX-stage3-dataset/release/duplexconv_edu0018_0045_stage3_zh_v1/empty_file_compat_manifest.jsonl",
+  "supplemental_manifest_sha256": "e01caea1ae0563098b80e74828629ee861e7c68af6b6b03e95fea976739cf4cc",
+  "supplemental_record_count": 3,
+  "zero_byte_representation_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1/receipts/empty_files_compat/empty_files.tar",
+  "zero_byte_representation_sha256": "5265896287828138faf1141ebe0fd5abb73fde12661767d61ff30d356a98182f"
+}

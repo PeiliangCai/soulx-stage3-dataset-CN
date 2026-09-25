@@ -17,7 +17,7 @@ from .state_labeling import (
     read_jsonl,
     validate_structured_labels,
 )
-from .openrouter_client import LEGACY_NETWORK_ROUTE_POLICY
+from .openrouter_client import SUPPORTED_NETWORK_ROUTE_POLICIES
 
 
 def finalize_state_labels(
@@ -36,8 +36,11 @@ def finalize_state_labels(
         request_by_signature = {
             item["request_signature"]: item for item in requests
         }
-        if len(request_by_signature) != 404 or len(results) != 404:
-            raise ValueError("request/result count is not 404")
+        if len(request_by_signature) != len(requests) or len(results) != len(requests):
+            raise ValueError("request/result signatures do not form a one-to-one closure")
+        expected_missing_count = sum(
+            event["official_state"] is None for event in events
+        )
 
         qwen_labels: dict[str, dict[str, Any]] = {}
         providers = Counter()
@@ -54,8 +57,9 @@ def finalize_state_labels(
             )
             if result["model"] != MODEL_ID:
                 raise ValueError(f"model drift: {result['model']} != {MODEL_ID}")
-            if result.get("network_route_policy") != LEGACY_NETWORK_ROUTE_POLICY:
-                raise ValueError("network route provenance is missing or wrong")
+            route_policy = result.get("network_route_policy")
+            if route_policy not in SUPPORTED_NETWORK_ROUTE_POLICIES:
+                raise ValueError("network route provenance is missing or unsupported")
             providers[str(result.get("provider"))] += 1
             schema_attempts[str(result.get("schema_attempt", 0))] += 1
             if result.get("openrouter_id"):
@@ -75,14 +79,16 @@ def finalize_state_labels(
                     "model_standard_name": MODEL_STANDARD_NAME,
                     "model_api_slug": MODEL_ID,
                     "provider": result.get("provider"),
-                    "network_route_policy": LEGACY_NETWORK_ROUTE_POLICY,
+                    "network_route_policy": route_policy,
                     "prompt_version": request_record["prompt_version"],
                     "prompt_sha256": request_record["prompt_sha256"],
                     "schema_version": request_record["schema_version"],
                     "schema_sha256": request_record["schema_sha256"],
                 }
-        if len(qwen_labels) != 1599:
-            raise ValueError(f"Qwen label count is {len(qwen_labels)}, expected 1599")
+        if len(qwen_labels) != expected_missing_count:
+            raise ValueError(
+                f"Qwen label count is {len(qwen_labels)}, expected {expected_missing_count}"
+            )
 
         finalized = []
         source_counts = Counter()
@@ -124,15 +130,20 @@ def finalize_state_labels(
                     "state_label_metadata": label_metadata,
                 }
             )
-        if len(finalized) != 8505:
-            raise ValueError("final event count is not 8,505")
-        if source_counts != Counter(
+        expected_source_counts = Counter(
             {
-                "duplexconv_official_llm_assisted": 6895,
-                "deterministic_wait_to_complete": 11,
-                "openrouter_qwen3_235b_a22b_instruct_2507": 1599,
+                "duplexconv_official_llm_assisted": sum(
+                    event["official_state"] in ALLOWED_OUTPUT_STATES for event in events
+                ),
+                "deterministic_wait_to_complete": sum(
+                    event["official_state"] == "wait" for event in events
+                ),
+                "openrouter_qwen3_235b_a22b_instruct_2507": expected_missing_count,
             }
-        ):
+        )
+        if len(finalized) != len(events):
+            raise ValueError("final event count does not match the scan manifest")
+        if source_counts != expected_source_counts:
             raise ValueError(f"state source closure failed: {source_counts}")
 
         with (output_dir / "events_with_final_state.jsonl").open(
@@ -154,7 +165,9 @@ def finalize_state_labels(
                 "model_api_slug": MODEL_ID,
                 "request_count": len(results),
                 "event_count": len(qwen_labels),
-                "network_route_policy": LEGACY_NETWORK_ROUTE_POLICY,
+                "network_route_policy_counts": dict(
+                    sorted(Counter(item["network_route_policy"] for item in results).items())
+                ),
                 "providers": dict(sorted(providers.items())),
                 "schema_attempts": dict(sorted(schema_attempts.items())),
                 "accepted_response_usage": dict(sorted(accepted_usage.items())),
@@ -185,7 +198,7 @@ def finalize_state_labels(
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Finalize all 8,505 state events.")
+    parser = argparse.ArgumentParser(description="Finalize all state events for one shard.")
     parser.add_argument("--scan-dir", type=Path, required=True)
     parser.add_argument("--request-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "completed_early_stop",
+  "decision_at_utc": "2026-08-21T13:12:15Z",
+  "decision_authority": "project_owner",
+  "decision_path": "evaluation_reports/duplexconv_edu0018_table3_evaluation_decision.json",
+  "planned_checkpoint_steps": [
+    0,
+    5,
+    10,
+    20,
+    30,
+    45,
+    60,
+    90,
+    120,
+    180,
+    240,
+    300
+  ],
+  "included_report_steps": [
+    0,
+    5,
+    10,
+    20,
+    30
+  ],
+  "not_further_evaluated_steps": [
+    45,
+    60,
+    90,
+    120,
+    180,
+    240,
+    300
+  ],
+  "partial_excluded_steps": [
+    45
+  ],
+  "partial_step_45_completed_classes": [
+    "en/complete",
+    "en/incomplete",
+    "zh/complete"
+  ],
+  "partial_step_45_missing_classes": [
+    "zh/incomplete"
+  ],
+  "first_observed_degradation_step": 5,
+  "first_obvious_decline_trigger_step": 10,
+  "decline_confirmation_step": 20,
+  "first_broad_language_macro_decline_step": 20,
+  "reason": "Step 10 first triggered the preregistered class-level obvious-decline rule and step 20 confirmed it; step 30 worsened further. The project owner determined that the completed 0/5/10/20/30 window is sufficient for the current meeting report and stopped the remaining expensive Table 3 inference.",
+  "reporting_policy": {
+    "include_all_fully_completed_checkpoints_through_step_30": true,
+    "exclude_incomplete_four_class_checkpoints": true,
+    "interpolate_unmeasured_results": false,
+    "replace_unmeasured_results_with_paper_targets": false,
+    "describe_early_stop_as_preregistered": false
+  }
+}

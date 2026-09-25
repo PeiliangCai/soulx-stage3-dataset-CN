@@ -1,0 +1,24 @@
+{
+  "category_bytes": {
+    "aggregate_reports": 15559,
+    "evidence_file": 197815,
+    "model_ready": 141410058,
+    "raw": 211827029597,
+    "release_metadata": 4375
+  },
+  "category_counts": {
+    "aggregate_reports": 5,
+    "evidence_file": 4,
+    "model_ready": 117,
+    "raw": 29,
+    "release_metadata": 2
+  },
+  "credential_like_path_count": 0,
+  "manifest_profile": "absolute-local-source-to-absolute-baidu-remote-v1",
+  "payload_bytes": 211968657404,
+  "record_count": 157,
+  "release_id": "duplexconv_edu0018_0045_stage3_zh_v1",
+  "remote_path_collision_count": 0,
+  "remote_root": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0018_0045_stage3_zh_v1",
+  "schema_version": 1
+}

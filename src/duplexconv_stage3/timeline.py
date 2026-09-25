@@ -10,7 +10,7 @@ from pathlib import Path
 import shutil
 from typing import Any, Sequence
 
-from .source_scan import interval_chunk_bounds, sha256_file
+from .source_scan import CHUNK_MS, interval_chunk_bounds, sha256_file
 from .state_labeling import canonical_json, read_jsonl
 
 
@@ -240,6 +240,46 @@ def build_view_timeline(
     )
 
 
+def validate_timeline_input_partition(
+    *,
+    views: Sequence[dict[str, Any]],
+    asr_results: Sequence[dict[str, Any]],
+    asr_quarantine: Sequence[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    view_ids = [item["view_id"] for item in views]
+    result_ids = [item["view_id"] for item in asr_results]
+    quarantine_ids = [item["view_id"] for item in asr_quarantine]
+    for label, values in (
+        ("target views", view_ids),
+        ("ASR results", result_ids),
+        ("ASR quarantine", quarantine_ids),
+    ):
+        if len(set(values)) != len(values):
+            raise ValueError(f"{label} contain duplicate view IDs")
+    result_set = set(result_ids)
+    quarantine_set = set(quarantine_ids)
+    overlap = result_set & quarantine_set
+    if overlap:
+        raise ValueError(
+            f"ASR result/quarantine view IDs overlap: {sorted(overlap)}"
+        )
+    expected = set(view_ids)
+    actual = result_set | quarantine_set
+    if expected != actual:
+        raise ValueError(
+            "target view partition does not close: "
+            f"missing={sorted(expected - actual)}, extra={sorted(actual - expected)}"
+        )
+    views_by_id = {item["view_id"]: item for item in views}
+    quarantine_by_id = {item["view_id"]: item for item in asr_quarantine}
+    for view_id, item in quarantine_by_id.items():
+        if item.get("source_id") != views_by_id[view_id]["source_id"]:
+            raise ValueError(f"ASR quarantine source mismatch for {view_id}")
+        if not isinstance(item.get("reason"), str) or not item["reason"]:
+            raise ValueError(f"ASR quarantine reason is missing for {view_id}")
+    return quarantine_by_id
+
+
 def build_timelines(
     *, scan_dir: Path, state_dir: Path, asr_dir: Path, output_dir: Path
 ) -> dict[str, Any]:
@@ -253,21 +293,26 @@ def build_timelines(
     temporary = output_dir.parent / f".{output_dir.name}.tmp-{os.getpid()}"
     temporary.mkdir()
     try:
-        views = {item["view_id"]: item for item in read_jsonl(scan_dir / "target_views.jsonl")}
+        view_records = list(read_jsonl(scan_dir / "target_views.jsonl"))
+        views = {item["view_id"]: item for item in view_records}
         events_by_view: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for event in read_jsonl(state_dir / "events_with_final_state.jsonl"):
             view_id = f"{event['source_id']}/target-ch{event['channel']:02d}"
+            if view_id not in views:
+                raise ValueError(f"state event references an unknown target view: {view_id}")
             events_by_view[view_id].append(event)
-        asr_results = {item["view_id"]: item for item in read_jsonl(asr_dir / "asr_results.jsonl")}
+        asr_result_records = list(read_jsonl(asr_dir / "asr_results.jsonl"))
+        asr_results = {item["view_id"]: item for item in asr_result_records}
         asr_quarantine = list(read_jsonl(asr_dir / "asr_quarantine.jsonl"))
-        if asr_quarantine:
-            raise ValueError("ASR quarantine is non-empty; resolve it before timeline construction")
-        if set(views) != set(asr_results):
-            raise ValueError("target view and ASR result ID sets differ")
+        quarantine_by_view = validate_timeline_input_partition(
+            views=view_records,
+            asr_results=asr_result_records,
+            asr_quarantine=asr_quarantine,
+        )
 
         timelines = []
         quarantines = []
-        for view_id in sorted(views):
+        for view_id in sorted(asr_results):
             timeline, view_quarantines = build_view_timeline(
                 view=views[view_id],
                 events=events_by_view[view_id],
@@ -275,11 +320,57 @@ def build_timelines(
             )
             timelines.append(timeline)
             quarantines.extend(view_quarantines)
+        source_view_quarantines = []
+        for view_id in sorted(quarantine_by_view):
+            view = views[view_id]
+            upstream = quarantine_by_view[view_id]
+            event_ids = sorted(item["event_id"] for item in events_by_view[view_id])
+            source_view_quarantines.append(
+                {
+                    "view_id": view_id,
+                    "source_id": view["source_id"],
+                    "source_ntrack": view["source_ntrack"],
+                    "target_channel": view["target_channel"],
+                    "reference_channels": view["reference_channels"],
+                    "original_chunk_count": view["chunk_count"],
+                    "duration_seconds": view["chunk_count"] * CHUNK_MS / 1000.0,
+                    "event_count": len(event_ids),
+                    "event_ids": event_ids,
+                    "quarantine_stage": "paraformer",
+                    "quarantine_reason": upstream["reason"],
+                    "asr_cache_signature": upstream.get("cache_signature"),
+                }
+            )
+        input_event_count = sum(len(items) for items in events_by_view.values())
+        processed_event_count = sum(
+            len(item["event_assignments"]) for item in timelines
+        )
+        quarantined_event_count = sum(
+            item["event_count"] for item in source_view_quarantines
+        )
+        if input_event_count != processed_event_count + quarantined_event_count:
+            raise ValueError("processed/source-view-quarantined event partition does not close")
+        input_original_chunk_count = sum(
+            item["chunk_count"] for item in views.values()
+        )
+        processed_original_chunk_count = sum(
+            item["original_chunk_count"] for item in timelines
+        )
+        quarantined_chunk_count = sum(
+            item["original_chunk_count"] for item in source_view_quarantines
+        )
+        if input_original_chunk_count != processed_original_chunk_count + quarantined_chunk_count:
+            raise ValueError("processed/source-view-quarantined chunk partition does not close")
         with (temporary / "timelines.jsonl").open("w", encoding="utf-8") as handle:
             for item in timelines:
                 handle.write(canonical_json(item) + "\n")
         with (temporary / "timeline_quarantine.jsonl").open("w", encoding="utf-8") as handle:
             for item in quarantines:
+                handle.write(canonical_json(item) + "\n")
+        with (temporary / "source_view_quarantine.jsonl").open(
+            "w", encoding="utf-8"
+        ) as handle:
+            for item in source_view_quarantines:
                 handle.write(canonical_json(item) + "\n")
 
         assignment_status_counts = Counter(
@@ -293,9 +384,21 @@ def build_timelines(
         summary = {
             "schema_version": 1,
             "timeline_profile": TIMELINE_PROFILE,
+            "input_view_count": len(views),
             "view_count": len(timelines),
-            "event_count": sum(len(item["event_assignments"]) for item in timelines),
-            "original_chunk_count": sum(item["original_chunk_count"] for item in timelines),
+            "source_view_quarantined_count": len(source_view_quarantines),
+            "view_partition_closed": (
+                len(views) == len(timelines) + len(source_view_quarantines)
+            ),
+            "input_event_count": input_event_count,
+            "event_count": processed_event_count,
+            "source_view_quarantined_event_count": quarantined_event_count,
+            "input_original_chunk_count": input_original_chunk_count,
+            "original_chunk_count": processed_original_chunk_count,
+            "source_view_quarantined_chunk_count": quarantined_chunk_count,
+            "source_view_quarantined_duration_seconds": sum(
+                item["duration_seconds"] for item in source_view_quarantines
+            ),
             "effective_chunk_count": sum(item["effective_chunk_count"] for item in timelines),
             "terminal_silence_padding_chunk_count": sum(
                 item["terminal_silence_padding_chunks"] for item in timelines

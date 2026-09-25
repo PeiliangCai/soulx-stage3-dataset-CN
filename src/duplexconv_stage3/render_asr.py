@@ -65,6 +65,23 @@ def render_asr_result(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def validate_asr_partition(
+    results: Sequence[dict[str, Any]], quarantines: Sequence[dict[str, Any]]
+) -> tuple[set[str], set[str]]:
+    result_ids = [item["view_id"] for item in results]
+    quarantine_ids = [item["view_id"] for item in quarantines]
+    if len(set(result_ids)) != len(result_ids):
+        raise ValueError("input ASR results contain duplicate view IDs")
+    if len(set(quarantine_ids)) != len(quarantine_ids):
+        raise ValueError("input ASR quarantine contains duplicate view IDs")
+    overlap = set(result_ids) & set(quarantine_ids)
+    if overlap:
+        raise ValueError(
+            f"ASR result/quarantine view IDs overlap: {sorted(overlap)}"
+        )
+    return set(result_ids), set(quarantine_ids)
+
+
 def render_asr_directory(*, input_dir: Path, output_dir: Path) -> dict[str, Any]:
     input_dir = input_dir.resolve(strict=True)
     output_dir = output_dir.absolute()
@@ -75,19 +92,32 @@ def render_asr_directory(*, input_dir: Path, output_dir: Path) -> dict[str, Any]
     temporary.mkdir()
     try:
         quarantines = list(read_jsonl(input_dir / "asr_quarantine.jsonl"))
-        if quarantines:
-            raise ValueError("input ASR quarantine is non-empty")
-        results = [render_asr_result(item) for item in read_jsonl(input_dir / "asr_results.jsonl")]
+        input_results = list(read_jsonl(input_dir / "asr_results.jsonl"))
+        result_ids, quarantine_ids = validate_asr_partition(input_results, quarantines)
+        input_summary = json.loads((input_dir / "summary.json").read_text(encoding="utf-8"))
+        input_view_count = input_summary.get("input_view_count")
+        if input_view_count != len(result_ids) + len(quarantine_ids):
+            raise ValueError(
+                "input ASR summary does not close over results and quarantine"
+            )
+        if input_summary.get("passed_view_count") != len(result_ids):
+            raise ValueError("input ASR summary passed-view count mismatch")
+        if input_summary.get("quarantined_view_count") != len(quarantine_ids):
+            raise ValueError("input ASR summary quarantine count mismatch")
+        results = [render_asr_result(item) for item in input_results]
         with (temporary / "asr_results.jsonl").open("w", encoding="utf-8") as handle:
             for item in results:
                 handle.write(canonical_json(item) + "\n")
-        (temporary / "asr_quarantine.jsonl").write_text("", encoding="utf-8")
-        input_summary = json.loads((input_dir / "summary.json").read_text(encoding="utf-8"))
+        with (temporary / "asr_quarantine.jsonl").open("w", encoding="utf-8") as handle:
+            for item in quarantines:
+                handle.write(canonical_json(item) + "\n")
         summary = {
             **input_summary,
             "rendered_from": str(input_dir),
             "text_render_profile": TEXT_RENDER_PROFILE,
             "rendered_view_count": len(results),
+            "propagated_quarantined_view_count": len(quarantines),
+            "view_partition_closed": True,
         }
         (temporary / "summary.json").write_text(
             json.dumps(summary, ensure_ascii=False, sort_keys=True, indent=2) + "\n",

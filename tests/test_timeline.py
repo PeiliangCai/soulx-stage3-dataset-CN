@@ -1,6 +1,13 @@
 import unittest
+from pathlib import Path
+import json
+import tempfile
 
-from duplexconv_stage3.timeline import build_view_timeline
+from duplexconv_stage3.timeline import (
+    build_timelines,
+    build_view_timeline,
+    validate_timeline_input_partition,
+)
 
 
 def make_view(chunk_count=3):
@@ -86,6 +93,82 @@ class TimelineTests(unittest.TestCase):
         )
         self.assertIsNone(timeline["chunk_states"][1])
         self.assertTrue(any(item["kind"] == "state_claim_conflict" for item in quarantine))
+
+    def test_input_partition_accepts_disjoint_quarantine(self):
+        view = make_view()
+        quarantine = {
+            "view_id": view["view_id"],
+            "source_id": view["source_id"],
+            "reason": "strict timestamp failure",
+        }
+        result = validate_timeline_input_partition(
+            views=[view], asr_results=[], asr_quarantine=[quarantine]
+        )
+        self.assertEqual(set(result), {view["view_id"]})
+
+    def test_build_timelines_propagates_quarantined_view_counts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scan_dir = root / "scan"
+            state_dir = root / "state"
+            asr_dir = root / "asr"
+            output_dir = root / "out"
+            for path in (scan_dir, state_dir, asr_dir):
+                path.mkdir()
+            first_view = make_view()
+            second_view = {
+                **make_view(),
+                "view_id": "second/target-ch00",
+                "source_id": "second",
+            }
+            (scan_dir / "target_views.jsonl").write_text(
+                "\n".join(json.dumps(item) for item in (first_view, second_view))
+                + "\n",
+                encoding="utf-8",
+            )
+            first_event = make_event()
+            second_event = {
+                **make_event(event_id="second/ch00/event0000"),
+                "source_id": "second",
+            }
+            (state_dir / "events_with_final_state.jsonl").write_text(
+                "\n".join(json.dumps(item) for item in (first_event, second_event))
+                + "\n",
+                encoding="utf-8",
+            )
+            (asr_dir / "asr_results.jsonl").write_text(
+                json.dumps(make_asr()) + "\n", encoding="utf-8"
+            )
+            (asr_dir / "asr_quarantine.jsonl").write_text(
+                json.dumps(
+                    {
+                        "view_id": second_view["view_id"],
+                        "source_id": second_view["source_id"],
+                        "reason": "strict timestamp failure",
+                        "cache_signature": "bad-asr",
+                    }
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            summary = build_timelines(
+                scan_dir=scan_dir,
+                state_dir=state_dir,
+                asr_dir=asr_dir,
+                output_dir=output_dir,
+            )
+            self.assertEqual(summary["input_view_count"], 2)
+            self.assertEqual(summary["view_count"], 1)
+            self.assertEqual(summary["source_view_quarantined_count"], 1)
+            self.assertEqual(summary["input_event_count"], 2)
+            self.assertEqual(summary["source_view_quarantined_event_count"], 1)
+            propagated = json.loads(
+                (output_dir / "source_view_quarantine.jsonl").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(propagated["original_chunk_count"], 3)
+            self.assertEqual(propagated["event_ids"], ["second/ch00/event0000"])
 
 
 if __name__ == "__main__":

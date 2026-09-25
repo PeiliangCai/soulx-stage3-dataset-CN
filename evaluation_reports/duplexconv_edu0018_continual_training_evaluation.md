@@ -1,379 +1,153 @@
-# SoulX-Duplug Stage 3 中文续训练模型性能评估
+# SoulX-Duplug Stage 3 中文续训练实验与性能评估
 
-更新时间：2026-08-21
+更新时间：2026-08-21T13:22:58.705540+00:00
 用途：课题组会议/导师汇报
-状态：历史工作稿/方法说明。数据集和 Table 3 候选基线已固定；原机器数值 gate 未通过但证据与反作假审计通过，项目负责人已在知悉限制的前提下授权续训练。正式运行的实时结果以 `duplexconv_edu0018_continual_training_run.md` 与配套 HTML 仪表盘为准。所有 `TBD` 必须用真实实验结果回填，不得用预期值代替。
+实验状态：**已完成（确认退化后提前结束后续评测）**
 
-## 1. 汇报摘要
+## 1. 结论摘要
 
-### 1.1 工作目标
+- 正式训练状态：`complete`；已完成 optimizer step：300/300。
+- 最终 Table 3 分析窗口为 step 0/5/10/20/30；其中续训练 checkpoint 已完成 4/4。原计划共有 11 个续训练 checkpoint。
+- 验证集选择的 peak LR：`1e-05`；选择过程未读取 Table 3。
+- 没有任何已测续训练 checkpoint 满足严格的“几乎未下降”条件；最早可观测退化点是 step 5。
+- 首次类别级明显下降在 step 10，并由 step 20 确认；EN/ZH 两种语言宏平均同时明显下降始于 step 20。
+- step 5 只是四个续训练点中相对损伤最小者，仍未通过稳定性门禁。若目标是保持现有 Table 3 通用能力，推荐继续使用官方 step 0。
 
-本项目使用 DuplexConv `Edu_0018` 构造 SoulX-Duplug Stage 3 中文状态预测训练数据，并从官方 `SoulX-Duplug-0.6B-Bilingual` 权重继续微调。核心问题不是只看训练 loss 是否下降，而是回答：
+> step 45/60/90/120/180/240/300 的进一步评测是在看到 step 10→20 已确认退化、step 30 继续恶化后，由项目负责人于 2026-08-21 决定停止。该决定是事后提前结束评测，不能表述为原始预注册网格的一部分；报告不对未测点插值，也不使用 step 45 的不完整四分类结果。
 
-1. 新中文数据能否改善或保持中文对话状态预测能力；
-2. 在多少个 continuation optimizer step 内，模型在论文 benchmark 上几乎不下降；
-3. 从哪个 step 开始出现明显下降或英文能力遗忘；
-4. 哪个 checkpoint 最适合作为最终交付模型。
+## 2. 起始状态与“续训练”定义
 
-### 1.2 当前进展
+- 官方 Bilingual 权重 SHA-256：`b0703dea0b1dbb1cd51e6e7b6514c60907ea4d4b6752cecc3f71cb6445650dbe`。
+- 发布权重不含 global_step、AdamW、scheduler、AMP scaler，因此这是从模型参数继续微调，不是 optimizer 的精确 resume。
+- 公开 Stage 3 配置 `total_steps=1800`，故将起始 step 估计为 1800（低置信度），不能表述为已证实的官方 checkpoint step。
+- 本地 batch=1、梯度累积=72，有效 batch=72；官方参考全局有效 batch=576。
+- 每个本地 step 对应约 0.125 个官方 sample-equivalent step；例如 local step 20 只有约 2.5 个官方 sample-equivalent step。
+- 可训练参数：13,505,536；总参数：953,154,816。
 
-| 项目 | 当前状态 |
-| --- | --- |
-| DuplexConv 源数据、状态补标、Paraformer、GLM token 和 Stage 3 导出 | 已完成 |
-| 官方 loader、NaN 修复、真实 5-step 训练和 checkpoint 重载 | 已通过 |
-| 官方论文、benchmark、推理代码和权重 step 元数据核对 | 已完成 |
-| EN/ZH Easy Turn 与 ZH Full-Duplex-Bench 资产固定 | 已完成 |
-| 官方 checkpoint 的论文指标复现 | Table 3 候选协议全量完成；证据审计通过，数值门禁失败 |
-| group-aware split 与 LR 校准 | TBD |
-| 正式 continuation step sweep | TBD |
-| 最后无明显下降点、首次明显下降点和推荐模型 | TBD |
+## 3. 数据集、处理方法与切分
 
-### 1.3 最终结论
+训练源为 DuplexConv `Edu_0018`：500 个同步多轨教育场景会话（495 个双声道、5 个三声道），展开为 1,005 个 target-speaker views。三声道不丢弃：每次只输入一个目标声道，其他声道聚合为关系证据，不把多路 audio token 放入同一 sequence。
 
-> 当前阶段结论：固定 `frozen-candidate-v1` 的四类全量运行和证据审计已完成。原机器数值 gate 结果保持失败，不篡改；专项反作假审计未发现代码级作弊。项目负责人认定其与论文已基本一致并授权作为本项目 step 0 配对基线，续训练已从 validation-only LR 校准开始。中文收益、英文遗忘、最后稳定 step 和推荐 checkpoint 仍为 `TBD`。
+原始完整会话去重时长约 10.519 小时，按目标说话人视角累计约 21.170 小时。相较 DuplexConv 公开约 2,000 小时的总体规模，本轮只覆盖约 0.53%，因此应称为 `Edu_0018` pilot，而不是完整 DuplexConv 续训练。
 
-## 2. 基础模型与续训练定义
+状态映射：官方 complete/incomplete/backchannel 原样映射；11 个 WAIT 映射为 complete；1,599 个缺失状态由固定 `qwen3-235b-a22b-instruct-2507` 通过 OpenRouter 补标（404 个源会话请求，accepted-response cost 0.2187791 USD）。这些是 LLM 辅助标签，不称为人工 gold。Paraformer 只用于中文伪转录/时间戳构造，不参与模型训练。
 
-基础模型：`Soul-AILab/SoulX-Duplug-0.6B` 的 Bilingual checkpoint。SoulX-Duplug 是流式状态预测模块；Paraformer 只在中文训练数据构造和中文推理 teacher forcing 中提供 ASR 文本，不是本项目要训练的模型。
+最终 model-ready 数据包含 2,168 rows、474,030 个可用 160 ms chunks 和 953,532 个 GLM audio tokens；另有 2,736 个异常 chunks（0.574%）被隔离，没有伪造文本或状态补齐。
 
-固定版本：
+| Split | 源会话 | target views | rows | 160ms chunks | 视角时长(h) | Qwen 补标事件 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Train | 475 | 955 | 2066 | 448222 | 19.921 | 1134 |
+| Validation | 25 | 50 | 102 | 25808 | 1.147 | 63 |
 
-```text
-官方模型仓库 revision：61701c4ab8193cc1ee2220d3848872ac6c720142
-官方 Bilingual pth SHA-256：b0703dea0b1dbb1cd51e6e7b6514c60907ea4d4b6752cecc3f71cb6445650dbe
-官方训练代码 commit：928b06508ed2de1344208d06fb1f6fb2ebfb1df5
-官方推理代码 commit：a0b9063843df69619b087b95b74597b2176910b8
-训练 runtime：SoulX-Duplug-928b065-finite-empty-head-v2
-```
+切分协议：`source-conversation-group-aware-random-v1`，seed=42，source leakage=0，split identity=`0f5060afcf27857af17b99755775921851125fdf7b96dbf6e233fbfb967c1f2b`。同一 WAV 的全部声道视角和窗口只属于一个 split。
 
-本项目的“续训练”是从官方权重继续微调，不是训练状态的精确 resume。发布的 `.pth` 只含 679 个模型 tensor，不含 `global_step`、AdamW、scheduler 或 AMP scaler。
+## 4. LR 校准与正式训练配置
 
-## 3. 续训练数据集
+两档校准都从官方权重重新初始化，并使用相同训练顺序和固定验证集；Table 3 不参与 LR 选择。失格规则为任一状态头相对 step 0 下降超过 5pp；最终验证目标差异不超过 1% 时选择较低 LR。
 
-### 3.1 数据集介绍与规模
+| Candidate | Peak LR | step 20 validation objective | state macro | 合格 |
+| --- | ---: | ---: | ---: | --- |
+| `calibration-lr1e-5-seed42-v1` | 1e-05 | 1.913779 | 56.680% | 否 |
+| `calibration-lr3p33e-5-seed42-v1` | 3.3333333e-05 | 1.731448 | 53.576% | 否 |
 
-训练源为 DuplexConv 官方同步多轨教育场景子集 `Edu_0018`：
+选择原因：all candidates failed the final guard; selected longest guard-safe horizon, then lower LR。正式 LR 采用 5-step 新 AdamW 重热身，并按估计原 step=1800 进行 offset inverse-square-root 衰减。正式训练运行时间为 2026-08-21T02:41:40.249676+00:00 至 2026-08-21T04:06:55.628100+00:00；300 次 optimizer 更新均已记录，AMP overflow 为 0。
 
-| 项目 | 数量 |
-| --- | ---: |
-| 完整同步多轨 WAV | 500 |
-| 双声道 WAV | 495 |
-| 三声道 WAV | 5 |
-| target-speaker views | 1,005 |
-| target views 总时长 | 约 21.169878 小时 |
-| 官方 metadata 事件 | 8,505 |
+## 5. 训练期 validation 变化
 
-双声道文件生成两个 target-speaker 视角。三声道不丢弃，每个声道分别作为目标用户，其他声道聚合为 `rest`，因此仍只向 SoulX 输入一条目标音频流；其他说话人的活动仅用于判断重叠、backchannel 等离线关系，不把多路 audio token 塞入同一 sequence。
+| Local step | 估计总 step | LR | token-weighted objective | state macro ACC | epoch-equivalent |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 1800 | 0 | 3.925068 | 50.715% | — |
+| 5 | 1805 | 9.98614e-06 | 3.451332 | 50.594% | 0.174 |
+| 10 | 1810 | 9.9723374e-06 | 2.703682 | 50.923% | 0.348 |
+| 20 | 1820 | 9.9449032e-06 | 1.913598 | 56.678% | 0.697 |
+| 30 | 1830 | 9.9176941e-06 | 1.789306 | 55.250% | 1.045 |
+| 45 | 1845 | 9.877296e-06 | 1.722838 | 55.097% | 1.568 |
+| 60 | 1860 | 9.8373875e-06 | 1.669028 | 56.115% | 2.091 |
+| 90 | 1890 | 9.7590007e-06 | 1.594009 | 57.740% | 3.136 |
+| 120 | 1920 | 9.6824584e-06 | 1.542596 | 57.757% | 4.182 |
+| 180 | 1980 | 9.5346259e-06 | 1.475095 | 59.126% | 6.273 |
+| 240 | 2040 | 9.3933644e-06 | 1.430206 | 60.400% | 8.364 |
+| 300 | 2100 | 9.258201e-06 | 1.395761 | 63.080% | 10.455 |
 
-### 3.2 状态标签来源与映射
+训练域 validation objective 持续下降并不代表外部通用能力保持。后续 Table 3 显示 Complete/Incomplete 决策边界发生快速偏移，这是本轮最重要的泛化差异。
 
-| DuplexConv 来源 | 数量 | SoulX 监督 | 处理方式 |
-| --- | ---: | --- | --- |
-| 官方 `complete` | 4,570 | `<|user_complete|>` | 保留官方标签 |
-| 官方 `incomplete` | 1,527 | `<|user_incomplete|>` | 保留官方标签 |
-| 官方 `backchannel` | 798 | `<|user_backchannel|>` | 保留官方标签 |
-| 官方 `wait` | 11 | `<|user_complete|>` | 按项目约定确定性映射 |
-| 官方缺失 state | 1,599 | complete/incomplete/backchannel | 固定 Qwen 模型补标 |
+## 6. Table 3 最终结果
 
-缺失状态使用固定模型 `qwen3-235b-a22b-instruct-2507`，通过 OpenRouter 以结构化输出补标；共处理 1,599 个事件、404 个源会话请求，accepted-response cost 为 0.2187791 USD。Qwen 标签属于 LLM 辅助标签，不称为人工 gold，也不覆盖已有官方状态。
+主规则始终为 `last-terminal-v1`；样本、seed、顺序、推理核心、尾部静音和 Teacher-ASR 固定。每个纳入报告的 checkpoint 四类结果都经过独立证据 gate；论文目标没有传入推理 runner，也不用于选择 LR 或训练 checkpoint。
 
-训练 sequence 的五种正式状态为：
+先用官方发布权重复现 step 0。语言宏平均与论文分别相差 EN +0.96pp、ZH -0.33pp，可视为数值基本接近；但预注册的“四类均不超过 ±1.0pp”机器门禁仍因 EN Complete 和 ZH Complete 失败，因此报告保留“已审计候选协议、尚缺作者样本级脚本确认”的限定。
 
-```text
-<|user_idle|>
-<|user_nonidle|>
-<|user_backchannel|>
-<|user_complete|>
-<|user_incomplete|>
-```
-
-其中 complete/incomplete/backchannel 是事件级终止状态；nonidle/idle 按目标声道的活动、ASR token 与时间线构造。其他声道活动只作关系证据，不新增第六种状态。
-
-### 3.3 ASR、时间戳与 Stage 3 格式
-
-每个目标声道先转为 16 kHz 单声道，由固定 Paraformer 生成伪转录和 token 时间戳。时间戳只决定 ASR 文本在哪个 160 ms chunk 首次发射，不反向更改状态标签。
-
-每个 160 ms chunk 写入：
-
-```text
-2 个 GLM-4-Voice audio token
-+ 当前 chunk 新增的 Paraformer 文本
-+ <|end_of_sentence|>
-+ 1 个 SoulX 用户状态 token
-```
-
-### 3.4 最终 model-ready 数据
-
-| 项目 | 数量 |
-| --- | ---: |
-| 原始时间线 chunk | 476,763 |
-| 新增 terminal 静音决策 chunk | 3 |
-| 可用 chunk | 474,030 |
-| 隔离 chunk | 2,736（0.574%） |
-| GLM audio token | 953,532 |
-| 最大序列长度 | 1,500 tokens |
-| 最终训练 rows | 2,168 |
-
-2,736 个异常 chunk 被隔离，没有为了保留数量而伪造 ASR 或状态。最终 2,168 条 sequence 已全部通过官方 loader、语法、长度和随机逐 chunk 回解验收。
-
-### 3.5 Train/validation 划分
-
-状态：TBD。
-
-正式实验必须按完整源会话 group-aware 切分：同一 WAV 的所有声道视角和相邻窗口只能位于同一 split，避免随机按 row 切分造成泄漏。这里回填 train/validation 的会话、视角、rows、时长、声道和状态分布。
-
-## 4. 官方模型原训练 step 估计与本地学习率
-
-官方发布的 Stage 3 重实现配置给出：
-
-```text
-total_steps = 1800
-learning_rate = 1e-4
-warmup_steps = 200
-anneal_steps = 100000
-batch_size = 1
-accumulate_grad_batches = 72
-num_gpu_per_node = 8
-```
-
-据此暂将官方 checkpoint 记为：
-
-```text
-origin_step_estimate = 1800
-estimate_confidence = low
-```
-
-该值只是基于公开重实现配置的估计，论文没有报告实际 checkpoint step，权重也没有 step 元数据，因此不能写成已证实事实。若按官方 inverse-square-root scheduler 把 1,800 当作原位置，参考 LR 约为 `3.33e-5`。
-
-由于 optimizer 动量不可恢复，本地训练必须重新初始化 AdamW。本项目会在不读取 benchmark 的前提下，用 group-aware validation 对 `1e-5` 与 `3.33e-5` 做最多 20 optimizer step 的短程校准，然后冻结唯一正式配置。
-
-正式实验参数：
-
-| 参数 | 最终值 |
-| --- | --- |
-| origin step estimate | 1,800（低置信度） |
-| selected peak LR | TBD |
-| LR scheduler / offset | TBD |
-| optimizer | AdamW |
-| batch size | 1 |
-| gradient accumulation | 暂定 72，TBD |
-| effective batch | TBD |
-| precision / initial scale | FP16 mixed / 16,384 |
-| trainable parameters | 13,505,536 |
-| LoRA | r=32, alpha=64, dropout=0.1 |
-| projector | trainable |
-| GLM speech tokenizer | frozen |
-| seed | 42 |
-
-所有表格中的 `step` 均指 optimizer update，不是 micro-batch。报告同时给出累计 micro-batch、样本曝光量和 epoch-equivalent。
-
-## 5. 论文 benchmark 复现
-
-### 5.1 为什么先复现官方模型
-
-续训练前先用同一 runner 测试官方 checkpoint。后续 checkpoint 均与该固定 step 0 做逐样本配对比较。原机器 gate 未通过时必须报告而不能调 test set；本项目由负责人在查看完整证据与限制后明确授权使用候选基线，不把它改称为作者确认的官方样本级协议。
-
-这里要区分训练期验证与论文 benchmark。官方公开的 Stage 3 重实现训练代码从训练数据随机切出 2% 做 validation，默认每 1,000 optimizer step 计算一次 `val_loss`、七个 token head accuracy 及其等权平均 `val_acc`，并按 `val_acc` 保存 top-2 checkpoint；训练脚本的 `test_step` 为空，不会自动运行论文表 2 或表 3。
-
-本项目改用按完整源会话分组的 validation，避免同一会话相邻窗口跨 split 泄漏。表 3 Easy Turn 只承担固定 checkpoint 的模型级外部测试；表 2 Full-Duplex-Bench 只承担完整系统级外部测试。两者都不参与训练期 LR 和停止点选择。
-
-### 5.2 模型级 benchmark：Bilingual Easy Turn
-
-固定测试资产：
-
-| 测试集 | 固定 revision | 类别/数量 | 本地事实 |
-| --- | --- | --- | --- |
-| SoulX-Duplug Easy Turn EN | `f6e50e8...` | Complete 318、Incomplete 299 | 617 个 24 kHz 单声道 WAV |
-| ASLP Easy Turn ZH | `5812651...` | Complete 300、Incomplete 300 | 600 WAV，含 16/24/48 kHz 和 34 个双声道文件 |
-
-评测前只做协议规定的单声道化和 16 kHz 重采样，不做响度或语义相关的 test-set 调参。按官方推理参数以 160 ms chunk 模拟在线输入；中文 teacher ASR 为 Paraformer，英文为 SenseVoice Small。
-
-论文和已发布代码尚未给出 Easy Turn 的样本级计分脚本。官方在线服务 `TurnModel` 中，`complete` 会立即交出话轮，`incomplete` 则继续监听；这是部署控制语义，不是论文明确要求的 Table 3 组件。另一台服务器提供的复现包表明，更接近论文的候选路径是直接调用 clean `training-code@928b065` 的流式推理函数：函数内部追加 2 秒静音并输出完整 state trace，不经过部署 RMS 过滤。
-
-论文目标和本地复现：
-
-| 语言 | 指标 | 论文 | 官方权重本地候选结果 | 差异 |
+| 语言 | 指标 | 论文结果 | 官方权重本地 step 0 | 差异 |
 | --- | --- | ---: | ---: | ---: |
-| EN | Complete ACC | 77.67%（247/318） | 78.93%（251/318） | +1.26 pp |
-| EN | Incomplete ACC | 88.96%（266/299） | 89.63%（268/299） | +0.67 pp |
-| EN | Macro Avg. ACC | 83.32% | 84.28% | +0.96 pp |
-| ZH | Complete ACC | 89.33%（268/300） | 87.67%（263/300） | -1.67 pp |
-| ZH | Incomplete ACC | 79.33%（238/300） | 80.33%（241/300） | +1.00 pp |
-| ZH | Macro Avg. ACC | 84.33% | 84.00% | -0.33 pp |
+| EN | Complete ACC | 77.67% | 78.93% | +1.26pp |
+| EN | Incomplete ACC | 88.96% | 89.63% | +0.67pp |
+| EN | Macro ACC | 83.32% | 84.28% | +0.96pp |
+| ZH | Complete ACC | 89.33% | 87.67% | -1.67pp |
+| ZH | Incomplete ACC | 79.33% | 80.33% | +1.00pp |
+| ZH | Macro ACC | 84.33% | 84.00% | -0.33pp |
 
-上表是官方权重在本机冻结候选协议下的独立运行结果，不写作“官方样本级协议已复现”。机器 gate 的预注册数值条件是四类准确率均与论文相差不超过 `1.0 pp`：EN Incomplete 和 ZH Incomplete 通过，EN Complete 和 ZH Complete 失败，因此总 gate 失败。原计划中“对应正确数或有完整解释的 ±1 条”是更严的验收语义；ZH Incomplete 虽通过 `1.0 pp` 机器筛查，仍与论文相差 3 条。无论采用哪一层标准，本轮都不能放行续训练。
+“基本不变”：EN/ZH macro 各下降不超过 1pp，且任一 class 下降不超过 2pp。“明显下降触发”：任一语言 macro 下降超过 3pp，或任一 class 下降超过 5pp；必须在下一个预注册点仍触发才确认。
 
-四个结果 JSON、独立 Teacher-ASR JSONL 缓存、2,447 个轨迹/日志/汇总文件和 gate 报告已保存在：
+| Local step | 估计总 step | LR | EN C | EN I | EN Macro | ΔEN | ZH C | ZH I | ZH Macro | ΔZH | 四类 Macro | 判定 |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 0 | 1800 | — | 78.931 | 89.632 | 84.281 | 0.000 | 87.667 | 80.333 | 84.000 | 0.000 | 84.141 | 官方发布权重基线 |
+| 5 | 1805 | 0.00000999 | 83.333 | 87.291 | 85.312 | 1.031 | 88.333 | 77.000 | 82.667 | -1.333 | 83.989 | 轻微/不均衡退化 |
+| 10 | 1810 | 0.00000997 | 92.453 | 81.605 | 87.029 | 2.748 | 91.333 | 71.333 | 81.333 | -2.667 | 84.181 | 明显下降（已确认） |
+| 20 | 1820 | 0.00000994 | 97.799 | 61.873 | 79.836 | -4.446 | 91.333 | 63.667 | 77.500 | -6.500 | 78.668 | 明显下降（已确认） |
+| 30 | 1830 | 0.00000992 | 97.799 | 40.803 | 69.301 | -14.981 | 92.000 | 57.667 | 74.833 | -9.167 | 72.067 | 明显下降趋势持续 |
 
-```text
-/root/autodl-tmp/dataset/soulx_duplug_eval/table3_audit/formal-candidate-v1-ac8fcf1
-run_id: formal-candidate-v1-ac8fcf1
-runner commit: ac8fcf1
-gate report SHA-256: e013f7ee866498a7797f5226cb0558be42c41675cc76ef8732461877d87336c9
-evidence_audit_passed: true
-accuracy_gate_passed: false
-continued_training_authorized: false
-```
+模型与证据身份：
 
-候选主规则和三个预声明敏感性规则的正确数如下。敏感性结果是从同一批已保存轨迹重算，没有替换主结果：
+| Step | checkpoint SHA-256 | evidence gate SHA-256 |
+| ---: | --- | --- |
+| 0 | `b0703dea0b1dbb1cd51e6e7b6514c60907ea4d4b6752cecc3f71cb6445650dbe` | `e013f7ee866498a7797f5226cb0558be42c41675cc76ef8732461877d87336c9` |
+| 5 | `30fab3f72af4c23ac4194a546b3a041753e8cf398996203526405d0b3cdb02e7` | `8e8582053d98372cc054873cc69961e625de288febeda0853e6f9105d67fda30` |
+| 10 | `4bec2628ecd1ea659dc9f1590cdfc4931ccf7d88e6648ec8eb439fa6cacf0230` | `027b971e2e6b81d3348933ee10c5af1ddb6052100c0ead8ede990a91c7c91335` |
+| 20 | `0ba2cb7333a7d12f91bede80bbea78ee6d0c9f4e5531a8f99a16251c9d62ebf9` | `4cc750d9cbf495e683bfaa8d3288eb2dcd8b502f0ec0491481b3be937d6dfec0` |
+| 30 | `26fe02223468e1e7ca262979e5cec87364c2a0d3e716a843756ee1e7c75b3ef8` | `c8987463fd052f39be4546c7752037786479ce0a7ecdd566549c73d095974fe1` |
 
-| 读出规则 | EN Complete | EN Incomplete | ZH Complete | ZH Incomplete |
-| --- | ---: | ---: | ---: | ---: |
-| last terminal（预注册主规则） | 251/318（78.93%） | 268/299（89.63%） | 263/300（87.67%） | 241/300（80.33%） |
-| first terminal | 242/318（76.10%） | 256/299（85.62%） | 223/300（74.33%） | 224/300（74.67%） |
-| closest to file endpoint | 252/318（79.25%） | 264/299（88.29%） | 263/300（87.67%） | 240/300（80.00%） |
-| first at/after file endpoint | 69/318（21.70%） | 250/299（83.61%） | 60/300（20.00%） | 99/300（33.00%） |
+关键观察：
 
-协议诊断（不计作官方基线）：
+1. step 5 已不满足“基本不变”：ZH Incomplete 下降 3.333pp，paired bootstrap 95% CI 为 [-6.000, -0.667]pp，exact McNemar p=0.0309；但尚未达到预定义明显下降阈值。
+2. step 10 首次触发类别级明显下降：EN Incomplete 下降 8.027pp（95% CI [-11.706, -4.682]，p=1.93e-5），ZH Incomplete 下降 9.000pp（95% CI [-12.333, -5.667]，p=1.12e-7）。step 20 再次触发，因此 step 10 被正式确认。
+3. step 10 的四类 Macro 为 84.181%，与 step 0 的 84.141% 几乎相同，但这是 Complete 上升和 Incomplete 下降相互抵消的结果，不能据此宣称模型整体无退化。
+4. step 20 首次出现 EN 与 ZH 宏平均同时下降超过 3pp；step 30 的 EN/ZH 宏平均分别下降 14.981/9.167pp，EN Incomplete 已下降 48.829pp。趋势表现为模型越来越偏向 Complete。
 
-| 语言 | 读出策略 | Complete | Incomplete | Macro | 结论 |
-| --- | --- | ---: | ---: | ---: | --- |
-| ZH | 在线服务语义：`complete` 立即结束，`incomplete` 暂存并继续监听 | 269/300（89.67%） | 191/300（63.67%） | 76.67% | Complete 与论文仅差 1 条，但 Incomplete 少 47 条；不能作为表 3 复现协议 |
+中文固定 600 条是发布方完整测试集，不是本项目随机抽样；每个 checkpoint 另报 complete/incomplete × real/synthetic 四个固定子组。差异显著性使用同一样本的 paired bootstrap 95% CI 和 exact McNemar，而不是把两次准确率当独立样本。
 
-`no_decision` 是本项目 runner 的审计结果，不是 SoulX 状态标签：它表示完整音频和预设尾部静音均输入后，按当前读出策略仍未得到可用于 Complete/Incomplete 分类的终态。它一律计为错误，不能映射或猜成任一标签。
+## 7. 评测提前结束、可恢复性与异常记录
 
-官方部署配置的 `far_field_threshold=0.02` 是对归一化 160 ms 音频块的 RMS 振幅门限（约 `-34 dBFS`），不是模型置信度。当尚未接受到语音、模型原始输出为 `user_nonidle` 且当前块 RMS 低于门限时，服务层会重置并返回 idle，以过滤噪声环境中的低振幅输入。中文 Incomplete 诊断中共有 18 条因此成为 `no_decision`；在只将这 18 条以 `far_field_threshold=0` 定向重跑的受控实验中，14 条变为正确 Incomplete、4 条变为 Complete。该结果证明部署门限造成部分差异，但即使只替换这 18 条，Incomplete 也仅从 191/300 提高到 205/300，仍不能解释论文的 238/300。
+- 评测决定状态：`completed_early_stop`；正式纳入 step：[0, 5, 10, 20, 30]；不再评测：[45, 60, 90, 120, 180, 240, 300]。
+- step 45 已完成 EN Complete、EN Incomplete、ZH Complete，但 ZH Incomplete 在 Paraformer VAD 辅助模型初始化时因本地代理不可用而退出。由于四类未闭环，step 45 整体不纳入正式分析；其 partial 证据保留在数据盘，不与其他 checkpoint 拼接。
+- 训练状态：`complete`；AMP overflow 次数：0。
+- 峰值 CUDA allocated：18.733 GiB。
+- GPU：NVIDIA vGPU-32GB；Python：3.10.20；Torch：2.6.0；CUDA：12.4。
+- 每个预注册点保存仅含 118 个可训练 tensor 的评测快照；训练完成到 step 300，停止的是耗时较长的外部 Table 3 推理，不是训练。
+- 正式 run manifest：`/root/SoulX-stage3-dataset/checkpoints/duplexconv_edu0018_continual_formal_v1/run_manifest.json`，SHA-256=`b80c3db0cb83eed1e67fab04d4571d58070fd2fa4c92da935d40839e94147b58`。
+- 评测停止决定：`evaluation_reports/duplexconv_edu0018_table3_evaluation_decision.json`。
+- 报告生成输入均记录绝对路径和 SHA-256；HTML 内嵌同一份结构化数据，可离线查看。
 
-该诊断的完整逐 chunk 轨迹保存在数据盘：
+| 报告输入 | 路径 | SHA-256 |
+| --- | --- | --- |
+| `split_manifest` | `/root/autodl-tmp/dataset/duplexconv/splits/edu0018_stage3_zh_v1_seed42_group95_5/split_manifest.json` | `b4874ccf3e263ec4bf56257f5850e676b66528647f06407caf9a3ff0819d6210` |
+| `lr_selection` | `/root/autodl-tmp/dataset/duplexconv/continual_training/lr_selection_v2.json` | `56a30722df519967c023287d9e7c68facc185887ea25737caec9ebc801b39897` |
+| `table3_index` | `/root/autodl-tmp/dataset/soulx_duplug_eval/table3_continual_sweep/formal_v1_b17bcf9/sweep_index.json` | `91c871d4855bf44b4f8c4a42797d723f8b8a1954cc857e6df6e107ecde4c34cd` |
+| `evaluation_decision` | `/root/SoulX-stage3-dataset/evaluation_reports/duplexconv_edu0018_table3_evaluation_decision.json` | `d02dc57641440857f6a33351c9ffd06dd7a1cf6051b685ae3cc9f0229d3b92c7` |
+| `source_inventory` | `/root/autodl-tmp/dataset/duplexconv/work/source_scan_v1/source_inventory.jsonl` | `bb6a31cf53f9cab69f72fec2198d9e57ef086ab8510bf127580e47feab5cc840` |
 
-```text
-/root/autodl-tmp/dataset/soulx_duplug_eval/reports/easy_turn_zh_service_provisional_diagnostic.json
-SHA-256: a63d9c1de32506078aff6d4f28a863714d9dab2a0b1b4152f1a0ce1c729132ce
-decision_policy: complete-immediate-incomplete-provisional-v1
-```
+## 8. 反作假检查与限制
 
-上述部署门限实验只是历史 diagnostic，不计作正式基线。在新候选 runner 完成审计后，旧 `TurnModel` 评测脚本及其三个专用配置已从代码仓库删除；历史结果 JSON 仅保留在数据盘作为审计证据。
+1. 专项审计未发现预测篡改、标签入模、样本排除、分类别调参或事后切换主规则；`selection_used_paper_targets=false`，LR selection 也记录 `benchmark_used_for_selection=false`。完整审计见 `evaluation_reports/soulx_table3_anti_cheating_audit.md`。
+2. 本轮提前结束发生在明显退化已被 step 20 确认之后，所有已经完整得到的 step 5/10/20/30 均如实报告；未用 step 45 partial 选择性补表，也未伪造后续点。
+3. 起始 1800 step 是依据公开配置的低置信度估计，不是官方权重元数据。
+4. 本地有效 batch=72，只有官方参考全局有效 batch=576 的 1/8；因此 local optimizer step 不能直接等同于官方同数量 step。
+5. 当前 Table 3 样本级读出规则是已审计候选协议，数值与论文基本一致，但仍缺作者发布的样本级计分脚本确认。
+6. `Edu_0018` 只有约 10.519 个去重会话小时；结论只适用于这次小规模 pilot，不能外推为完整 2,000 小时 DuplexConv 的训练结论。
+7. Full-Duplex-Bench 是包含 LLM/TTS 的系统级表 2 测试。本轮没有续训练 checkpoint 通过模型级稳定性门禁，因此未继续对这些 checkpoint 做昂贵的系统级评测；本报告的最终结论限于模型级 Table 3。
 
-收到的 bundle 历史结果为 EN Complete 247/318、EN Incomplete 266/299、ZH Complete 266/300、ZH Incomplete 238/300，数值确实接近论文；逐样本预测也能由所附轨迹中的最后一个 `speak/wait` 重算。但这些 JSON 是从较早轨迹事后规范化而来，包内还存在直接比较四种规则与论文目标的脚本，并缺少规范化前原始结果、Teacher-ASR 缓存和完整运行日志。因此历史结果只作为参考，不能回填上表“官方权重本地结果”。
+## 9. 模型选择与后续建议
 
-本机正式运行前已冻结 `frozen-candidate-v1`：最后一个 terminal 是唯一主规则；first terminal、closest-to-endpoint 和 first-at/after-endpoint 只作敏感性分析。四类各用新进程、seed 42、独立空 ASR 文本缓存，严格 gate 从完整轨迹重新计算 summary，并核对官方 checkpoint、上游 commit/script、配置、数据、模型、ASR、依赖和日志。配置中的 `precision: bf16` 在官方 training-code 推理函数内没有被使用，本机报告必须同时记录该字段和真实参数 dtype，不能把配置值误报为有效 BF16 推理。
-
-官方 checkpoint 在该 training-code 初始化路径中会因 `embed_tokens_func.weight` 这个晚注册别名触发 `strict=False` 回退。本机已确认 checkpoint 中该别名与正式 embedding、LM head 是同一 tensor，最终 679 个模型键全部匹配，无缺失键、形状差异或其他多余键。审计 gate 只允许这一项固定差异，不把任意 `strict=False` 当作成功。
-
-首次正式候选运行在 ZH Complete 第 120 条遇到 Paraformer 空列表后停止。核对 pinned training-code 发现官方 `ParaformerASR` 会记录异常并返回空字符串；本机包装器已补齐相同行为并增加结构化 fallback 证据，定向真实样本验证为 18 次 ASR 调用中恰好 1 次 `IndexError` fallback。为保持四类 runner 提交一致，旧 partial 和旧提交下英文结果均不与修复后的正式结果拼接，四类从新路径重新运行。
-
-修复后的正式候选运行中，ZH Teacher-ASR 的 11,500 个 cache entry 中有 6 次调用按官方包装器语义回退为空字符串，分布于 5 个样本；EN 的 8,451 次无 fallback。异常类型、信息、空文本和对应样本均写入 JSONL/逐样本证据，严格 gate 已核对调用顺序和缓存一致性。
-
-各类单样本 runner 耗时的 median/p90/p95 分别为：EN Complete `3.957/5.098/5.380 s`，EN Incomplete `2.830/3.951/4.307 s`，ZH Complete `5.806/8.742/10.010 s`，ZH Incomplete `4.633/6.651/7.255 s`。这些是包含整条音频、Teacher-ASR、SoulX 和证据落盘的离线 wall-clock 时间，不是论文所报的单次流式决策延迟，不与 205/240 ms 直接比较。
-
-本机结果与 bundle 历史规范化预测在 EN Complete、EN Incomplete、ZH Complete、ZH Incomplete 分别有 16、14、9、5 条预测不同。因 bundle 缺少原始 Teacher-ASR 缓存、完整运行日志和规范化前结果，当前不能把差异归因为某一个已证实因素，也不用 bundle 预测覆盖本机结果。
-
-候选协议全量独立复现已完成，数值门禁失败这一历史事实保持不变；项目负责人已接受其作为内部配对基线并授权续训练。取得作者样本级协议/评测脚本仍是后续工作，届时需并行报告协议差异，不能覆盖当前已冻结结果。
-
-2026-08-21 的专项反作假审计未发现预测篡改、标签入模、样本排除、分类别调参或事后切换主规则。但 `last-terminal-v1` 的来源包含已看过论文目标的历史 bundle，所以仍保留“候选协议、尚缺作者确认”这一限制。完整证据、数据选择核对和废弃代码清单见 `evaluation_reports/soulx_table3_anti_cheating_audit.md`。
-
-中文 600 条不是本项目随机抽样，而是发布方固定 Testset 中全部 300 Complete + 300 Incomplete；没有第二个同分布 600 条池可供重抽。按发布时已存在的子组重算，真人录音 Complete/Incomplete 为 92.00%/86.00%，合成语音为 83.33%/74.67%。后续 checkpoint 必须同时报告这四个子组，不只报 macro。
-
-延迟：论文给出 240 ms 理论延迟和 L20 上 205 ms 部署测量。本机硬件不同，因此回填本机 median、p90、p95、首个有效 state latency、样本实时率和 CUDA 配置，不把硬件差异误判为模型退化。
-
-### 5.3 系统级 benchmark：Full-Duplex-Bench
-
-论文系统由 SoulX-Duplug、Qwen2.5-7B-Instruct 和 IndexTTS-1.5 组成。主要指标：
-
-- Pause Handling：TOR 越低越好；
-- Turn Taking：TOR 越高越好，RL 越低越好；
-- User Backchannel：RsR 越高越好；
-- User Interruption v1：TOR 越高越好，RL 越低越好；
-- User Interruption v1.5：RpR 越高越好，SL/RL 越低越好；
-- Overall：turn-management accuracy 越高越好，latency 越低越好。
-
-论文中文官方结果：
-
-| Pause TOR ↓ | Turn TOR ↑ | Turn RL ↓ | Backchannel RsR ↑ | Interrupt v1 TOR ↑ | Interrupt v1 RL ↓ | v1.5 RpR ↑ | v1.5 SL ↓ | v1.5 RL ↓ | Overall ACC ↑ | Overall latency ↓ |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0.038 | 0.994 | 0.767 | 0.800 | 0.994 | 1.089 | 0.830 | 0.380 | 1.150 | 0.916 | 0.847 |
-
-本地复现表：TBD。随机组件至少重复 3 次，报告 mean/std、seed、失败率和系统版本。
-
-## 6. Continuation step 与性能变化
-
-预注册 checkpoint：
-
-```text
-0, 5, 10, 20, 30, 45, 60, 90, 120, 180, 240, 300 optimizer steps
-```
-
-Easy Turn 结果表：
-
-| Local step | Estimated total step | LR | ZH Complete | ZH Incomplete | ZH Macro | EN Complete | EN Incomplete | EN Macro | 相对 step 0 | 判定 |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 0 | ≈1,800 | — | TBD | TBD | TBD | TBD | TBD | TBD | — | 官方基线 |
-| 5 | ≈1,805 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 10 | ≈1,810 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 20 | ≈1,820 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 30 | ≈1,830 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 45 | ≈1,845 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 60 | ≈1,860 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 90 | ≈1,890 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 120 | ≈1,920 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 180 | ≈1,980 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 240 | ≈2,040 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-| 300 | ≈2,100 | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD | TBD |
-
-每个点还需报告 train/validation loss、五状态 accuracy、每 head 有效目标数、预测状态分布、AMP overflow/跳步、梯度范数、累计曝光量、耗时和峰值显存。
-
-## 7. 退化判定与统计方法
-
-以同一 runner 得到的官方 step 0 逐样本预测为配对基线：
-
-- 几乎未下降：EN、ZH macro 降幅均 ≤1.0 个百分点，任一单类降幅 ≤2.0 个百分点；
-- 明显下降：任一语言 macro 降幅 >3.0 个百分点，或任一单类降幅 >5.0 个百分点，并在相邻下一个 checkpoint 再次出现；
-- 中间范围标为灰区，结合 95% paired bootstrap CI、McNemar 检验、validation 和预测分布解释；
-- 中文提升与英文遗忘分别报告，不能只报一个合并平均数。
-
-最终回填：
-
-```text
-最后一个几乎未下降的 step 区间：TBD
-首次明显下降的 step：TBD
-validation 最佳 step：TBD
-推荐交付 checkpoint：TBD
-推荐原因：TBD
-```
-
-预注册网格用于描述 step–性能曲线，不能看完 test 结果再改变 LR 或重新定义阈值。超参数和 checkpoint 主选择依据为 group-aware validation；论文 benchmark 用于冻结后的对比和汇报。
-
-## 8. 重要工程修复与验证
-
-官方 Stage 3 对某一训练样本未涉及的状态 head 使用全 `-100` 标签。直接调用 cross-entropy 会产生 NaN。本项目 runtime 对空 head 返回与计算图相连的有限 FP32 0，保留原有 `-100` 屏蔽语义，不伪造标签。
-
-真实 5-step 预检：
-
-| 项目 | 结果 |
-| --- | --- |
-| 成功 optimizer updates | 5 |
-| 可训练参数 | 13,505,536 |
-| FP16 scale | 65,536 经 2 次可恢复 overflow 降至 16,384 |
-| CUDA peak memory | 8,144,328,192 bytes |
-| projector 参数变化 | L2 0.0207257 |
-| 紧凑 checkpoint | 162,241,270 bytes |
-| checkpoint SHA-256 | `f12a49a392f7ad319e56c4cb75f21ce8f027f2fb76d9ea88c7799762efa6c4de` |
-| checkpoint 重载 | 通过 |
-
-该 5-step run 只证明训练链路可用，不代表正式模型性能。
-
-## 9. 可复现性记录
-
-最终文档附上：
-
-- 训练源、评测集、模型、代码 revision 和 SHA-256；
-- 完整配置和命令；
-- GPU、driver、CUDA、PyTorch、Transformers、PEFT、FunASR/ModelScope 版本；
-- train/validation split manifest 与泄漏审计；
-- 每个 checkpoint 的 step、LR、有效 batch、累计样本、epoch-equivalent 和 hash；
-- 每条 benchmark 样本的预测、时序、正确性与耗时；
-- 随机 seed、重复次数、均值/标准差、置信区间和失败样本；
-- 任何相对官方代码的补丁及其必要性。
-
-## 10. 局限与风险
-
-1. 官方权重不含原始 optimizer/scheduler/global step，`1,800` 只是低置信度估计。
-2. DuplexConv 状态中有 1,599 个 Qwen 辅助标签，不能等同人工标注。
-3. 训练 ASR 文本由 Paraformer 生成，存在伪标签错误。
-4. Easy Turn 是固定 test set；多 checkpoint 评测可能造成隐性 test overfitting，因此使用预注册网格并禁止据其修改超参数。
-5. Full-Duplex-Bench 的系统结果受 LLM、TTS、ASR、网络/调度和随机性共同影响，不宜单独归因于 SoulX checkpoint。
-6. 本机 GPU 与论文 L20/H20 环境不同，吞吐和实测延迟不可直接横向比较。
-
-## 11. 会议结论页
-
-> TBD：实验完成后将本节整理为一页，包括一张 step–performance 曲线、一张关键 checkpoint 对比表、三条结论、两条局限和最终模型路径/hash。
+- 保持现有 EN/ZH Easy Turn 能力：使用官方 step 0。
+- 若只做研究性对比、必须使用本轮续训练权重：step 5 是四个已测点中损伤最小者，但应明确标注“未通过稳定性门禁”，不能作为无退化版本发布。
+- 下一轮不宜直接增加本轮数据上的 step；优先扩大 DuplexConv 覆盖规模并平衡 Complete/Incomplete，考虑官方/英文 replay、降低峰值 LR，并把 step 1–5 设为更密的早期评测窗口。
+- 需要另建与训练域分离的中文 in-domain 测试集，才能判断 `Edu_0018` 适配收益；训练域 validation 改善不能替代外部收益证据。

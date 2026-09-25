@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "running",
+  "task_id": "duplexconv_edu0001_0045_table3_parallel_scheduler_transition",
+  "owner_approval": {
+    "approved": true,
+    "approved_at_conversation_turn": "2026-08-30",
+    "approved_change": "Use two GPUs concurrently now and keep GPU-count selection convenient for future one-, two-, or multi-GPU runs."
+  },
+  "scope": {
+    "layer": "execution-resource-scheduling-only",
+    "samples_rules_thresholds_metrics_changed": false,
+    "checkpoint_grid_changed": false,
+    "inference_runtime_changed": false,
+    "official_upstream_changed": false,
+    "mandatory_logical_order": [1, 30, 10, 5, 20],
+    "conditional_refinement_order": [2, 3]
+  },
+  "implementation": {
+    "coordinator": "/root/SoulX-stage3-dataset/scripts/run_official_table3_coarse_to_fine.py",
+    "coordinator_sha256": "0e3e29e92bde268d0962bc5e72c4a2c1f72d2057d9cc5e212f5594a265c861ef",
+    "test": "/root/SoulX-stage3-dataset/tests/test_official_table3_parallel_scheduler.py",
+    "test_sha256": "fb075cda84c275104f04873cb7658a4ee95e113b4d05b1dbe367270d18b10327",
+    "targeted_tests": "9 passed",
+    "device_interface": ["--devices 0", "--devices 0,1", "--devices auto"],
+    "worker_invariant": "At most one checkpoint per GPU; four classes within a checkpoint remain serial; global manifest and index are written only by the main thread.",
+    "failure_policy": "After a worker failure, submit no new pending checkpoints; retain already-running worker outcomes and fail closed."
+  },
+  "recovery": {
+    "previous_failure": "step10 ZH Incomplete initialization inherited unavailable local proxy 127.0.0.1:17890",
+    "previous_failure_preserved": true,
+    "network_route": "direct-with-proxy-environment-cleared",
+    "model_configuration_changed": false,
+    "partial_output_policy": "archive invalid partial class output, then retry; reuse only outputs passing frozen identity validation"
+  },
+  "launch": {
+    "started_at_utc": "2026-08-30T01:18:53.956927+00:00",
+    "table3_tmux": "soulx_table3_parallel_edu0001_0045_v1",
+    "report_tmux": "soulx_report_parallel_edu0001_0045_v1",
+    "devices": ["0", "1"],
+    "initial_assignments": [
+      {"device": "1", "local_step": 10, "remaining_class": "zh/incomplete"},
+      {"device": "0", "local_step": 5, "remaining_class": "all four classes"}
+    ],
+    "gpu_binding_verified_from_process_environment": true,
+    "proxy_environment_absent_in_workers": true,
+    "both_models_loaded_on_distinct_gpus": true,
+    "report_supervisor_status": "waiting_for_evaluation"
+  },
+  "artifacts": {
+    "orchestration_manifest": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/coarse_to_fine_orchestration_manifest.json",
+    "table3_log": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/table3_coarse_to_fine.log",
+    "report_supervisor_manifest": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/report_supervisor_coarse_to_fine_manifest.json"
+  },
+  "estimated_remaining_wall_time": {
+    "without_conditional_steps_2_3": "about 2.5-3 hours from restart",
+    "with_conditional_steps_2_3": "about 4.5-5 hours from restart"
+  },
+  "paid_api_cost_usd": 0.0
+}

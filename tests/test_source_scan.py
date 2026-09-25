@@ -42,6 +42,18 @@ class SourceScanUnitTests(unittest.TestCase):
             relation["overlap_by_chunk"], [False, False, False, True]
         )
 
+    def test_four_channel_target_vs_rest_aggregates_all_other_tracks(self):
+        channels = [
+            [True, False, False],
+            [False, True, False],
+            [False, True, True],
+            [True, False, True],
+        ]
+        relation = target_vs_rest_activity(channels, 0)
+        self.assertEqual(relation["other_active_by_chunk"], [True, True, True])
+        self.assertEqual(relation["other_active_count_by_chunk"], [1, 2, 2])
+        self.assertEqual(relation["overlap_by_chunk"], [True, False, False])
+
     def test_stable_ids(self):
         self.assertEqual(
             stable_event_id("Edu--010456", 1, 2),

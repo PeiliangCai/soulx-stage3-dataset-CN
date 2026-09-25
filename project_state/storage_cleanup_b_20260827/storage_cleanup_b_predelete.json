@@ -1,0 +1,136 @@
+{
+  "audited_at_utc": "2026-08-27T12:29:01.375598+00:00",
+  "deprecated_root": "/root/autodl-tmp/soulx-duplug-stage3-cn-replacement",
+  "deprecated_root_inventory": {
+    "apparent_bytes": 106745069447,
+    "directory_count": 111,
+    "file_count": 406429,
+    "symlink_count": 0,
+    "top_level": {
+      "archives": {
+        "apparent_bytes": 0,
+        "directory_count": 0,
+        "file_count": 0,
+        "symlink_count": 0
+      },
+      "datasets": {
+        "apparent_bytes": 106710574029,
+        "directory_count": 0,
+        "file_count": 406429,
+        "symlink_count": 0
+      }
+    }
+  },
+  "disk_before": {
+    "free_bytes": 39915470848,
+    "total_bytes": 536870912000,
+    "used_bytes": 496955441152
+  },
+  "owner_approved_plan": "storage_cleanup_B",
+  "preserved": [
+    "/root/autodl-tmp/dataset/duplexconv/raw",
+    "/root/autodl-tmp/dataset/duplexconv/processed",
+    "/root/autodl-tmp/dataset/duplexconv/model_ready",
+    "/root/autodl-tmp/dataset/duplexconv/aggregates",
+    "/root/autodl-tmp/dataset/duplexconv/reports",
+    "/root/autodl-tmp/dataset/duplexconv/cache",
+    "all non-targeted work manifests, request/results, source scans, selection lists, checksums, and reports"
+  ],
+  "schema_version": 1,
+  "status": "predelete_audit_passed",
+  "training_dependency_check": "passed_no_aggregate_or_training_path_references_targeted_tars",
+  "work_tar_bytes": 80093716480,
+  "work_tar_count": 15,
+  "work_tars": [
+    {
+      "bytes": 8170137600,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0026_v1/Edu_0026_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "bb4da72b08e63efd634acf52d6ba21313200a80a143956a3dc0c013fc31f6a25"
+    },
+    {
+      "bytes": 8048936960,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0039_v1/Edu_0039_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "a7782e4ec6070c3f8b45d397e858aaff38178b42abb486f7fa613aa15358ecdb"
+    },
+    {
+      "bytes": 7965470720,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/leakage_sanitize_edu0023_v1/Edu_0023_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "382d9202032b839c7617f56225ee68d8c4dc4c32f6aa3dffee457e020a983a0c"
+    },
+    {
+      "bytes": 7963473920,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0030_v1/Edu_0030_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "dfa04ec55cc4f39289ebebbf2c4da2f205ae12ee06d3b9cf22636c1e9e3a6c3b"
+    },
+    {
+      "bytes": 7729909760,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/leakage_sanitize_edu0037_v1/Edu_0037_sanitized_498sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "7f8336d9dc21264be677f68c04f72deed1799d52d733e6b0ac230d787ad260d3"
+    },
+    {
+      "bytes": 7690178560,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/leakage_sanitize_edu0032_v1/Edu_0032_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "457f279518009e11703e9e949915596150e955cf8c1c6ddb6760b812b2ad66f3"
+    },
+    {
+      "bytes": 7436410880,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/leakage_sanitize_edu0035_v1/Edu_0035_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "3a187226927dd9725d50a00fe9c238b14266e694e5d561330b69625c303a659a"
+    },
+    {
+      "bytes": 7432970240,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/leakage_sanitize_edu0043_v1/Edu_0043_sanitized_499sources_v1.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "4cb6b77de2fede4a1fb1a47749454ee06595b1a7ed8d7656a401c8002d30ed60"
+    },
+    {
+      "bytes": 2709524480,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0041_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "de3650cf6280430c9b55f71ff2b03e2300100b6c4fa7ebe7832a9bd5054cea14"
+    },
+    {
+      "bytes": 2607134720,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0044_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "9f47aac1d625d924b91e902e236a2c36f4e2f044bff425ed1983a7b45306fc13"
+    },
+    {
+      "bytes": 2509926400,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0040_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "55da63168f710b916a94bbb522c6c23c038f45c5b4c53f60fe8311c4ccaf5c12"
+    },
+    {
+      "bytes": 2480691200,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0043_sanitized_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "7b3edda477d9db6d0045923c1b4766e144b016cf90f4a6e18f0cbdf96b83555a"
+    },
+    {
+      "bytes": 2466170880,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0042_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "a9ef5d68d2cce663cac56d7f3f9708bd9fe1ba073614df14117b83fef9f49dbc"
+    },
+    {
+      "bytes": 2442065920,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0018_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "cd62a494e8b4b7b849f61f0f195ce3e86336660b7a909484906ea51f3deb4bc0"
+    },
+    {
+      "bytes": 2440714240,
+      "path": "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0018_sanitized_v1/candidate_model_ready_views.tar",
+      "role": "rebuildable_sanitized_source_or_gate_d_candidate_tar_not_used_by_training",
+      "sha256": "d9d00017d8c30e2a1f9326cc908bf829eace6d22488711a3dc21495b94bfb245"
+    }
+  ]
+}

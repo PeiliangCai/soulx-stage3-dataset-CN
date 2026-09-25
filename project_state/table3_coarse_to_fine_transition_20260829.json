@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "status": "complete",
+  "task_id": "duplexconv_edu0001_0045_official_continual_v1_table3_protocol_transition",
+  "completed_at_utc": "2026-08-29T13:30:00Z",
+  "owner_approval": {
+    "approved": true,
+    "approved_before_step1_aggregate_result_was_read": true,
+    "approved_change": "Replace the seven-point sequential Table 3 run with endpoint-first coarse-to-fine-v1 while preserving the seven-point training and internal-validation grids."
+  },
+  "step1_supervision": {
+    "status": "complete_and_evidence_gate_passed",
+    "completed_at_utc": "2026-08-29T13:26:11.015297+00:00",
+    "checkpoint": {
+      "path": "/root/autodl-tmp/dataset/duplexconv/training/edu0001_0045_official_continual_v1/checkpoints/evaluation/step000001.pt",
+      "sha256": "7838a6b5c91b5e35bf9b4ff65d43f87831a2554b8b343f5ab15ec649911eb1fa"
+    },
+    "classes": {
+      "en/complete": {
+        "correct": 262,
+        "total": 318,
+        "accuracy_percent": 82.38993710691824,
+        "result_sha256": "b9aedc693a70947b2b75c482e812ef0edf9fb88bebe184cbbb420937aaa99fd1"
+      },
+      "en/incomplete": {
+        "correct": 254,
+        "total": 299,
+        "accuracy_percent": 84.94983277591973,
+        "result_sha256": "6f6a7f954687246a7038ef1d84319bb581da2434b8852bd3aef8aaeb78d887e5"
+      },
+      "zh/complete": {
+        "correct": 266,
+        "total": 300,
+        "accuracy_percent": 88.66666666666667,
+        "result_sha256": "b746720e2b5df497b27b03c778811fc7fefc1c4dff3f7193e8fcbcd6db0b3231"
+      },
+      "zh/incomplete": {
+        "correct": 233,
+        "total": 300,
+        "accuracy_percent": 77.66666666666667,
+        "result_sha256": "b102a657f690f024f5313feda7f309a3e88cc6e87c7dba985f1b1db7e7a40f22"
+      }
+    },
+    "evidence_gate": {
+      "path": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/checkpoints/step000001/table3-gate.json",
+      "sha256": "37390044098fc87ea95d1a4dc9dfe86a19b87be2c378c55d55d2db0625d9c796",
+      "evaluation_mode": "continuation",
+      "evidence_audit_passed": true,
+      "gate_passed": true
+    },
+    "archived_index": {
+      "path": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/archives/sequential_full_grid_stopped_after_step1_20260829T1327Z/sweep_index.step1.sequential.json",
+      "sha256": "e4a485b5eeb86efbb59a6601466100b21e589f43c4080b5ef8ca5951624d1073"
+    }
+  },
+  "superseded_sequential_attempt": {
+    "status": "stopped_after_step1_gate_and_index",
+    "archive": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/archives/sequential_full_grid_stopped_after_step1_20260829T1327Z",
+    "table3_orchestration_manifest_sha256": "5479fe2d0ce05052fc75845f499d62f2e7df7bc69fbbc680e47643a87731bbbf",
+    "posttrain_orchestration_manifest_sha256": "8a9a93d4a0b8ec358a99d8ad65c05aef058506485254e0ff3541f22f45fbd1c4",
+    "step2_started_at_utc": "2026-08-29T13:26:50.840078+00:00",
+    "partial_step2_contents": [
+      "en-complete-process.log (15 bytes)",
+      "en-complete-traces/initialization.log (0 bytes)"
+    ],
+    "step2_predictions_created": false,
+    "evidence_deleted": false
+  },
+  "new_protocol": {
+    "profile": "table3-endpoint-first-coarse-to-fine-v1",
+    "mandatory_evaluation_order": [1, 30, 10, 5, 20],
+    "conditional_refinement_order": [2, 3],
+    "refinement_trigger": "evaluate steps 2 and 3 iff step 5 obvious_decline_trigger is true",
+    "non_monotonicity_assumed": false,
+    "table3_used_for_checkpoint_selection": false,
+    "samples_rules_thresholds_metrics_changed": false,
+    "training_checkpoint_grid_changed": false,
+    "internal_validation_grid_changed": false,
+    "omission_limitation": "When steps 2 and 3 are not triggered, the sparse grid can miss a narrow local non-monotonic change; omitted points must never be described as unchanged."
+  },
+  "implementation": {
+    "coordinator": {
+      "path": "/root/SoulX-stage3-dataset/scripts/run_official_table3_coarse_to_fine.py",
+      "sha256": "8ca79a69f8ac60f6a2cedee3a81032d150d9add49bd06988f2c67dd9315c196f"
+    },
+    "report_renderer": {
+      "path": "/root/SoulX-stage3-dataset/scripts/render_official_continual_report.py",
+      "sha256": "3b6e4460ff0195223e1ce3bdc5d5b6debc3c6fac1d60505a2b3150ea3f94f43d"
+    },
+    "report_supervisor": {
+      "path": "/root/SoulX-stage3-dataset/scripts/run_official_report_after_evaluation.py",
+      "sha256": "a3e4cffcb20d51c0a5f33bbbfea8d0ef219dee3144c61d0c9f9615080a336794"
+    },
+    "test_status": "18 targeted Table3/evaluation tests passed in the actual table3 Conda environment"
+  },
+  "running": {
+    "table3_tmux": "soulx_table3_coarse_edu0001_0045_v1",
+    "table3_manifest": "/root/autodl-tmp/dataset/soulx_duplug_eval/table3_official_continual_sweep/edu0001_0045_official_continual_v1_b17bcf/coarse_to_fine_orchestration_manifest.json",
+    "table3_log": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/table3_coarse_to_fine.log",
+    "verified_next_step": 30,
+    "report_tmux": "soulx_report_coarse_edu0001_0045_v1",
+    "report_manifest": "/root/autodl-tmp/dataset/duplexconv/evaluation/edu0001_0045_official_continual_v1/report_supervisor_coarse_to_fine_manifest.json"
+  },
+  "paid_api_cost_usd": 0.0
+}

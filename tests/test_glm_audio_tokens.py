@@ -6,6 +6,7 @@ from duplexconv_stage3.glm_audio_tokens import (
     group_chunk_tokens,
     make_glm_cache_signature,
     split_audio_segments,
+    validate_glm_input_partition,
 )
 
 
@@ -36,6 +37,33 @@ class GlmAudioTokenTests(unittest.TestCase):
             model_signature="model",
         )
         self.assertNotEqual(first, second)
+
+    def test_upstream_quarantine_partitions_audio_manifests(self):
+        manifests = [
+            {"view_id": "ok", "source_id": "a", "chunk_count": 2},
+            {"view_id": "bad", "source_id": "b", "chunk_count": 3},
+        ]
+        timelines, eligible = validate_glm_input_partition(
+            manifests=manifests,
+            timelines=[{"view_id": "ok"}],
+            source_view_quarantine=[
+                {
+                    "view_id": "bad",
+                    "source_id": "b",
+                    "original_chunk_count": 3,
+                }
+            ],
+        )
+        self.assertEqual(set(timelines), {"ok"})
+        self.assertEqual([item["view_id"] for item in eligible], ["ok"])
+
+    def test_missing_manifest_partition_is_rejected(self):
+        with self.assertRaises(ValueError):
+            validate_glm_input_partition(
+                manifests=[{"view_id": "missing", "source_id": "a", "chunk_count": 1}],
+                timelines=[],
+                source_view_quarantine=[],
+            )
 
 
 if __name__ == "__main__":

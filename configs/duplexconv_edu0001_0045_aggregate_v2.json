@@ -1,0 +1,279 @@
+{
+  "schema_version": 1,
+  "dataset_version": "duplexconv_edu0001_0045_stage3_zh_v2",
+  "aggregate_profile": "immutable-multi-parquet-manifest-v1",
+  "input_policy": "Use every shard's final frozen Gate-D-passed model-ready version. Sanitized or network-retry variants are selected only where the preserved final completion evidence requires them; immutable Edu_0018-Edu_0045 v1 inputs are reused exactly.",
+  "training_split_status": "not_created",
+  "shards": [
+    {
+      "shard_id": "Edu_0001",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/processed/model_ready/edu0001_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0001/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0001/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0002",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0002_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0002/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0002/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0003",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0003_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0003/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0003/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0004",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0004_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0004/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0004/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0005",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0005_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0005/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0005/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0006",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0006_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0006/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0006/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0007",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0007_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0007/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0007/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0008",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0008_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0008/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0008/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0009",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0009_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0009/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0009/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0010",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0010_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0010/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0010/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0011",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0011_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0011/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0011/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0012",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0012_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0012/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0012/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0013",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0013_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0013/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0013/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0014",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0014_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0014/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0014/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0015",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0015_network_retry_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0015/model_ready_validation_network_retry_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0015/gate_d_closure_network_retry_v1.json"
+    },
+    {
+      "shard_id": "Edu_0016",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0016_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0016/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0016/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0017",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0017_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0017/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0017/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0018",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0018_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0018/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0018/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0019",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0019_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0019/model_ready_validation.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0019/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0020",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0020_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0020/model_ready_validation.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0020/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0021",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0021_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0021/model_ready_validation.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0021/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0022",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0022_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0022/model_ready_validation.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0022/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0023",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0023_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0023/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0023/leakage_gate_d_sanitized_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0024",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0024_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0024/model_ready_validation.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0024/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0025",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0025_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0025/model_ready_validation.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0025/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0026",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0026_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0026/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0026/leakage_gate_d_sanitized_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0027",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0027_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0027/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0027/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0028",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0028_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0028/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0028/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0029",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0029_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0029/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0029/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0030",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0030_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0030/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0030/leakage_gate_d_sanitized_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0031",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0031_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0031/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0031/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0032",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0032_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0032/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0032/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0033",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0033_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0033/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0033/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0034",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0034_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0034/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0034/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0035",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0035_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0035/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0035/leakage_gate_d_v1/gate_d_closure.json"
+    },
+    {
+      "shard_id": "Edu_0036",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0036_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0036/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0036/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0037",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0037_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0037/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0037/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0038",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0038_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0038/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0038/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0039",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0039_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0039/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0039/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0040",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0040_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0040/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0040/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0041",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0041_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0041/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0041/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0042",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0042_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0042/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0042/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0043",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0043_sanitized_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0043/model_ready_validation_sanitized_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0043/gate_d_closure_sanitized_v1.json"
+    },
+    {
+      "shard_id": "Edu_0044",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0044_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0044/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0044/gate_d_closure_v1.json"
+    },
+    {
+      "shard_id": "Edu_0045",
+      "model_ready_dir": "/root/autodl-tmp/dataset/duplexconv/model_ready/edu0045_stage3_zh_v1",
+      "validation_report": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0045/model_ready_validation_v1.json",
+      "gate_d_closure": "/root/autodl-tmp/dataset/duplexconv/reports/expansion_v1/Edu_0045/gate_d_closure_v1.json"
+    }
+  ]
+}

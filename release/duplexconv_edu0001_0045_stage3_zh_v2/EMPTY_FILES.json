@@ -1,0 +1,120 @@
+{
+  "aggregate_directory_name": "edu0001_0045_stage3_zh_v2",
+  "archive_bytes": 20480,
+  "archive_name": "empty_files.tar",
+  "archive_sha256": "a67361aa1ee5014a88f106c829bbc249007d34de3d152f463f8ce9de23aed097",
+  "empty_file_count": 21,
+  "empty_file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "files": [
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0001.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0001.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0002.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0002.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0004.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0004.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0008.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0008.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0011.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0011.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0013.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0013.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0014.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0014.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0016.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0016.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0017.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0017.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0018.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0018.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0022.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0022.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0023.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0023.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0027.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0027.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0029.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0029.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0030.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0030.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0033.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0033.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0034.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0034.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0035.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0035.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0043.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0043.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0044.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0044.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "original_remote_path": "/soulx-stage3-dataset-CN/datasets/duplexconv_edu0001_0045_stage3_zh_v2/model_ready/edu0001_0045_stage3_zh_v2/quarantine/by_shard/Edu_0045.views.jsonl",
+      "relative_path": "quarantine/by_shard/Edu_0045.views.jsonl",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "profile": "baidu-zero-byte-compatibility-v1",
+  "reason": "BaiduPCS-Go v4.0.1 refuses zero-byte local files.",
+  "restore_command": "python restore_baidu_empty_release_files.py --aggregate-dir /path/to/edu0001_0045_stage3_zh_v2 --manifest EMPTY_FILES.json --archive empty_files.tar",
+  "restore_script_name": "restore_baidu_empty_release_files.py",
+  "schema_version": 1
+}

@@ -142,6 +142,49 @@ def make_glm_cache_signature(
     ).hexdigest()
 
 
+def validate_glm_input_partition(
+    *,
+    manifests: Sequence[dict[str, Any]],
+    timelines: Sequence[dict[str, Any]],
+    source_view_quarantine: Sequence[dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]]]:
+    manifest_ids = [item["view_id"] for item in manifests]
+    timeline_ids = [item["view_id"] for item in timelines]
+    quarantine_ids = [item["view_id"] for item in source_view_quarantine]
+    for label, values in (
+        ("audio manifests", manifest_ids),
+        ("timelines", timeline_ids),
+        ("source-view quarantine", quarantine_ids),
+    ):
+        if len(set(values)) != len(values):
+            raise ValueError(f"{label} contain duplicate view IDs")
+    timeline_set = set(timeline_ids)
+    quarantine_set = set(quarantine_ids)
+    overlap = timeline_set & quarantine_set
+    if overlap:
+        raise ValueError(
+            f"timeline/source-view quarantine IDs overlap: {sorted(overlap)}"
+        )
+    expected = set(manifest_ids)
+    actual = timeline_set | quarantine_set
+    if expected != actual:
+        raise ValueError(
+            "audio view partition does not close: "
+            f"missing={sorted(expected - actual)}, extra={sorted(actual - expected)}"
+        )
+    manifests_by_id = {item["view_id"]: item for item in manifests}
+    for item in source_view_quarantine:
+        view_id = item["view_id"]
+        manifest = manifests_by_id[view_id]
+        if item.get("source_id") != manifest["source_id"]:
+            raise ValueError(f"source-view quarantine source mismatch for {view_id}")
+        if item.get("original_chunk_count") != manifest["chunk_count"]:
+            raise ValueError(f"source-view quarantine chunk mismatch for {view_id}")
+    timelines_by_id = {item["view_id"]: item for item in timelines}
+    eligible = [item for item in manifests if item["view_id"] in timeline_set]
+    return timelines_by_id, eligible
+
+
 def extract_glm_audio_tokens(
     *,
     upstream_dir: Path,
@@ -172,16 +215,39 @@ def extract_glm_audio_tokens(
         sys.path.insert(0, str(upstream_dir))
         from models.glm_4_voice.speech_tokenizer.modeling_whisper import WhisperVQEncoder
 
-        manifests = list(read_jsonl(audio_dir / "audio_manifest.jsonl"))
-        timelines = {item["view_id"]: item for item in read_jsonl(timeline_dir / "timelines.jsonl")}
+        all_manifests = list(read_jsonl(audio_dir / "audio_manifest.jsonl"))
+        timeline_records = list(read_jsonl(timeline_dir / "timelines.jsonl"))
+        source_view_quarantine_path = timeline_dir / "source_view_quarantine.jsonl"
+        source_view_quarantine = (
+            list(read_jsonl(source_view_quarantine_path))
+            if source_view_quarantine_path.exists()
+            else []
+        )
+        timelines, eligible_manifests = validate_glm_input_partition(
+            manifests=all_manifests,
+            timelines=timeline_records,
+            source_view_quarantine=source_view_quarantine,
+        )
         if selected_view_ids is not None:
             selected = set(selected_view_ids)
             if len(selected) != len(selected_view_ids):
                 raise ValueError("selected view IDs contain duplicates")
-            manifests = [item for item in manifests if item["view_id"] in selected]
-            missing = selected - {item["view_id"] for item in manifests}
+            missing = selected - {item["view_id"] for item in all_manifests}
             if missing:
                 raise ValueError(f"selected view IDs are unknown: {sorted(missing)}")
+            quarantined_selected = selected & {
+                item["view_id"] for item in source_view_quarantine
+            }
+            if quarantined_selected:
+                raise ValueError(
+                    "selected view IDs are source-view quarantined: "
+                    f"{sorted(quarantined_selected)}"
+                )
+            manifests = [
+                item for item in eligible_manifests if item["view_id"] in selected
+            ]
+        else:
+            manifests = eligible_manifests
         manifests.sort(key=lambda item: item["view_id"])
 
         model_files = [model_dir / "model.safetensors", model_dir / "config.json"]
@@ -267,12 +333,23 @@ def extract_glm_audio_tokens(
         with (temporary / "glm_quarantine.jsonl").open("w", encoding="utf-8") as handle:
             for item in quarantines:
                 handle.write(canonical_json(item) + "\n")
+        with (temporary / "source_view_quarantine.jsonl").open(
+            "w", encoding="utf-8"
+        ) as handle:
+            for item in source_view_quarantine:
+                handle.write(canonical_json(item) + "\n")
         summary = {
             "schema_version": 1,
             "glm_audio_profile": GLM_AUDIO_PROFILE,
             "model_dir": str(model_dir),
             "model_signature": model_signature,
-            "input_view_count": len(manifests),
+            "input_view_count": len(all_manifests),
+            "eligible_view_count": len(manifests),
+            "upstream_source_view_quarantined_count": len(source_view_quarantine),
+            "view_partition_closed": (
+                len(all_manifests)
+                == len(eligible_manifests) + len(source_view_quarantine)
+            ),
             "passed_view_count": len(results),
             "quarantined_view_count": len(quarantines),
             "cache_hit_count": cache_hits,

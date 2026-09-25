@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0001_sanitized_v1_stage3_zh_v1",
+  "shard_number": 1,
+  "archive_name": "Edu_0001_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0001.tar",
+  "parent_official_archive_bytes": 7799214080,
+  "parent_official_archive_sha256": "cc2de50abb77ea34893bd1bdb0bd1d8ae808a41396e93c1f907e46ec15f1d18e",
+  "sanitization_profile": "exclude-source-frozen-benchmark-near-duplicate-quarantine-v1",
+  "excluded_source_ids": [
+    "Edu--000241"
+  ],
+  "exclusion_reason": "The unchanged frozen benchmark leakage gate v2.2 produced one near-duplicate hit between channel 1 and candor_turn_taking/62/input.wav (similarity=0.6553030303030303, aligned_frames=231, LSH votes=41). Read-only diagnostics strongly support a fingerprint collision but do not override the gate; the complete source conversation is conservatively excluded without changing any threshold or scorer rule.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--000001",
+    "last_source_id": "Edu--000615",
+    "source_ids_sha256": "a3b6d8361004cf92827af7bfb88fa197380179591575b9a876e3fda766e0edef",
+    "source_ntrack": {
+      "2": 494,
+      "3": 5
+    },
+    "target_view_count": 1003,
+    "target_view_hours": 22.545739583333322,
+    "event_count": 8943,
+    "state_distribution": {
+      "complete": 4668,
+      "incomplete": 1643,
+      "backchannel": 891,
+      "wait": 16,
+      "missing": 1725
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# source_repo=DanielLin94144/Full-Duplex-Bench
+# source_commit=3e799c45a045256f47d5f1c9cda90157e2d2ec9e
+# source_readme=https://github.com/DanielLin94144/Full-Duplex-Bench/tree/3e799c45a045256f47d5f1c9cda90157e2d2ec9e/v1_v1.5/dataset
+# download_origin=Google Drive links published by the pinned README
+# expected_file_count=9
+# expected_total_bytes=705372348
+version	filename	google_drive_id	expected_bytes
+v1.0	candor_pause_handling.zip	1uls3atEz7bZ1IkVq3Rw0yQyLAjjVkklc	67089249
+v1.0	candor_turn_taking.zip	1sb9mwOqDCK9BEpMb6fDVYOJU1vd5RFlb	37850555
+v1.0	icc_backchannel.zip	1HttNZbi0bYHe7a-CO_9vg_z7hMM8a5h0	112509001
+v1.0	synthetic_pause_handling.zip	1iV0X6z3Z9SrmJvxJ2Hkij3nb8iuWbJyv	107106287
+v1.0	synthetic_user_interruption.zip	1I36wGbPtZObjqI_1h11Rb2s1ulerb65a	152934381
+v1.5	background_speech.zip	1W63k1BlQ0QCgvYCb_8YJNqFfUhBwI97W	24649756
+v1.5	talking_to_other.zip	1Jh6ER4AUmqGgEZBTV0pcbDaMMQIWA7Kt	28699879
+v1.5	user_backchannel.zip	1EGwCd9CdGuh8jeqwPENzbBs5FSEgnYL3	23179469
+v1.5	user_interruption.zip	1wqYcYS4-30W2YMc3TfeMeoiaW9PLf4yT	151353771

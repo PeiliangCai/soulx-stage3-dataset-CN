@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-benchmark-audio-leakage-v1",
+  "frozen_at_utc": "2026-08-22T11:36:00Z",
+  "benchmark_records_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_denylist_v1/benchmark_identity_manifest.jsonl",
+  "benchmark_records_sha256": "a27380aff2d625b24c441a9fc47bc2a2285993b60d230eb6f9a6fd7fede9ec7d",
+  "calibration_result_path": "/root/autodl-tmp/dataset/soulx_duplug_eval/reports/benchmark_leakage_denylist_v1/calibration_result_final_v1.json",
+  "calibration_result_sha256": "cdd3f00e4ce9d07a1d0c13145e494eb792c28c468389a292e1e175a8628d5032",
+  "implementation_path": "/root/SoulX-stage3-dataset/src/duplexconv_stage3/audio_leakage.py",
+  "implementation_sha256": "e5b36c76a6e5fdaf801c609df809855c53874af17c1475d2ba49d9d8b140c536",
+  "near_duplicate_similarity_threshold": 0.8,
+  "minimum_aligned_frames": 64,
+  "fingerprint_parameters": {
+    "canonical_sample_rate": 16000,
+    "window_seconds": 4.0,
+    "window_hop_seconds": 1.0,
+    "chromaprint_algorithm": 1,
+    "lsh_bits": 12,
+    "lsh_shifts": [
+      0,
+      5,
+      10,
+      15,
+      20
+    ],
+    "lsh_max_postings": 512
+  },
+  "decision": {
+    "exact_pcm_identity_match": "quarantine",
+    "peak_normalized_pcm_identity_match": "quarantine",
+    "normalized_window_identity_match": "quarantine",
+    "near_duplicate_at_or_above_threshold": "quarantine"
+  },
+  "calibration_summary": {
+    "same_source_control_count": 144,
+    "same_source_retrieval_recall": 1.0,
+    "same_source_minimum_similarity": 0.9555921052631579,
+    "different_source_control_count": 2472,
+    "different_source_maximum_similarity": 0.6376953125,
+    "positive_p01_minus_threshold_margin": 0.17186754918981473,
+    "noise_control_role": "diagnostic_only_not_used_for_threshold"
+  }
+}

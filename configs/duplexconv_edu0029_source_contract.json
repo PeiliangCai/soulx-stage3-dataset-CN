@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0029_stage3_zh_v1",
+  "shard_number": 29,
+  "archive_name": "Edu_0029.tar",
+  "official_archive_bytes": 8074332160,
+  "official_archive_sha256": "fe2238a45cc8f9cc9d110019765e8d34e0df0997635c3db4f82451e960bdab7b",
+  "official_xet_hash": "5501f117585c77d0ff221e05a454edefc0ba76c54343225df812f917381b3774",
+  "metadata_membership_status_before_download": "inferred_from_sorted_metadata_chunks_pending_exact_tar_member_closure",
+  "inferred_first_source_id": "Edu--017239",
+  "inferred_last_source_id": "Edu--017861",
+  "supported_track_counts": [
+    2,
+    3
+  ],
+  "expected": {
+    "source_count": 500,
+    "first_source_id": "Edu--017239",
+    "last_source_id": "Edu--017861",
+    "source_ids_sha256": "27919058ef44cdc6eba858ee5f5b9a47c93874633669533581cb1a78f9d68de2",
+    "source_ntrack": {
+      "2": 498,
+      "3": 2
+    },
+    "target_view_count": 1002,
+    "event_count": 9274,
+    "state_distribution": {
+      "complete": 4906,
+      "incomplete": 1703,
+      "backchannel": 922,
+      "wait": 21,
+      "missing": 1722
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0008_sanitized_v1_stage3_zh_v1",
+  "shard_number": 8,
+  "archive_name": "Edu_0008_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0008.tar",
+  "parent_official_archive_bytes": 8555407360,
+  "parent_official_archive_sha256": "804554f8e16c66d5125cd90c7f1546986b45454e9440a43374b86fb0ec4fe080",
+  "input_archive_bytes": 8553216000,
+  "input_archive_sha256": "75e8b7246b04a8bab795b3eecc2b9ebb13a0721eb64aa8b4be93340f20e9c5b1",
+  "sanitization_profile": "exclude-source-frozen-benchmark-near-duplicate-quarantine-v1",
+  "excluded_source_ids": [
+    "Edu--004835"
+  ],
+  "exclusion_reason": "The unchanged frozen benchmark leakage gate v2.2 produced one near-duplicate hit between channel 1 and candor_turn_taking/62/input.wav (similarity=0.724911971830986, aligned_frames=71, LSH votes=26). Read-only diagnostics strongly support a low-information Chromaprint collision but do not override the gate; exactly the complete source conversation is conservatively excluded without changing any threshold or scorer rule.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--004313",
+    "last_source_id": "Edu--004926",
+    "source_ids_sha256": "b6f88561ae96dd8a6e901760129fcd39440c6cfbd18436487aadff92b23cf88a",
+    "source_ntrack": {
+      "2": 494,
+      "3": 5
+    },
+    "target_view_count": 1003,
+    "target_view_hours": 24.74591623842592,
+    "event_count": 9639,
+    "state_distribution": {
+      "complete": 4963,
+      "incomplete": 1815,
+      "backchannel": 952,
+      "wait": 22,
+      "missing": 1887
+    }
+  }
+}

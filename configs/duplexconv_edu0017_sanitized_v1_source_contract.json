@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-edu-shard-source-contract-v1",
+  "dataset_version": "duplexconv_edu0017_sanitized_v1_stage3_zh_v1",
+  "shard_number": 17,
+  "archive_name": "Edu_0017_sanitized_499sources_v1.tar",
+  "parent_official_archive": "Edu_0017.tar",
+  "parent_official_archive_bytes": 8201093120,
+  "parent_official_archive_sha256": "34996ddfd98a53c9e4c22bffbc8fd13d340503111f4fa277fa0f7ba5cdf3c8d2",
+  "input_archive_bytes": 8196945920,
+  "input_archive_sha256": "a1be1cab6ac36e0a02140bb3ddd178e4e966e6cc8f141fb64ec6af88e6f2f926",
+  "sanitization_profile": "exclude-source-frozen-benchmark-leakage-v1",
+  "excluded_source_ids": [
+    "Edu--009870"
+  ],
+  "exclusion_reason": "The unchanged frozen v2.2 gate produced one near-fingerprint hit against candor_turn_taking/62, while exact, normalized, active-content and content-window matches were zero. Independent every-lag waveform comparison did not confirm literal reuse and the same benchmark record has recurrently collided with 11 distinct source conversations. The owner approved conservative exclusion of only the complete Edu--009870 conversation while preserving the authoritative original gate failure.",
+  "supported_track_counts": [
+    2,
+    3,
+    4
+  ],
+  "expected": {
+    "source_count": 499,
+    "first_source_id": "Edu--009843",
+    "last_source_id": "Edu--010455",
+    "source_ids_sha256": "10ba02e1f560abd474025c489c48d8a2bbe662ba52eaf9d2f99c8904a0b03c03",
+    "source_ntrack": {
+      "2": 497,
+      "3": 2
+    },
+    "target_view_count": 1000,
+    "target_view_hours": 23.715030729166625,
+    "event_count": 9336,
+    "state_distribution": {
+      "complete": 4833,
+      "incomplete": 1656,
+      "backchannel": 949,
+      "wait": 17,
+      "missing": 1881
+    }
+  }
+}

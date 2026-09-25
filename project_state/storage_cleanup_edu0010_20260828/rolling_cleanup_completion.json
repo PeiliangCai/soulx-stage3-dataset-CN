@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "profile": "duplexconv-rebuildable-work-tar-rolling-cleanup-completion-v1",
+  "completed_at_utc": "2026-08-28T11:34:03Z",
+  "status": "complete",
+  "predelete_audit": "/root/SoulX-stage3-dataset/project_state/storage_cleanup_edu0010_20260828/rolling_cleanup_predelete.json",
+  "predelete_audit_sha256": "828eda316afc7f86f05f1ed487b234595f993385f2f31f2bc05b3c6b38a19678",
+  "deleted_target_count": 2,
+  "deleted_target_apparent_bytes": 9867079680,
+  "free_bytes_before": 43183869952,
+  "free_bytes_after": 53050957824,
+  "free_bytes_increase": 9867087872,
+  "free_space_note": "The filesystem-reported increase differs from the sum of apparent tar sizes by 8192 bytes because filesystem metadata and allocated blocks are reported independently; both exact target paths are absent after deletion.",
+  "deleted_paths": [
+    "/root/autodl-tmp/dataset/duplexconv/work/gate_d_edu0010_sanitized_v1/candidate_model_ready_views.tar",
+    "/root/autodl-tmp/dataset/duplexconv/work/structural_sanitize_edu0010_v1/Edu_0010_sanitized_499sources_v1.tar"
+  ],
+  "preserved": {
+    "official_raw_archive": true,
+    "model_ready_parquet": true,
+    "target_audio": true,
+    "openrouter_state_label_cache_file_count": 432,
+    "paraformer_cache_file_count": 1001,
+    "glm_audio_token_cache_file_count": 1001,
+    "state_request_and_result_file_count": 16,
+    "source_scan_file_count": 7,
+    "model_ready_file_count": 7,
+    "requests_results_and_api_manifests": true,
+    "gate_selections_manifests_checksums_and_reports": true,
+    "training_and_evaluation_outputs": true
+  },
+  "postdelete_validation_note": "The initial preservation stat command referenced a nonexistent generic target-audio filename manifest.jsonl after both exact deletions had already succeeded. A second read-only check used the actual file audio_manifest.jsonl and confirmed 1006 target-audio directory files, 2473144931 bytes, and all listed preserved artifacts.",
+  "recoverability": "Deleted files cannot be restored in place, but are deterministically rebuildable from preserved inputs and the exact identities recorded in the predelete audit."
+}
