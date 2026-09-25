@@ -8,7 +8,7 @@
 
 ### 数据集
 
-最终冻结版本为 `duplexconv_edu0001_0045_stage3_zh_v2`：
+最终冻结版本为 `duplexconv_edu0001_0045_stage3_zh`：
 
 | 项目 | 数量 |
 |---|---:|
@@ -48,7 +48,7 @@ Table 2 Full-Duplex-Bench **没有执行**。A 的结果在提出 B/C/D 假设�
 | `runtimes/`、`third_party/`、`.conda-envs/` | 派生运行时、官方仓库副本与 Conda 环境 | 否 |
 | `.env` | OpenRouter API key | 否 |
 
-百度网盘发布已经独立验收通过：242 条逻辑记录，其中 221 个直接远端文件、21 个零字节兼容表示，直接远端文件合计 346,099,226,326 bytes，覆盖和删除均为 0。详见 [v2 发布说明](release/duplexconv_edu0001_0045_stage3_zh_v2/README.md) 与 [远端验收回执](release/duplexconv_edu0001_0045_stage3_zh_v2/remote_verification.json)。
+百度网盘发布已经独立验收通过：242 条逻辑记录，其中 221 个直接远端文件、21 个零字节兼容表示，直接远端文件合计 346,099,226,326 bytes，覆盖和删除均为 0。详见 [v2 发布说明](release/duplexconv_edu0001_0045_stage3_zh/README.md) 与 [远端验收回执](release/duplexconv_edu0001_0045_stage3_zh/remote_verification.json)。
 
 发布包不保存可重建的 `processed/` 中间层、cache、work、失败重试目录或运行环境；它保存原始数据和可直接供官方 loader 使用的最终 `model_ready` 数据。旧 v1 已退役，恢复时以 v2 为准。
 
@@ -58,7 +58,7 @@ Table 2 Full-Duplex-Bench **没有执行**。A 的结果在提出 B/C/D 假设�
 2. [当前任务注册表](project_state/ACTIVE_TASKS.md)——所有任务均已结束，用于理解产物之间的依赖；
 3. [完整项目计划](project_plan/duplexconv_edu0018_stage3_plan.md)——虽以 Edu_0018 命名，但记录了 Edu_0001–Edu_0045 的完整演进；
 4. [A/B/C/D 最终实验报告](evaluation_reports/duplexconv_edu0001_0045_abcd_experiment_summary.md)；
-5. [v2 数据发布说明](release/duplexconv_edu0001_0045_stage3_zh_v2/README.md)；
+5. [v2 数据发布说明](release/duplexconv_edu0001_0045_stage3_zh/README.md)；
 6. [执行审批规范](agent_governance/EXECUTION_APPROVAL_PROTOCOL.md)。
 
 `new_autodl_paraformer_stage3_handoff.md` 是 2026-08-20 的历史迁移快照，不能覆盖上述最终状态。
